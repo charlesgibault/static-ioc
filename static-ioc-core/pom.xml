@@ -5,7 +5,43 @@
 	<packaging>jar</packaging>
 	<version>0.1-SNAPSHOT</version>
 	<name>staticioc</name>
-	<url>http://maven.apache.org</url>
+	 <description>The goal of this project is to allow the use of the Inversion of Control pattern at compile time so it can be applied in any context, and for virtually any langage: IoC configuration files are resolved at compile time and converted into the appropriate piece of code.
+	 
+	 IoC configuration file uses the very-wide spread Spring framework XML format. Generated code won't depend on any framework, making it easy to integrate it into any kind of application.</description>
+	<inceptionYear>2012</inceptionYear>
+	<url>https://code.google.com/p/static-ioc/</url>
+	
+	<developers>
+    <developer>
+      <id>charles.gibault</id>
+      <name>Charles</name>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+	
+	<licenses>
+		<license>
+		<name>The Apache Software License, Version 2.0</name>
+		<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		<distribution>repo</distribution>
+		<comments>A business-friendly OSS license</comments>
+		</license>
+   </licenses>
+	
+	<issueManagement>
+		<system>Google Code</system>
+		<url>https://code.google.com/p/static-ioc/issues/list</url>
+	</issueManagement>
+	
+	 <scm>
+		<developerConnection>scm:git: https://code.google.com/p/static-ioc/</developerConnection>
+		<url>https://code.google.com/p/static-ioc/source/browse/</url>
+	</scm>
+	
 	<dependencies>
 
 		<dependency>
