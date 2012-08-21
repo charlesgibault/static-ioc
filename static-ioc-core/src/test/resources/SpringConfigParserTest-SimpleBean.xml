@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans 	xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:p="http://www.springframework.org/schema/p"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+	
+	<bean id="personBean" class="test.Person">
+		<property name="name" value="personName" />
+		<property name="username">
+    		<value>root</value>
+  		</property>
+		<property name="address" value="address 1" />
+		<property name="country">
+			<ref>country</ref>
+  		</property>
+  		<property name="birthCountry">
+			<idref bean="country"/>
+  		</property>
+		<property name="age" value="28"/>
+		<property name="reference" ref="number10House" />
+	</bean>
+
+	 <!-- class without id  -->
+	<bean class="test.AnonymousPerson" p:name="Tony" p:age="53" p:house-ref="number10House" />
+
+	<!-- class with id and p notation " -->
+	<bean class="test.House" name="number10House" p:name="10 Downing Street" p:p-ref="personBean" p:person-ref="personBean"/>
+		
+	<!-- class with constructor args -->
+	<bean id="country" class="test.Country">
+  		<constructor-arg index="1"><value type="java.util.Integer">7500000</value></constructor-arg>
+  		<constructor-arg index="0"><value>42</value></constructor-arg>
+	</bean>
+</beans>

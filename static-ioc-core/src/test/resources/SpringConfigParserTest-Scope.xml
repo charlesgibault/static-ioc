@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans 	xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:p="http://www.springframework.org/schema/p"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+	
+	<!-- singleton bean (default mode) but with declared scope -->
+	<bean id="singleton" class="test.Singleton" scope="singleton"> 
+  		<property name="type" value="singleton bean - same instance for everyone" />
+	</bean>
+	
+	<bean id="oldSingleton" class="test.Singleton" singleton="true"> 
+  		<property name="type" value="singleton bean - same instance for everyone" />
+	</bean>
+	
+	<!-- Prototype bean -->
+	<bean id="prototype" class="test.Prototype"  scope="prototype" >
+		<property name="type" value="prototype bean - everyone gets a different instance" />
+	</bean>
+	
+	<bean id="oldPrototype" class="test.Prototype" singleton="false"> 
+  		<property name="type" value="prototype bean - everyone gets a different instance" />
+	</bean>
+	
+	<bean id="prototypeChild" parent="prototype" />
+	
+	<!-- User beans -->
+	<bean id="userBean1" class="test.UserBean" >
+		<property name="singletonBean" ref="singleton" />
+		<property name="prototypeBean" ref="prototype" />
+	</bean>
+	
+	<bean id="userBean2" class="test.UserBean" >
+		<property name="singletonBean" ref="singleton" />
+		<property name="prototypeBean" ref="prototype" />
+	</bean>
+
+	<!-- Prototype with inheritance -->
+	<bean id="userBean3" parent="userBean1" />
+</beans>

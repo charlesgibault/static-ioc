@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans 	xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:p="http://www.springframework.org/schema/p"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+	
+	<bean id="personBean" class="test.Person">
+		<property name="name" value="personName" />
+	</bean>
+	
+	<!-- class with constructor args -->
+	<bean id="country" class="test.Country">
+  		<constructor-arg index="1"><value>7500000</value></constructor-arg>
+  		<constructor-arg index="0"><value>42</value></constructor-arg>
+	</bean>
+	
+	<!-- class with param collection id -->
+	<bean id="collectBean" class="test.Collection">
+
+		<!-- java.util.List -->
+		<property name="lists">
+			<list>
+				<value type="java.lang.String">1</value>
+				<value type="java.lang.Integer">2</value>
+				<ref bean="personBean" />
+				<idref bean="country"/>
+				<bean class="test.Person">
+					<property name="name" value="myself" />
+					<property name="address" value="address" />
+					<property name="age" value="28" />
+				</bean>
+			</list>
+		</property>
+
+		<!-- java.util.Set -->
+		<property name="sets">
+			<set>
+				<value>1</value>
+				<ref bean="personBean" />
+				<bean class="test.Person">
+					<property name="name" value="yourOldSelf" />
+					<property name="address" value="address" />
+					<property name="age" value="29" />
+				</bean>
+			</set>
+		</property>
+			
+
+		<!-- java.util.Map  -->
+		<property name="maps">
+			<map>
+				<entry key="Key 1" value="1" />
+				<entry key-ref="Key 2" value="42" />
+				<entry key="Key 3" value-ref="personBean" />
+				<entry key="Key 4"><value>test</value></entry>
+				<entry key="Key 5">
+					<bean class="test.Person">
+						<property name="name" value="nobody" />
+						<property name="address" value="address" />
+						<property name="age" value="28" />
+					</bean>
+				</entry>
+				
+				<entry>
+					<key>
+						<value>Key 6</value>
+					</key>
+					<bean class="test.Person">
+						<property name="name" value="yourself" />
+						<property name="address" value="address" />
+						<property name="age" value="28" />
+					</bean>
+				</entry>
+				<entry key="Key 7"><value>2</value></entry>
+				<entry>
+					<key>
+						<bean class="test.Person">
+							<property name="name" value="myself" />
+							<property name="address" value="address2" />
+							<property name="age" value="32" />
+						</bean>
+					</key>
+					<value>woah</value>
+				</entry>
+				<entry key="Key 9"><null/></entry>
+			</map>
+		</property>
+	
+		<!-- java.util.Properties -->
+		<property name="props">
+			<props>
+				<prop key="admin">admin@nospam.com</prop>
+				<prop key="support">support@nospam.com</prop>
+				<prop key="test">test@nospam.com</prop>
+			</props>
+		</property>
+	</bean>
+</beans>

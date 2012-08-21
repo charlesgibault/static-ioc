@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans 	xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:p="http://www.springframework.org/schema/p"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<bean id="children" parent="parent" class="children.Bean">
+		<property name="name" value="cycleChildren" />
+	</bean>
+	
+	<!-- Imported parent -->
+	<bean id="grandParent" parent="realBean">
+		<property name="name" value="cycleGrandParent" />
+		<property name="age" value="old" />	
+	</bean>
+	
+	<bean id="parent" parent="grandParent" class="parent.Bean">
+		<property name="age" value="40" />	
+	</bean>
+	
+	<!-- Cycle -->
+	<bean id="cycleChildren" parent="cycleParent" class="children.Bean"/>
+	<bean id="cycleGrandParent" parent="cycleChildren" class="grandParent.Bean"/>
+	<bean id="cycleParent" parent="cycleGrandParent" class="parent.Bean"/>
+	 
+	<!-- Cyclic import that should be resolved -->
+	<import resource="SpringConfigParserTest-Parent.xml"/>
+</beans>
