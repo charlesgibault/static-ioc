@@ -22,7 +22,7 @@
   		<property name="type" value="prototype bean - everyone gets a different instance" />
 	</bean>
 	
-	<bean id="prototypeChild" parent="prototype" />
+	<bean id="prototypeChild" parent="prototype" /> <!-- scope is inherited so this is a singleton -->
 	
 	<!-- User beans -->
 	<bean id="userBean1" class="test.UserBean" >

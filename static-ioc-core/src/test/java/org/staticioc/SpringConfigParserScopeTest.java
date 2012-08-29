@@ -122,11 +122,11 @@ public class SpringConfigParserScopeTest extends AbstractSpringParserTest {
 	 * Simple prototype inheritance test
 	 */
 	@Test
-	public void testPrototypeInheritance()
+	public void testNonScopeInheritance()
 	{
 		final Bean prototypeChild = loadedBeans.get("prototypeChild");
 		Assert.assertNotNull( prototypeChild );
-		assertEquals("Bean is not a prototype" , Bean.Scope.PROTOTYPE, prototypeChild.getScope() );
+		assertEquals("Bean is a prototype" , Bean.Scope.SINGLETON, prototypeChild.getScope() );
 	}
 	
 	/**

@@ -2,6 +2,7 @@ package org.staticioc;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.staticioc.model.Bean;
 import org.staticioc.model.ParentDependency;
 import org.staticioc.model.Property;
+import org.staticioc.model.Bean.Scope;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -37,6 +39,8 @@ public abstract class AbstractSpringConfigParser {
 	protected static final String ABSTRACT = "abstract";
 	protected static final String PARENT = "parent";
 	protected static final String SCOPE = "scope";
+	protected static final String PROTOTYPE = "prototype";
+	protected static final String SINGLETON = "singleton";
 	protected static final String MAP = "map";
 	protected static final String LIST = "list";
 	protected static final String SET = "set";
@@ -52,11 +56,21 @@ public abstract class AbstractSpringConfigParser {
 	protected static final String RESOURCE = "resource";
 	
 	public static final String ANONYMOUS_BEAN_PREFIX = "bean_";
+	public static final String PROTOTYPE_BEAN_PREFIX = "prototyped_";
 	private static int anonymousBeanIdentifier = 0;
 
+	// Map a bean's name to the actual Bean instance
 	private final Map<String,Bean> beanClassMap = new ConcurrentHashMap<String,Bean>();
+	
+	// Map a bean
 	private final Map<String, ParentDependency > parentDependencyMap = new ConcurrentHashMap<String, ParentDependency>();
-
+	
+	// Track prototypes Beans separately 
+	private final Set<String> prototypeBeans = new LinkedHashSet<String>();
+	
+	// Map a bean name with a Collection of Properties referencing that Bean
+	private final Map<String,Collection<Property>> propertyReferencesMap = new ConcurrentHashMap<String,Collection<Property>>();
+	
 	/**
 	 * 
 	 * @return
@@ -64,12 +78,42 @@ public abstract class AbstractSpringConfigParser {
 	protected String generateAnonymousBeanId() {
 		return ANONYMOUS_BEAN_PREFIX + (++anonymousBeanIdentifier);
 	}
-
+	
+	protected String generatePrototypeBeanId( String beanName) {
+		return ANONYMOUS_BEAN_PREFIX + beanName + (++anonymousBeanIdentifier);
+	}
+	
+	/**
+	 * Add or replace a Property in a bean's property set
+	 * Also updates a the Map of Property with a bean ref.
+	 * 
+	 * @param prop
+	 * @param set
+	 */
 	protected void addOrReplaceProperty(final Property prop, final Collection<Property> set) {
 		if( ! set.add( prop ) )
 		{
 			set.remove(prop);
 			set.add(prop);
+		}
+		
+		// Build a Map< Bean ref name -> Property> (used for Prototype resolution)
+		registerPropertyReference( prop);
+	}
+	
+	private void registerPropertyReference( final Property prop )
+	{
+		if( prop.getRef() != null )
+		{
+			Collection<Property> props = propertyReferencesMap.get( prop.getRef() );
+			
+			if (props == null )
+			{
+				props = new LinkedList<Property>();
+				propertyReferencesMap.put( prop.getRef(), props );
+			}
+			
+			props.add( prop );
 		}
 	}
 
@@ -83,7 +127,13 @@ public abstract class AbstractSpringConfigParser {
 			logger.debug( "Adding {}", bean );
 		}
 		
-		beanClassMap.put( bean.getName(), bean);
+		beanClassMap.put( bean.getName(), bean );
+		
+		if( bean.getScope().equals( Scope.PROTOTYPE ) )
+		{
+			logger.debug( "Referencing bean {} as prototype", bean );
+			prototypeBeans.add( bean.getName() );
+		}
 	}
 
 	/**
@@ -91,12 +141,10 @@ public abstract class AbstractSpringConfigParser {
 	 * @param beans
 	 */
 	protected void register(final Map<String, Bean> beans) {	
-		if( logger.isDebugEnabled())
+		for( final Bean bean : beans.values() )
 		{
-			logger.debug( "Adding {}", beans );
+			register(bean);
 		}
-		
-		beanClassMap.putAll(beans);
 	}
 	
 	/**
@@ -113,17 +161,22 @@ public abstract class AbstractSpringConfigParser {
 	}
 	
 	/**
-	 * Register a bean in the bean map
+	 * Register a parser's into this parser
+	 * Merge parent dependencies, prototypeBeans and propertyReferencesMap
 	 * @param bean to be registered
 	 */
-	protected void registerParents( final AbstractSpringConfigParser parser) {	
+	protected void register( final AbstractSpringConfigParser parser) {	
 		if( logger.isDebugEnabled())
 		{
-			logger.debug( "Adding {}", parser.parentDependencyMap );
+			logger.debug( "Adding {} parent dependencies", parser.parentDependencyMap );
+			logger.debug( "Adding {} prototypes definitions", parser.prototypeBeans );
+			logger.debug( "Adding {} Bean reference tracking", parser.propertyReferencesMap );
 		}
 		
 		parentDependencyMap.putAll( parser.parentDependencyMap );
-	}
+		prototypeBeans.addAll( parser.prototypeBeans );
+		propertyReferencesMap.putAll( parser.propertyReferencesMap );
+	}	
 	
 	/**
 	 * Resolve a bean by Name
@@ -258,8 +311,7 @@ public abstract class AbstractSpringConfigParser {
 				}
 			}
 			else
-			{
-			
+			{			
 				logger.warn( "Cycle detected with bean {}", name );
 				return;
 			}
@@ -269,9 +321,54 @@ public abstract class AbstractSpringConfigParser {
 		final Bean bean = new Bean( dependency.getName(), parentBean, dependency.isAnonymous() );
 		final Node beanNode = dependency.getNode();
 		final NamedNodeMap beanAttributes = beanNode.getAttributes();
+		//TODO remove from parentDependencyMap ?
 		
 		processBeanNode(beanNode, beanAttributes, bean.getName(), dependency.isAnonymous(), bean);			
 	}
 	
+	protected void resolvePrototypeBeans()
+	{
+		for( String bean : propertyReferencesMap.keySet() )
+		{
+			if( prototypeBeans.contains(bean) )
+			{
+				logger.debug( "Resolving prototype bean {}", bean );	
+				Collection<Property> props = propertyReferencesMap.get(  bean );
+				
+				for( Property prop : props )
+				{
+					injectPrototype( prop );
+				}
+				
+				//clear prop mapping once for all
+				props.clear();
+			}
+		}
+	}
+
+	private void injectPrototype( Property prop )
+	{
+		if ( prop.getRef() != null && prototypeBeans.contains( prop.getRef() ) )
+		{
+			Bean prototype = beanClassMap.get( prop.getRef() );
+			
+			if( prototype != null)
+			{
+				//duplicate bean with a new identifier and scope it as a singleton
+				Bean prototypedInstance = new Bean( generatePrototypeBeanId( prototype.getName() ), prototype, true );
+				prototypedInstance.setScope( Scope.SINGLETON );
+
+				// change reference name 
+				prop.setRef( prototypedInstance.getName() );
+				
+				// register it
+				register( prototypedInstance );
+				
+				// Update prop mapping 
+				registerPropertyReference( prop );
+			}
+		}
+	}
+
 	abstract protected String processBeanNode(final Node beanNode, final NamedNodeMap beanAttributes, final String id, boolean isAnonymous, Bean bean) throws XPathExpressionException;
 }

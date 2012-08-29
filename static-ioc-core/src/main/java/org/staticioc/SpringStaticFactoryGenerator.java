@@ -13,6 +13,7 @@ import org.xml.sax.SAXException;
 import org.staticioc.generator.CodeGenerator;
 import org.staticioc.generator.JavaCodeGenerator;
 import org.staticioc.model.*;
+import org.staticioc.model.Bean.Scope;
 
 public class SpringStaticFactoryGenerator
 {
@@ -65,6 +66,16 @@ public class SpringStaticFactoryGenerator
 	}	
 	
 	/**
+	 * Ignore abstract beans and prototypes
+	 * @param bean
+	 * @return
+	 */
+	protected boolean isHidden( final Bean bean )
+	{
+		return bean.isAbstract() || bean.getScope().equals( Scope.PROTOTYPE );
+	}
+	
+	/**
 	 * Entry point for the service : generate code matching setup configuration file.
 	 * @return
 	 * @throws XPathExpressionException
@@ -87,8 +98,8 @@ public class SpringStaticFactoryGenerator
 		{
 			final Bean bean = beanClassMap.get(beanName);
 			
-			// Ignore abstract beans
-			if ( bean.isAbstract() ){ continue; }
+			// Ignore abstract beans and prototypes
+			if ( isHidden(bean) ){ continue; }
 						
 			codeGenerator.declareBean( bean );
 		}
@@ -101,8 +112,8 @@ public class SpringStaticFactoryGenerator
 		{
 			final Bean bean = beanClassMap.get(beanName);
 			
-			// Ignore abstract beans
-			if ( bean.isAbstract() ){ continue; }
+			// Ignore abstract beans and prototypes
+			if ( isHidden(bean) ){ continue; }
 						
 			codeGenerator.instantiateBean( bean );
 		}
@@ -115,7 +126,7 @@ public class SpringStaticFactoryGenerator
 			final Bean bean = beanClassMap.get(beanName);
 			
 			// Ignore abstract beans and beans with no properties
-			if ( bean.isAbstract() || bean.getProperties().isEmpty() ){ continue; }
+			if ( isHidden(bean) || bean.getProperties().isEmpty() ){ continue; }
 			
 			codeGenerator.comment("Setting up bean " + beanName );			
 			for( Property prop : bean.getProperties() )
