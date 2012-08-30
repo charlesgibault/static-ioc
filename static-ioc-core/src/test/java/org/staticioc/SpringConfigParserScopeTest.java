@@ -137,25 +137,42 @@ public class SpringConfigParserScopeTest extends AbstractSpringParserTest {
 	{
 		// Retrieve personBean and test properties
 		final Bean userBean3 = loadedBeans.get("userBean3");
+		final Bean userBean4 = loadedBeans.get("userBean4");
 		Assert.assertNotNull( userBean3 );
+		Assert.assertNotNull( userBean4 );
 		
 		// Property checks
 		final Map<String, Property> userBean3Properties = mapProperties( userBean3.getProperties() );
 		final Property protoRef3 = userBean3Properties.get("prototypeBean");
+
+		final Map<String, Property> userBean4Properties = mapProperties( userBean4.getProperties() );
+		final Property protoRef4 = userBean4Properties.get("prototypeBean");
 		
 		Assert.assertNotNull( protoRef3.getRef() );
+		Assert.assertNotNull( protoRef4.getRef() );
 		Assert.assertFalse( "Different reference to prototype bean expected", "prototype".equals( protoRef3.getRef() ) );
+		Assert.assertFalse( "Different reference to prototype bean expected", "prototype".equals( protoRef4.getRef() ) );
 
 		final Bean injectedPrototypeBean3 = loadedBeans.get( protoRef3.getRef() );
+		final Bean injectedPrototypeBean4 = loadedBeans.get( protoRef4.getRef() );
 		
 		Assert.assertNotNull( injectedPrototypeBean3 );
+		Assert.assertNotNull( injectedPrototypeBean4 );
+		
 		assertEquals("Bean class not properly set", "test.Prototype", injectedPrototypeBean3.getClassName() );
+		assertEquals("Bean class not properly set", "test.Prototype", injectedPrototypeBean4.getClassName() );
+		
 		assertFalse("Real bean wrongly considered as abstract" , injectedPrototypeBean3.isAbstract() );
+		assertFalse("Real bean wrongly considered as abstract" , injectedPrototypeBean4.isAbstract() );
+		
 		assertEquals("Injected bean shouldn't be a prototype anymore" , Bean.Scope.SINGLETON, injectedPrototypeBean3.getScope() );
+		assertEquals("Injected bean shouldn't be a prototype anymore" , Bean.Scope.SINGLETON, injectedPrototypeBean4.getScope() );
 		
 		// Property checks
 		final Map<String, Property> protoBean3Properties = mapProperties( injectedPrototypeBean3.getProperties() );
+		final Map<String, Property> protoBean4Properties = mapProperties( injectedPrototypeBean4.getProperties() );
 
 		checkProperty(protoBean3Properties, "type", "prototype bean - everyone gets a different instance", null, null );
+		checkProperty(protoBean4Properties, "type", "prototype bean - everyone gets a different instance", null, null );
 	}
 }

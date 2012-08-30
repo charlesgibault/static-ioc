@@ -35,6 +35,7 @@
 		<property name="prototypeBean" ref="prototype" />
 	</bean>
 
-	<!-- Prototype with inheritance -->
+	<!-- Prototype with inheritance, with direct (userBean3) and indirect (userBean4) dependency resolution -->
+	<bean id="userBean4" parent="userBean3" />
 	<bean id="userBean3" parent="userBean1" />
 </beans>
