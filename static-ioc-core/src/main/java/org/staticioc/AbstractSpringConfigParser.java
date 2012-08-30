@@ -101,6 +101,15 @@ public abstract class AbstractSpringConfigParser {
 		registerPropertyReference( prop);
 	}
 	
+	protected Bean duplicateBean( final String id, final Bean parent, final boolean isAnonymous)
+	{
+		final Bean duplicatedBean = new Bean( id, parent, isAnonymous );
+		
+		 //Make sure inherited properties are tracked
+		registerPropertiesReference( duplicatedBean );
+		return duplicatedBean;
+	}
+	
 	private void registerPropertyReference( final Property prop )
 	{
 		if( prop.getRef() != null )
@@ -114,6 +123,19 @@ public abstract class AbstractSpringConfigParser {
 			}
 			
 			props.add( prop );
+		}
+	}
+	
+	private void registerPropertiesReference( final Bean bean)
+	{
+		for( Property prop : bean.getProperties() )
+		{
+			registerPropertyReference( prop );
+		}
+		
+		for( Property prop : bean.getConstructorArgs() )
+		{
+			registerPropertyReference( prop );
 		}
 	}
 
@@ -318,7 +340,7 @@ public abstract class AbstractSpringConfigParser {
 		}
 		
 		// Perform bean copy and continue
-		final Bean bean = new Bean( dependency.getName(), parentBean, dependency.isAnonymous() );
+		final Bean bean = duplicateBean( dependency.getName(), parentBean, dependency.isAnonymous() );
 		final Node beanNode = dependency.getNode();
 		final NamedNodeMap beanAttributes = beanNode.getAttributes();
 		//TODO remove from parentDependencyMap ?

@@ -145,8 +145,8 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 			}
 			else
 			{
-				// Perform bean copy and continue
-				bean = new Bean( id, parentBean, isAnonymous );
+				// Perform bean copy and continues
+				bean = duplicateBean( id, parentBean, isAnonymous );
 			}
 		}
 		
