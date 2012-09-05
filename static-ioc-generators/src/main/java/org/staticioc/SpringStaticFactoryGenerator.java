@@ -11,6 +11,7 @@ import javax.xml.xpath.XPathExpressionException;
 import org.xml.sax.SAXException;
 
 import org.staticioc.generator.CodeGenerator;
+import org.staticioc.generator.CodeGenerator.Level;
 import org.staticioc.generator.JavaCodeGenerator;
 import org.staticioc.model.*;
 import org.staticioc.model.Bean.Scope;
@@ -23,6 +24,8 @@ public class SpringStaticFactoryGenerator
 	
 	private final static int INIT_BUFFER_SIZE=4096;
 		
+	private String commentHeader = "This code has been generated using Static IoC framework (http://code.google.com/p/static-ioc/). DO NOT EDIT MANUALLY HAS CHANGES MAY BE OVERRIDEN";
+	private String generatedPackageName = "org.staticioc.factory";
 	private String generatedClassName = "GeneratedBeanContext";
 	private final String configurationFile;
 	
@@ -86,14 +89,18 @@ public class SpringStaticFactoryGenerator
 	public StringBuilder generate()  throws SAXException, IOException, ParserConfigurationException
 	{
 		final StringBuilder res = new StringBuilder( INIT_BUFFER_SIZE );
-		initCodeGenerator(res);
+		initCodeGenerator(res);//TODO take as parameter
 		
 		SpringConfigParser springConfigParser = new SpringConfigParser();
 		Map<String, Bean> beanClassMap = springConfigParser.load( configurationFile );
-		
+
+		codeGenerator.comment(Level.HEADER, commentHeader );
+
+		codeGenerator.initPackage( generatedPackageName );		
 		codeGenerator.initClass( generatedClassName );
 		
 		// declare beans
+		codeGenerator.comment(Level.CLASS, "Bean definition" );
 		for ( String beanName: beanClassMap.keySet() )
 		{
 			final Bean bean = beanClassMap.get(beanName);
@@ -105,9 +112,12 @@ public class SpringStaticFactoryGenerator
 		}
 
 		res.append("\n");
+		codeGenerator.comment(Level.CLASS, "Constructor of the Factory" );
 		codeGenerator.initConstructor( generatedClassName );
 		
 		// Instantiate beans
+		codeGenerator.comment(Level.METHOD, "Instanciating beans" );			
+		
 		for ( String beanName: beanClassMap.keySet() )
 		{
 			final Bean bean = beanClassMap.get(beanName);
@@ -128,7 +138,7 @@ public class SpringStaticFactoryGenerator
 			// Ignore abstract beans and beans with no properties
 			if ( isHidden(bean) || bean.getProperties().isEmpty() ){ continue; }
 			
-			codeGenerator.comment("Setting up bean " + beanName );			
+			codeGenerator.comment(Level.METHOD, "Setting up bean " + beanName );			
 			for( Property prop : bean.getProperties() )
 			{
 				// Check that the reference exists and is not abstract
@@ -159,7 +169,12 @@ public class SpringStaticFactoryGenerator
 		}
 		
 		codeGenerator.closeConstructor( generatedClassName );
+		
+		//TODO build destructor : free beans in their reverse order of creation
+		
 		codeGenerator.closeClass( generatedClassName );
+		codeGenerator.closePackage( generatedPackageName );
+
 		return res;
 	}
 

@@ -43,17 +43,25 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 	}
 	
 	@Override
-	public void comment( String comment )
+	public void comment( Level level, String comment )
 	{
-		getBuilder().append( "// ").append(comment).append("\n");
+		switch ( level )
+		{
+		case HEADER:
+			getBuilder().append( "/** ").append(comment).append(" */\n");
+			break;
+			
+		case CLASS:
+			getBuilder().append( "\t/**\n\t * ").append(comment).append("\n*/\t\n");
+			break;
+			
+		case METHOD:
+			getBuilder().append( "\t\t// ").append(comment).append("\n");
+			break;
+		}
+		
 	}
-	
-	@Override
-	public void headerComment( String comment )
-	{
-		getBuilder().append( "/** ").append(comment).append(" */\n");
-	}
-	
+		
 	@Override
 	public void initClass( String className )
 	{
@@ -62,7 +70,7 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 	
 
 	@Override
-	public void closeClass( String className )
+	public void closeClass(String className)
 	{		
 		getBuilder().append("\n}");
 	}
@@ -74,7 +82,7 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 	}
 	
 	@Override
-	public void closeConstructor( String className )
+	public void closeConstructor(String className)
 	{		
 		getBuilder().append( "\n\t}" );
 	}
@@ -172,6 +180,48 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 		getBuilder().append( "\t\t").append( bean.getName() ).append("." ).append( getAssignMethod( bean, property ) );
 		appendPropertyValue( property );
 		getBuilder().append( " );\n" );	
+	}
+	
+	
+	
+	/* (non-Javadoc)
+	 * @see org.staticioc.generator.CodeGenerator#getFilePath(java.lang.String)
+	 */
+	@Override
+	public String getFilePath( String fullClassName )
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void initPackage( String packageDef )
+	{
+		getBuilder().append("package ").append( packageDef ).append( "\n");
+	}
+
+	@Override
+	public void closePackage( String packageDef )
+	{
+		//Nothing to do in Java
+	}
+
+	@Override
+	public void initDestructor( String className )
+	{
+		getBuilder().append("\tpublic void destroyContext()\n\t{\n" );
+	}
+	
+	@Override
+	public void closeDestructor( String className )
+	{
+		getBuilder().append( "\n\t}" );	
+	}
+
+	@Override
+	public void deleteBean( Bean bean )
+	{
+		getBuilder().append( "\t" ).append( bean.getName() ).append(" = null;");
 	}
 
 	protected String getListClass() {
