@@ -44,10 +44,10 @@
 
 	<modules>
         	<module>static-ioc-core</module>
-      <!--  	<module>static-ioc-generators</module>
+        	<module>static-ioc-generators</module>
 		<module>static-ioc-commandline</module>
-		<module>static-ioc-mavenplugin</module>
-   --> 	</modules>
+		<module>static-ioc-maven-plugin</module>
+    	</modules>
 
 	<properties>
 		<slf4j-version>1.6.6</slf4j-version>
@@ -55,6 +55,9 @@
 		<commons-lang-version>2.6</commons-lang-version>
 		<commons-io-version>2.2</commons-io-version>
 		<junit-version>4.10</junit-version>	
+
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 
 	<build>
@@ -64,8 +67,8 @@
                     			<groupId>org.apache.maven.plugins</groupId>
                     			<artifactId>maven-compiler-plugin</artifactId>
                     			<configuration>
-                        			<source>1.5</source>
-                        			<target>1.5</target>
+                        			<source>1.6</source>
+                        			<target>1.6</target>
                     			</configuration>
                			</plugin>
             		</plugins>
