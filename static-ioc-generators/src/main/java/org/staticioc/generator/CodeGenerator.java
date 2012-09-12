@@ -12,12 +12,39 @@ public interface CodeGenerator
 	enum Level {HEADER, CLASS, METHOD };
 	
 	/**
-	 * Compute the path were a class's source code is expected (relative to source directory)
+	 * Change the target StringBuilder to which actual generated code is appended 
+	 * @param output
+	 */
+	void setOutput( StringBuilder output );
+	
+	/**
+	 * Compute the path were a class's source code is expected (relative to the root of source directory)
 	 *  
 	 * @param fullClassName 
 	 * @return the path to that file
 	 */
 	String getFilePath( String fullClassName );
+	
+	/**
+	 * Extract the class name from a fully qualified (package.classname) class name
+	 *  
+	 * @param fullClassName  fully qualified class name
+	 * @return class name
+	 */
+	String getClassName( String fullClassName );
+	
+	/**
+	 * Extract the package name from a fully qualified (package.classname) class name
+	 *  
+	 * @param fullClassName  fully qualified class name
+	 * @return package name
+	 */
+	String getPackageName( String fullClassName );
+	
+	/**
+	 * @return the default source file extension for the target language
+	 */
+	String getDefaultSourceFileExtension();
 	
 	/**
 	 * 

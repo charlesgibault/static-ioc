@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -627,6 +628,31 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		}
 	}
 
+	public Map<String, Bean> load( List<String> configurationFiles) throws SAXException, IOException
+	{
+		final Set<String> loadedContext = new HashSet<String>();
+
+		// Start by loading each configuration file without resolving beans
+		for( String config : configurationFiles )
+		{
+			load( config, loadedContext, false );
+		}
+
+		// Now resolve every beans
+		try
+		{
+			resolveParentDefinition();
+			resolvePrototypeBeans();
+		}
+		catch( XPathExpressionException e)
+		{
+			logger.error( "Error parsing files" + configurationFiles.toString(), e );
+		}
+
+		return getBeans();
+	}
+
+	
 	public Map<String, Bean> load( String configurationFile) throws SAXException, IOException
 	{
 		return load( configurationFile, new HashSet<String>(), true );

@@ -6,12 +6,7 @@ import org.staticioc.model.*;
 public class JavaCodeGenerator extends AbstractCodeGenerator
 {
 	private final static String SETTER_PREFIX="set";
-	
-	public JavaCodeGenerator( StringBuilder builder )
-	{
-		super(builder);
-	}
-	
+		
 	protected String getSetterName( final Property property )
 	{
 		return SETTER_PREFIX + WordUtils.capitalize( property.getName() );
@@ -182,16 +177,16 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 		getBuilder().append( " );\n" );	
 	}
 	
-	
-	
-	/* (non-Javadoc)
-	 * @see org.staticioc.generator.CodeGenerator#getFilePath(java.lang.String)
-	 */
 	@Override
-	public String getFilePath( String fullClassName )
+	protected String getPackageSeparator()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		return ".";
+	}
+
+	@Override
+	public String getDefaultSourceFileExtension()
+	{
+		return ".java";
 	}
 
 	@Override

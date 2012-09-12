@@ -1,8 +1,11 @@
 package org.staticioc;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,11 +15,10 @@ import org.xml.sax.SAXException;
 
 import org.staticioc.generator.CodeGenerator;
 import org.staticioc.generator.CodeGenerator.Level;
-import org.staticioc.generator.JavaCodeGenerator;
 import org.staticioc.model.*;
 import org.staticioc.model.Bean.Scope;
 
-public class SpringStaticFactoryGenerator
+public class SpringStaticFactoryGenerator implements IoCCompiler
 {
 	private static final Logger logger  = LoggerFactory.getLogger(SpringStaticFactoryGenerator.class);
 	
@@ -25,34 +27,16 @@ public class SpringStaticFactoryGenerator
 	private final static int INIT_BUFFER_SIZE=4096;
 		
 	private String commentHeader = "This code has been generated using Static IoC framework (http://code.google.com/p/static-ioc/). DO NOT EDIT MANUALLY HAS CHANGES MAY BE OVERRIDEN";
-	private String generatedPackageName = "org.staticioc.factory";
-	private String generatedClassName = "GeneratedBeanContext";
-	private final String configurationFile;
-	
-	private CodeGenerator codeGenerator;
-	private TargetCode targetCode = TargetCode.JAVA;
-	
+		
 	private boolean ignoreUnresolvedRefs = true;
-	
-	/**
-	 * Constructor : init XML parser properly
-	 * 
-	 * @param configFile
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
-	 * @throws IOException
-	 * @throws XPathExpressionException
-	 */
-	public SpringStaticFactoryGenerator( final String configFile )
-	{
-		configurationFile = configFile;
-	}
-	
+		
+	//	private TargetCode targetCode = TargetCode.JAVA;
+	//TODO move to helper ?
 	/**
 	 * Instantiate the proper code generator given target language. Bind StringBuilder that will hold generated result 
 	 * @param res
 	 * @return true if init was successful, false otherwise
-	 */
+	
 	protected boolean initCodeGenerator( StringBuilder res )
 	{
 		switch ( targetCode)
@@ -66,7 +50,7 @@ public class SpringStaticFactoryGenerator
 			return false;
 		}
 		return true;
-	}	
+	}*/	
 	
 	/**
 	 * Ignore abstract beans and prototypes
@@ -77,7 +61,39 @@ public class SpringStaticFactoryGenerator
 	{
 		return bean.isAbstract() || bean.getScope().equals( Scope.PROTOTYPE );
 	}
+
+	@Override
+	public void compile( CodeGenerator generator, String outputPath, Map< String, List< String >> inputOutputMapping ) throws SAXException,
+			IOException, ParserConfigurationException
+	{
+		compile( generator, outputPath, inputOutputMapping, generator.getDefaultSourceFileExtension() );
+	}
 	
+	@Override
+	public void compile( final CodeGenerator generator, final String outputPath, final Map< String, List< String >> inputOutputMapping, String fileExtensionOverride ) throws SAXException,
+	IOException, ParserConfigurationException
+	{
+		// Check if a valid extension override was provided
+		fileExtensionOverride = (fileExtensionOverride == null) ? generator.getDefaultSourceFileExtension() : fileExtensionOverride;
+		
+		//Build complete output file path:
+		for( final String targetClass : inputOutputMapping.keySet() )
+		{
+			String targetFile = outputPath + generator.getFilePath( targetClass ) + fileExtensionOverride;
+
+			//Load all configuration files for this target
+			logger.info( "Generating code for {}", targetClass );
+			
+			String generatedClassName = generator.getClassName( targetClass );
+			String generatedPackageName = generator.getPackageName( targetClass );
+			StringBuilder generatedCode = generate( generator, generatedPackageName, generatedClassName, inputOutputMapping.get(targetClass) );
+			
+			// Generate resulting file
+			logger.info( "Writing {} to {}", targetClass, targetFile );
+			FileUtils.writeStringToFile( new File(targetFile), generatedCode.toString() );
+		}
+	}
+
 	/**
 	 * Entry point for the service : generate code matching setup configuration file.
 	 * @return
@@ -86,13 +102,14 @@ public class SpringStaticFactoryGenerator
 	 * @throws SAXException 
 	 * @throws ParserConfigurationException 
 	 */
-	public StringBuilder generate()  throws SAXException, IOException, ParserConfigurationException
+	public StringBuilder generate(final CodeGenerator codeGenerator, final String generatedPackageName, final String generatedClassName, final List<String> configurationFiles )  throws SAXException, IOException, ParserConfigurationException
 	{
 		final StringBuilder res = new StringBuilder( INIT_BUFFER_SIZE );
-		initCodeGenerator(res);//TODO take as parameter
+	
+		codeGenerator.setOutput( res );
 		
 		SpringConfigParser springConfigParser = new SpringConfigParser();
-		Map<String, Bean> beanClassMap = springConfigParser.load( configurationFile );
+		Map<String, Bean> beanClassMap = springConfigParser.load( configurationFiles );
 
 		codeGenerator.comment(Level.HEADER, commentHeader );
 
@@ -178,10 +195,6 @@ public class SpringStaticFactoryGenerator
 		return res;
 	}
 
-	public void setGeneratedClassName(String generatedClassName) {
-		this.generatedClassName = generatedClassName;
-	}
-
 	public boolean isIgnoreUnresolvedRefs() {
 		return ignoreUnresolvedRefs;
 	}
@@ -189,14 +202,4 @@ public class SpringStaticFactoryGenerator
 	public void setIgnoreUnresolvedRefs(boolean ignoreUnresolvedRefs) {
 		this.ignoreUnresolvedRefs = ignoreUnresolvedRefs;
 	}
-
-	public String getGeneratedClassName() {
-		return generatedClassName;
-	}
-
-	public String getConfigurationFile() {
-		return configurationFile;
-	}
-	
-	// TODO clean up code generator interface / define abstract class ?
 }
