@@ -86,17 +86,6 @@ public class IoCCompilerHelper
 			for (String source : sources)
 			{
 				String trimmedSource = source.trim();
-				/*
-				File file = new File(trimmedSource);
-				
-				if( !file.exists()  )
-				{
-					throw new IllegalArgumentException("Source file " + trimmedSource + " does not exist");
-				}
-				else if (!file.canRead() )
-				{
-					throw new IllegalArgumentException("Source file " + trimmedSource + " is not readable");
-				}*/
 				
 				if( !trimmedSource.isEmpty() )
 				{

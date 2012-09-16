@@ -6,6 +6,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.staticioc.generator.CodeGenerator;
 import org.staticioc.generator.JavaCodeGenerator;
+import org.staticioc.model.Bean;
+import org.staticioc.model.Bean.Scope;
+import org.staticioc.model.Property;
 
 /**
  * Unit test for testing the Java Code Generator
@@ -13,6 +16,17 @@ import org.staticioc.generator.JavaCodeGenerator;
 public class JavaCodeGeneratorTest
 {
 	CodeGenerator generator = new JavaCodeGenerator();
+	StringBuilder result = new StringBuilder();
+	
+	public JavaCodeGeneratorTest()
+	{
+		generator.setOutput(result);
+	}
+	
+	private String normalizeCode( String code)
+	{
+		return code.replaceAll("\\s+", " ").trim();
+	}
 	
 	/**
 	 * Test that paths for generated code matches with code package
@@ -65,16 +79,62 @@ public class JavaCodeGeneratorTest
 	@Test
 	public void testSimpleClassDefinition()
 	{
-		Assert.fail();
+		final String packageName = "org.staticioc.test";
+		final String className = "TestClass";
+
+		Bean bean = new Bean("bean", "org.staticioc.model.Bean");
+		Property property = new Property( "name", "value", null);
+		bean.getProperties().add(property);
+		
+		generator.initPackage( packageName );
+		
+		generator.initClass(className);
+
+		generator.declareBean(bean);
+		
+		generator.initConstructor( className );	
+		
+		generator.instantiateBean(bean);
+		generator.declareProperty(bean, property);
+		
+		generator.closeConstructor( className );
+		
+		generator.initDestructor( className );
+		generator.closeDestructor( className );
+		
+		generator.closeClass(className);
+		
+		generator.closePackage(packageName);
+	
+		final String expectedResult = normalizeCode( "package " + packageName + ";\n" 
+					+ "public class " + className + " {\n"
+					+ "public final org.staticioc.model.Bean bean;\n"
+					+ "public " + className + "() {\n"
+					+ "bean = new org.staticioc.model.Bean();\n"
+					+ "bean.setName( \"value\" );\n"
+					+"}\n"
+					+ "public void destroyContext() { }\n"
+					+ "}" );
+		
+		Assert.assertEquals( "Incorrect class definition", expectedResult, normalizeCode( result.toString() ) );
 	}
 	
 	/**
-	 * Anonymous and prototype beans tests
+	 * Anonymous beans visibility tests
 	 */
 	@Test
 	public void testAnonymousBeansDeclaration()
 	{
-		Assert.fail();
+		Bean bean = new Bean("bean", "org.staticioc.model.Bean", false);		
+		generator.declareBean(bean);
+		
+		Bean anonymousBean = new Bean("anonymousBean", "org.staticioc.model.Bean", true);
+		generator.declareBean(anonymousBean);
+
+		Assert.assertEquals( "Incorrect bean definition", normalizeCode(
+					"public final org.staticioc.model.Bean bean;\n"
+				+  	"private final org.staticioc.model.Bean anonymousBean;\n"),
+				 	normalizeCode( result.toString() ) );
 	}
 
 	/**
@@ -83,16 +143,61 @@ public class JavaCodeGeneratorTest
 	@Test
 	public void testConstructorArgsDeclaration()
 	{
-		Assert.fail();
+		Bean bean = new Bean("bean", "org.staticioc.model.Bean");
+
+		Property arg1 = new Property( "name", "value", null);
+		Property arg2 = new Property( "className", "java.util.LinkedList<String>", null);
+		
+		bean.getConstructorArgs().add(arg1);
+		bean.getConstructorArgs().add(arg2);
+		
+		generator.instantiateBean(bean);
+		
+		Assert.assertEquals( "Incorrect bean with constructor args instantation", normalizeCode(
+				"bean = new org.staticioc.model.Bean(\"value\", \"java.util.LinkedList<String>\");\n" ),
+			 	normalizeCode( result.toString() ) );
 	}
 
 	/**
-	 * Test that String / Integer / Double conversion are properly working
+	 * Test that String / Integer / Double / true/false / typed values conversion are properly working
 	 */
 	@Test
 	public void testValueConversions()
 	{
-		Assert.fail();
+		Bean bean = new Bean("bean", "org.staticioc.model.Bean");
+		
+		Property textValue = new Property( "name", "value", null);
+		generator.declareProperty(bean, textValue);
+		
+		Property intValue = new Property( "name", "3", null);
+		generator.declareProperty(bean, intValue);
+		
+		Property intAsTextValue = new Property( "name", "3", null);
+		intAsTextValue.setType( "String");
+		generator.declareProperty(bean, intAsTextValue);
+		
+		Property fpValue = new Property( "name", "3.0", null);
+		Property floatValue = new Property( "name", "3.0f", null);
+		Property doubleValue = new Property( "name", "3.0d", null);
+		generator.declareProperty(bean, fpValue);
+		generator.declareProperty(bean, floatValue);
+		generator.declareProperty(bean, doubleValue);
+		
+		Property booleanPositiveValue = new Property( "name", "TruE", null);
+		Property booleanNegativeValue = new Property( "name", "FALSE", null);
+		generator.declareProperty(bean, booleanPositiveValue);
+		generator.declareProperty(bean, booleanNegativeValue);
+	
+		final String expectedResult = normalizeCode(	"bean.setName( \"value\" );\n"
+													+ 	"bean.setName( 3 );\n"
+													+ 	"bean.setName(  new String( 3 ) );\n"
+													+ 	"bean.setName( 3.0 );\n"
+													+ 	"bean.setName( 3.0f );\n"
+													+ 	"bean.setName( 3.0d );\n"
+													+ 	"bean.setName( true );\n"
+													+ 	"bean.setName( false );\n" );
+	
+	Assert.assertEquals( "Incorrect class definition", expectedResult, normalizeCode( result.toString() ) );
 	}
 	
 	/**

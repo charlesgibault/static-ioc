@@ -149,6 +149,14 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 			{
 				getBuilder().append( "new " ).append(  property.getType() ).append("( ").append( property.getValue() ).append( " )");
 			}
+			else if( "true".equalsIgnoreCase( property.getValue() ) ) // Must be careful with char encoding here, so using equalsIgnoreCase
+			{
+				getBuilder().append( "true" );	
+			}
+			else if( "false".equalsIgnoreCase( property.getValue() ) ) // Must be careful with char encoding here, so using equalsIgnoreCase
+			{
+				getBuilder().append( "false" );	
+			}
 			else
 			{
 				try
@@ -192,7 +200,7 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 	@Override
 	public void initPackage( String packageDef )
 	{
-		getBuilder().append("package ").append( packageDef ).append( "\n");
+		getBuilder().append("package ").append( packageDef ).append( ";\n");
 	}
 
 	@Override
