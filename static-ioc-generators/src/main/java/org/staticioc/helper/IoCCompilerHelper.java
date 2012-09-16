@@ -79,15 +79,14 @@ public class IoCCompilerHelper
 			}
 			
 			String target = trimmedMapping.substring( 0, targetSourceSeparator );
-			String[] sources = trimmedMapping.substring( targetSourceSeparator ).split( "," );
+			String[] sources = trimmedMapping.substring( targetSourceSeparator + 1 ).split( "," );
 			
 			List<String> sourcesList = new LinkedList<String>();
 			
 			for (String source : sources)
 			{
-				//TODO Check that source exists here ?
 				String trimmedSource = source.trim();
-				
+				/*
 				File file = new File(trimmedSource);
 				
 				if( !file.exists()  )
@@ -97,12 +96,18 @@ public class IoCCompilerHelper
 				else if (!file.canRead() )
 				{
 					throw new IllegalArgumentException("Source file " + trimmedSource + " is not readable");
-				}
+				}*/
 				
-				sourcesList.add(trimmedSource);				
+				if( !trimmedSource.isEmpty() )
+				{
+					sourcesList.add(trimmedSource);				
+				}
 			}
 			
-			targetMapping.put( target, sourcesList );
+			if( !sourcesList.isEmpty() && !target.isEmpty() )
+			{
+				targetMapping.put( target, sourcesList );
+			}
 			
 		}
 		

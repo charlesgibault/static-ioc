@@ -3,8 +3,14 @@
  */
 package org.staticioc.helper;
 
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import org.staticioc.generator.CodeGenerator;
+import org.staticioc.generator.JavaCodeGenerator;
 
 /**
  * @author Charles Gibault
@@ -18,16 +24,16 @@ public class IoCCompilerHelperTest
 	@Test
 	public void testCheckOutputPathExisting()
 	{
-		Assert.fail();
+		IoCCompilerHelper.checkOutputPath( FileUtils.getTempDirectoryPath() );
 	}
 
 	/**
 	 * Check an incorrect path
 	 */
-	@Test
+	@Test(expected = IllegalArgumentException.class) 
 	public void testCheckOutputPathNonExisting()
 	{
-		Assert.fail();
+		IoCCompilerHelper.checkOutputPath("/nonexisting/path/");
 	}
 
 	/**
@@ -36,25 +42,26 @@ public class IoCCompilerHelperTest
 	@Test
 	public void testGetCodeGenerator()
 	{
-		Assert.fail();
+		CodeGenerator generator = IoCCompilerHelper.getCodeGenerator("org.staticioc.generator.JavaCodeGenerator");
+		Assert.assertTrue("Incorrect class instantiated", generator instanceof JavaCodeGenerator );
 	}
 	
 	/**
 	 * Try to load a non existing Code generator
 	 */
-	@Test
+	@Test(expected = IllegalArgumentException.class)
 	public void testCodeGeneratorNotFound()
 	{
-		Assert.fail();
+		IoCCompilerHelper.getCodeGenerator("non.existing.class");
 	}
 	
 	/**
 	 * Try to load a class that doesn't implement CodeGenerator
 	 */
-	@Test
+	@Test(expected = IllegalArgumentException.class)
 	public void testCodeGeneratorNotImplemented()
 	{
-		Assert.fail();
+		IoCCompilerHelper.getCodeGenerator("java.util.List");
 	}
 	
 
@@ -64,16 +71,34 @@ public class IoCCompilerHelperTest
 	@Test
 	public void testGetTargetMappingSingleFile()
 	{
-		Assert.fail();
+		Map<String, List<String>> result = IoCCompilerHelper.getTargetMapping("package.name.target1:source1");
+		
+		Assert.assertEquals( "More elements than expected", 1, result.keySet().size() );
+	
+		List<String> sources = result.get("package.name.target1");
+		Assert.assertEquals( "More elements than expected", 1, sources.size() );
+		Assert.assertEquals( "Incorrect value", "source1", sources.get(0) );
 	}
 	
 	/**
 	 * Try to load a complex - multi-target - multiple files per target
+	 * Note: expected format "package.name.target1:source1,source2;target2:source1,..."
 	 */
 	@Test
 	public void testGetTargetMappingMultiTarget()
 	{
-		Assert.fail();
+		Map<String, List<String>> result = IoCCompilerHelper.getTargetMapping("package.name.target1:source1,source2;package.name.target2:source3");
+		
+		Assert.assertEquals( "More elements than expected", 2, result.keySet().size() );
+	
+		List<String> sources1 = result.get("package.name.target1");
+		Assert.assertEquals( "More elements than expected", 2, sources1.size() );
+		Assert.assertEquals( "Incorrect value", "source1", sources1.get(0) );
+		Assert.assertEquals( "Incorrect value", "source2", sources1.get(1) );
+		
+		List<String> sources2 = result.get("package.name.target2");
+		Assert.assertEquals( "More elements than expected", 1, sources2.size() );
+		Assert.assertEquals( "Incorrect value", "source3", sources2.get(0) );
 	}
 
 	/**
@@ -82,6 +107,20 @@ public class IoCCompilerHelperTest
 	@Test
 	public void testGetTargetMappingMalFormatted()
 	{
-		Assert.fail();
+		// Empty mapping :
+		Map<String, List<String>> result = IoCCompilerHelper.getTargetMapping("");
+		Assert.assertEquals( "More elements than expected", 0, result.keySet().size() );
+		
+		// missing source after :
+		result = IoCCompilerHelper.getTargetMapping("p:;p2:s2");
+		Assert.assertEquals( "More elements than expected", 1, result.keySet().size() );
+		
+		// missing mapping between ;;
+		result = IoCCompilerHelper.getTargetMapping("p:s;;");
+		Assert.assertEquals( "More elements than expected", 1, result.keySet().size() );
+		
+		// missing target before :
+		result = IoCCompilerHelper.getTargetMapping(":s;");
+		Assert.assertEquals( "More elements than expected", 0, result.keySet().size() );
 	}
 }
