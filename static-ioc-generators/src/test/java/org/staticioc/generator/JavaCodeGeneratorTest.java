@@ -197,17 +197,72 @@ public class JavaCodeGeneratorTest
 													+ 	"bean.setName( true );\n"
 													+ 	"bean.setName( false );\n" );
 	
-	Assert.assertEquals( "Incorrect class definition", expectedResult, normalizeCode( result.toString() ) );
+		Assert.assertEquals( "Incorrect class definition", expectedResult, normalizeCode( result.toString() ) );
 	}
 	
 	/**
 	 * Test that various Java Collections are properly defined
 	 */
 	@Test
-	public void testCollectionDeclaration()
+	public void testListDeclaration()
+	{
+		Property prop1 = new Property( "name", "nameValue", null);
+		Property prop2 = new Property( "id", null, "idRef" );
+		
+		Bean bean = new Bean("listBean", null);
+		bean.setType( Bean.Type.LIST);
+		
+		generator.instantiateBean( bean );
+		generator.declareProperty(bean, prop1);
+		generator.declareProperty(bean, prop2);
+		
+		final String expectedResult = normalizeCode(	"listBean = new java.util.LinkedList();\n"
+													+	"listBean.add( \"nameValue\" );\n"
+													+ 	"listBean.add( idRef );\n" );
+		
+		Assert.assertEquals( "Incorrect collection definition", expectedResult, normalizeCode( result.toString() ) );
+	}
+	
+	/**
+	 * Test that various Java Collections are properly defined
+	 */
+	@Test
+	public void testSetDeclaration()
+	{
+		Property prop1 = new Property( "name", "nameValue", null);
+		Property prop2 = new Property( "id", null, "idRef" );
+		
+		Bean bean = new Bean("setBean", null);
+		bean.setType( Bean.Type.SET);
+	
+		generator.instantiateBean( bean );
+		generator.declareProperty(bean, prop1);
+		generator.declareProperty(bean, prop2);
+		
+		final String expectedResult = normalizeCode(	"setBean = new java.util.HashSet();\n"
+				+	"setBean.add( \"nameValue\" );\n"
+				+ 	"setBean.add( idRef );\n" );
+
+		Assert.assertEquals( "Incorrect collection definition", expectedResult, normalizeCode( result.toString() ) );
+	}
+	
+	/**
+	 * Test that various Java Collections are properly defined
+	 */
+	@Test
+	public void testMapDeclaration()
 	{
 		Assert.fail();
 	}
 	
+	/**
+	 * Test that various Java Collections are properly defined
+	 */
+	@Test
+	public void testPropertiesDeclaration()
+	{
+		
+		Assert.fail();
+	}
 	
 }
