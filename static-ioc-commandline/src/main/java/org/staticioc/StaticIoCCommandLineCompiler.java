@@ -85,7 +85,7 @@ public class StaticIoCCommandLineCompiler
 		}
 		else
 		{
-			formatter.printHelp( USAGE, options, true );
+			formatter.printHelp( USAGE, options );
 			throw new IllegalArgumentException("Missing output path");
 		}
 		
@@ -104,7 +104,7 @@ public class StaticIoCCommandLineCompiler
 		}
 		else
 		{
-			formatter.printHelp( USAGE, options, true );
+			formatter.printHelp( USAGE, options );
 			throw new IllegalArgumentException("Missing code generator");
 		}
 
@@ -114,7 +114,7 @@ public class StaticIoCCommandLineCompiler
 		}
 		catch ( RuntimeException e)
 		{
-			formatter.printHelp( USAGE, options, true );
+			formatter.printHelp( USAGE, options );
 			throw e;
 		}
 	}
@@ -129,7 +129,7 @@ public class StaticIoCCommandLineCompiler
 		}
 		else
 		{
-			formatter.printHelp( USAGE, options, true );
+			formatter.printHelp( USAGE, options );
 			throw new IllegalArgumentException("Missing target mapping definition");
 		}
 		
@@ -139,7 +139,7 @@ public class StaticIoCCommandLineCompiler
 		}
 		catch ( RuntimeException e)
 		{
-			formatter.printHelp( USAGE, options, true );
+			formatter.printHelp( USAGE, options );
 			throw e;
 		}
 	}
@@ -163,7 +163,7 @@ public class StaticIoCCommandLineCompiler
 	        
 	        // Help first
 	        if( line.hasOption( ARG_HELP ) ) {
-	        	formatter.printHelp( USAGE, options, true );
+	        	formatter.printHelp( USAGE, options );
 	        	return;
 	        }
 
@@ -179,7 +179,7 @@ public class StaticIoCCommandLineCompiler
 	    catch( ParseException exp ) {
 	        // oops, something went wrong
 	        logger.error( "Parsing failed.  Reason: {}", exp.getMessage() );
-	        formatter.printHelp( USAGE, options, true );
+	        formatter.printHelp( USAGE, options );
 	        throw new IllegalArgumentException(exp);
 	    }
 		
