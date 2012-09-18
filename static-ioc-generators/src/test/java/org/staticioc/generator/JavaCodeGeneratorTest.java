@@ -252,7 +252,21 @@ public class JavaCodeGeneratorTest
 	@Test
 	public void testMapDeclaration()
 	{
-		Assert.fail();
+		Property prop1 = new Property( "name", "nameValue", null);
+		Property prop2 = new Property( "id", null, "idRef" );
+		
+		Bean bean = new Bean("mapBean", null);
+		bean.setType( Bean.Type.MAP);
+		
+		generator.instantiateBean( bean );
+		generator.declareProperty(bean, prop1);
+		generator.declareProperty(bean, prop2);
+		
+		final String expectedResult = normalizeCode(	"mapBean = new java.util.HashMap();\n"
+				+	"mapBean.put( \"name\", \"nameValue\" );\n"
+				+ 	"mapBean.put( \"id\", idRef );\n" );
+
+		Assert.assertEquals( "Incorrect collection definition", expectedResult, normalizeCode( result.toString() ) );
 	}
 	
 	/**
@@ -261,8 +275,21 @@ public class JavaCodeGeneratorTest
 	@Test
 	public void testPropertiesDeclaration()
 	{
+		Property prop1 = new Property( "name", "nameValue", null);
+		Property prop2 = new Property( "id", null, "idRef" );
 		
-		Assert.fail();
+		Bean bean = new Bean("propBean", null);
+		bean.setType( Bean.Type.PROPERTIES);
+		
+		generator.instantiateBean( bean );
+		generator.declareProperty(bean, prop1);
+		generator.declareProperty(bean, prop2);
+		
+		final String expectedResult = normalizeCode(	"propBean = new java.util.Properties();\n"
+				+	"propBean.setProperty( \"name\", \"nameValue\" );\n"
+				+ 	"propBean.setProperty( \"id\", idRef );\n" );
+
+		Assert.assertEquals( "Incorrect collection definition", expectedResult, normalizeCode( result.toString() ) );
 	}
 	
 }
