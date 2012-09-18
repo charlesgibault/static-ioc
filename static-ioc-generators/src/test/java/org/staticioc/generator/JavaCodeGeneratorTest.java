@@ -7,7 +7,6 @@ import org.junit.Test;
 import org.staticioc.generator.CodeGenerator;
 import org.staticioc.generator.JavaCodeGenerator;
 import org.staticioc.model.Bean;
-import org.staticioc.model.Bean.Scope;
 import org.staticioc.model.Property;
 
 /**

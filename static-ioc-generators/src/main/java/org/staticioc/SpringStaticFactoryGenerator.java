@@ -187,7 +187,9 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 		
 		codeGenerator.closeConstructor( generatedClassName );
 		
+		codeGenerator.initDestructor( generatedClassName );
 		//TODO build destructor : free beans in their reverse order of creation
+		codeGenerator.closeDestructor( generatedClassName );
 		
 		codeGenerator.closeClass( generatedClassName );
 		codeGenerator.closePackage( generatedPackageName );
