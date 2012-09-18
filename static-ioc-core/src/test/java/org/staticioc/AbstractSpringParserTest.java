@@ -2,6 +2,7 @@ package org.staticioc;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,6 +18,12 @@ public abstract class AbstractSpringParserTest
 {
 	protected final SpringConfigParser parser;
 	protected final Map<String, Bean> loadedBeans;
+	
+	public AbstractSpringParserTest(final String[] testContexts) throws Exception 
+	{
+		parser = new SpringConfigParser();
+		loadedBeans = parser.load( Arrays.asList(testContexts) ) ;
+	}
 	
 	public AbstractSpringParserTest(final String testContext) throws Exception 
 	{

@@ -12,119 +12,90 @@ import org.staticioc.model.*;
  * TODO implement the test 
  */
 public class SpringConfigParserMultiConfigTest extends AbstractSpringParserTest {
-	private final static String TEST_CONTEXT = "src/test/resources/SpringConfigParserTest-Parent.xml";
-
+	private final static String[] TEST_CONTEXT = {
+		"src/test/resources/SpringConfigParserTest-MultiConfig.xml",
+		"src/test/resources/SpringConfigParserTest-SimpleBean.xml",
+		"src/test/resources/SpringConfigParserTest-Scope.xml"
+		};
+	
 	public SpringConfigParserMultiConfigTest() throws Exception {
 		super(TEST_CONTEXT);		
 	}
 
 	/**
-	 * Parent loading test
+	 * Multiple files loaded at once, with parent and scope dependencies
+	 * 
 	 */
 	@Test
-	public void testSimpleParentBeanLoading()
+	public void testExternalScopedBeanLoading()
 	{
-		Assert.fail();
-		// Retrieve personBean and test properties
-		final Bean parentBean = loadedBeans.get("beanParent");
-		final Bean abstractBean = loadedBeans.get("abstractBean");
-		final Bean realBean = loadedBeans.get("realBean");
+		final Bean userBean7 = loadedBeans.get("userBean7");
+		final Bean userBean2 = loadedBeans.get("userBean2");
+		final Bean prototypeBean = loadedBeans.get("prototype");
+		
+		Assert.assertNotNull( userBean7 );
+		Assert.assertNotNull( userBean2 );
+		Assert.assertNotNull( prototypeBean );		
 
-		Assert.assertNotNull( parentBean );
-		Assert.assertNotNull( abstractBean );
-		Assert.assertNotNull( realBean );
-				
-		// Bean definition checks
-		assertEquals("Bean id not properly set", "beanParent", parentBean.getName() );
-		assertEquals("Bean id not properly set", "abstractBean", abstractBean.getName() );
-		assertEquals("Bean id not properly set", "realBean", realBean.getName() );
-
-		assertEquals("Bean class not properly set", "test.Bean", parentBean.getClassName() );
-		assertEquals("Bean class not properly set", "test.AnotherBean", abstractBean.getClassName() );
-		assertEquals("Bean class not properly set", "test.AnotherBean", realBean.getClassName() );
-
-		assertFalse("Real bean wrongly considered as abstract" , parentBean.isAbstract() );
-		assertTrue("Abstract bean wrongly considered as real" , abstractBean.isAbstract() );
-		assertFalse("Real bean wrongly considered as abstract" , realBean.isAbstract() );
-
-		assertEquals( "Constructor args not found were expected", 2, parentBean.getConstructorArgs().size() );
-		assertEquals( "Constructor args not found were expected", 2, abstractBean.getConstructorArgs().size() );
-		assertEquals( "Constructor args not found were expected", 3, realBean.getConstructorArgs().size() );
+		// Prototype bean definition checks
+		assertEquals("Bean id not properly set", "prototype", prototypeBean.getName() );
+		assertEquals("Bean is not a prototype" , Bean.Scope.PROTOTYPE, prototypeBean.getScope() );
 
 		// Property checks
-		final Map<String, Property> parentProperties = mapProperties( parentBean.getProperties() );
-		final Map<String, Property> abstractProperties = mapProperties( abstractBean.getProperties() );
-		final Map<String, Property> realProperties = mapProperties( realBean.getProperties() );
+		final Map<String, Property> userBean7Properties = mapProperties( userBean7.getProperties() );
+		final Map<String, Property> userBean2Properties = mapProperties( userBean2.getProperties() );
 
-		checkProperty(parentProperties, "nation", 	"import", 	null );
-		checkProperty(abstractProperties, "nation", "import", 	null );
-		checkProperty(realProperties, "nation", 	"reality", 	null );
+		final Property protoRef7 = userBean7Properties.get("prototypeBean");
+		final Property protoRef2 = userBean2Properties.get("prototypeBean");
+		
+		Assert.assertNotNull( protoRef7.getRef() );
+		Assert.assertNotNull( protoRef2.getRef() );
+		Assert.assertFalse( "Different reference to prototype bean expected", protoRef7.getRef().equals( protoRef2.getRef() ) );
 
-		Assert.assertNull( parentProperties.get("address") );
-		checkProperty(abstractProperties, "address", "Somewhere over the rainbow", 	null );
-		checkProperty(realProperties, "address", 	"Somewhere over the rainbow", 	null );
+		final Bean injectedPrototypeBean7 = loadedBeans.get( protoRef7.getRef() );
+		final Bean injectedPrototypeBean2 = loadedBeans.get( protoRef2.getRef() );
+		
+		Assert.assertNotNull( injectedPrototypeBean7 );
+		Assert.assertNotNull( injectedPrototypeBean2 );
+		
+		assertEquals("Bean class not properly set", "test.Prototype", injectedPrototypeBean7.getClassName() );
+		assertEquals("Bean class not properly set", "test.Prototype", injectedPrototypeBean2.getClassName() );
+		
+		assertFalse("Real bean wrongly considered as abstract" , injectedPrototypeBean7.isAbstract() );
+		assertFalse("Real bean wrongly considered as abstract" , injectedPrototypeBean2.isAbstract() );
+		
+		assertEquals("Injected bean shouldn't be a prototype anymore" , Bean.Scope.SINGLETON, injectedPrototypeBean7.getScope() );
+		assertEquals("Injected bean shouldn't be a prototype anymore" , Bean.Scope.SINGLETON, injectedPrototypeBean2.getScope() );
+		
+		// Property checks
+		final Map<String, Property> protoBean1Properties = mapProperties( injectedPrototypeBean7.getProperties() );
+		final Map<String, Property> protoBean2Properties = mapProperties( injectedPrototypeBean2.getProperties() );
 
-		Assert.assertNull( parentProperties.get("type") );
-		Assert.assertNull( abstractProperties.get("type") );
-		checkProperty(realProperties, "type", "Cold hard concrete bean", 	null );	
-
-		// Constructor arguments inheritance checks
-		final Map<String, Property> constructorArgsParent = mapProperties( parentBean.getConstructorArgs() );
-		final Map<String, Property> constructorArgsAbstract = mapProperties( abstractBean.getConstructorArgs() );
-		final Map<String, Property> constructorArgsReal = mapProperties( realBean.getConstructorArgs() );
-
-		checkProperty(constructorArgsParent, SpringConfigParser.CONSTRUCTOR_ARGS + "0", "00", 	null );
-		checkProperty(constructorArgsParent, SpringConfigParser.CONSTRUCTOR_ARGS + "1", "10", null, "java.util.Integer" );
-
-		checkProperty(constructorArgsAbstract, SpringConfigParser.CONSTRUCTOR_ARGS + "0", "00", 	null );
-		checkProperty(constructorArgsAbstract, SpringConfigParser.CONSTRUCTOR_ARGS + "1", "10", null, "java.util.Integer" );
-
-		checkProperty(constructorArgsReal, SpringConfigParser.CONSTRUCTOR_ARGS + "0", "30", null, "java.util.Integer" );
-		checkProperty(constructorArgsReal, SpringConfigParser.CONSTRUCTOR_ARGS + "1", "40", null, null );
-		checkProperty(constructorArgsReal, SpringConfigParser.CONSTRUCTOR_ARGS + "2", "45", null );
+		checkProperty(protoBean1Properties, "type", "prototype bean - everyone gets a different instance", null, null );
+		checkProperty(protoBean2Properties, "type", "prototype bean - everyone gets a different instance", null, null );	
 	}
-
+	
 	/**
-	 * Imported bean loading test
-	 */
-	@Test
-	public void testSimpleImportBeanLoading() {
-		Assert.fail();
-		Assert.assertNotNull( loadedBeans.get("children") ); // Existence test. More detailed test below
-	}
-
-	/**
-	 * imported bean loading test with cross file parent dependencies
+	 * Multiple files loaded at once, with parent and scope dependencies
 	 * 
 	 */
 	@Test
 	public void testParentImportedBeanLoading()
 	{
-		Assert.fail();
 		// Retrieve personBean and test properties
-		final Bean parentBean = loadedBeans.get("parent");
-		final Bean grandParentBean = loadedBeans.get("grandParent");
-		final Bean childrenBean = loadedBeans.get("children");
+		final Bean foreignChildBean = loadedBeans.get("foreignChildBean");
 
-		Assert.assertNotNull( parentBean );
-		Assert.assertNotNull( grandParentBean );
-		Assert.assertNotNull( childrenBean );
+		Assert.assertNotNull( foreignChildBean );
 		
 		// Bean definition checks
-		assertEquals("Bean id not properly set", "parent", parentBean.getName() );
-		assertEquals("Bean id not properly set", "grandParent", grandParentBean.getName() );
-		assertEquals("Bean id not properly set", "children", childrenBean.getName() );
-
-		assertEquals("Bean class not properly set", "parent.Bean", parentBean.getClassName() );
-		assertEquals("Bean class not properly set", "test.AnotherBean", grandParentBean.getClassName() );
-		assertEquals("Bean class not properly set", "children.Bean", childrenBean.getClassName() );
-
-		assertFalse("Real bean wrongly considered as abstract" , parentBean.isAbstract() );
-		assertFalse("Real bean wrongly considered as abstract" , grandParentBean.isAbstract() );
-		assertFalse("Real bean wrongly considered as abstract" , childrenBean.isAbstract() );
-
-		assertEquals( "Constructor args not found were expected", 3, parentBean.getConstructorArgs().size() );
-		assertEquals( "Constructor args not found were expected", 3, grandParentBean.getConstructorArgs().size() );
-		assertEquals( "Constructor args not found were expected", 3, childrenBean.getConstructorArgs().size() );
+		assertEquals("Bean id not properly set", "foreignChildBean", foreignChildBean.getName() );
+		assertEquals("Bean class not properly set", "test.Person", foreignChildBean.getClassName() );		
+		assertFalse("Real bean wrongly considered as abstract" , foreignChildBean.isAbstract() );
+		
+		// Property checks
+		final Map<String, Property> properties = mapProperties( foreignChildBean.getProperties() );
+				
+		checkProperty(properties, "name", 		"personName", 	null );
+		checkProperty(properties, "username", 	"root", 		null );
 	}
 }
