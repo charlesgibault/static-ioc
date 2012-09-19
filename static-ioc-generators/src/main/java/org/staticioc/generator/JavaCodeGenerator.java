@@ -200,7 +200,10 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 	@Override
 	public void initPackage( String packageDef )
 	{
-		getBuilder().append("package ").append( packageDef ).append( ";\n");
+		if (packageDef != null && !packageDef.isEmpty() )
+		{
+			getBuilder().append("package ").append( packageDef ).append( ";\n");
+		}
 	}
 
 	@Override

@@ -64,6 +64,23 @@ public class JavaCodeGeneratorTest
 	}
 
 	/**
+	 * Test that generated package definition is correct
+	 */
+	@Test
+	public void testInitPackage()
+	{
+		generator.initPackage("");
+		assertEquals("Incorrect package declaration", "", result.toString() );
+		
+		generator.initPackage(null);
+		assertEquals("Incorrect package declaration", "", result.toString() );
+		
+		generator.initPackage("org.test.package");
+		assertEquals("Incorrect package declaration", "package org.test.package;\n", result.toString());
+	}
+	
+	
+	/**
 	 * Test that generated java file will end by .java
 	 */
 	@Test
