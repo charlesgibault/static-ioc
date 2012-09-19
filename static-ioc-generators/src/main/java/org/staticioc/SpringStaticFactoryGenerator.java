@@ -22,35 +22,11 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 {
 	private static final Logger logger  = LoggerFactory.getLogger(SpringStaticFactoryGenerator.class);
 	
-	public enum TargetCode { JAVA };
-	
-	private final static int INIT_BUFFER_SIZE=4096;
+	private final static int INIT_BUFFER_SIZE = 4096;
 		
 	private String commentHeader = "This code has been generated using Static IoC framework (http://code.google.com/p/static-ioc/). DO NOT EDIT MANUALLY HAS CHANGES MAY BE OVERRIDEN";
 		
 	private boolean ignoreUnresolvedRefs = true;
-		
-	//	private TargetCode targetCode = TargetCode.JAVA;
-	//TODO move to helper ?
-	/**
-	 * Instantiate the proper code generator given target language. Bind StringBuilder that will hold generated result 
-	 * @param res
-	 * @return true if init was successful, false otherwise
-	
-	protected boolean initCodeGenerator( StringBuilder res )
-	{
-		switch ( targetCode)
-		{
-		case JAVA:
-			codeGenerator = new JavaCodeGenerator( res );
-			
-			break;
-		default:
-			logger.error( "Unsupported target : {}", targetCode );
-			return false;
-		}
-		return true;
-	}*/	
 	
 	/**
 	 * Ignore abstract beans and prototypes
@@ -108,7 +84,6 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 	public StringBuilder generate(final CodeGenerator codeGenerator, final String generatedPackageName, final String generatedClassName, final List<String> configurationFiles )  throws SAXException, IOException, ParserConfigurationException
 	{
 		final StringBuilder res = new StringBuilder( INIT_BUFFER_SIZE );
-	
 		codeGenerator.setOutput( res );
 		
 		SpringConfigParser springConfigParser = new SpringConfigParser();

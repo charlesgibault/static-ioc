@@ -742,18 +742,12 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		return getBeans();
 	}
 
-	//TODO add support for scope
+
 	//TODO add support for factory bean / factory method
-	//TODO add unit tests for code generation
 	//TODO add more control on target class : inheritance, lifecycle
-	//TODO license headers
-	//TODO refactor target code generator selection to make it more plug and play
-	//TODO multiproject maven to separate code generation from core
-	//TODO Maven plugin
 	//TODO add (partial) support for PropertyPlaceHolders
 	//TODO add support for init-method and a init() method
 	//TODO add support for depends-on (in init-method)
-	//TODO add support for destroy-method and a teardDown() method ?
-	
-	//TODO resplit this class ?
+	//TODO add support for destroy-method and a teardDown() method ?	
+	//TODO refactor this class : split it between Delegate that are responsible for handling a particular type of element?
 }

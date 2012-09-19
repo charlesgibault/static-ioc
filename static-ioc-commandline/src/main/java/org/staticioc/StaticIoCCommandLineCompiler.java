@@ -11,6 +11,7 @@ import org.apache.commons.cli.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.staticioc.generator.CodeGenerator;
+import org.staticioc.helper.CodeGeneratorNameHelper;
 import org.staticioc.helper.IoCCompilerHelper;
 
 import java.io.IOException;
@@ -26,12 +27,13 @@ public class StaticIoCCommandLineCompiler
 	private static final String ARG_OUTPUT_PATH = "o";
 	private static final String ARG_HELP = "h";
 	private static final String ARG_CODE_GENERATOR = "g";
+	private static final String ARG_TARGET_LANGUAGE = "L";
 	private static final String ARG_TARGET_MAPPING = "t";
 
 	private static final Logger logger  = LoggerFactory.getLogger(StaticIoCCommandLineCompiler.class);
 	
-	private static final String USAGE = "StaticIoCCommandLineCompiler -"+ ARG_CODE_GENERATOR + " <org.staticioc.javaCodeGenerator> -"
-																+ ARG_OUTPUT_PATH+" </output/path> -"
+	private static final String USAGE = "StaticIoCCommandLineCompiler -"+ ARG_TARGET_LANGUAGE + " <Java> -"
+																+ ARG_OUTPUT_PATH + " </output/path> -"
 																+ ARG_TARGET_MAPPING + " <org.demo.GeneratedFile:src/main/resources/context.xml>";
 	
 	private static final HelpFormatter formatter = new HelpFormatter();
@@ -43,9 +45,15 @@ public class StaticIoCCommandLineCompiler
 		
 		Option codeGenerator = OptionBuilder.withArgName( "package.codeGeneratorClass" )
 				.hasArg()
-				.withDescription(  "Fully qualified classname for the code generator" )
+				.withDescription(  "Fully qualified classname for the code generator (optional, overrides target language)" )
 				.withLongOpt( "generator" )
 				.create( ARG_CODE_GENERATOR );
+		
+		Option targetLanguage = OptionBuilder.withArgName( "Java" )
+				.hasArg()
+				.withDescription(  "Name of the target language" )
+				.withLongOpt( "language" )
+				.create( ARG_TARGET_LANGUAGE );
 		
 		Option outputPath = OptionBuilder.withArgName( "path/to/output/folder" )
 				.hasArg()
@@ -67,9 +75,10 @@ public class StaticIoCCommandLineCompiler
 		
 		Options options = new Options();
 		options.addOption( help );
-		options.addOption( codeGenerator );
+		options.addOption( targetLanguage );
 		options.addOption( outputPath );
 		options.addOption( targetMapping );
+		options.addOption( codeGenerator );
 		options.addOption( fileExtension );
 		
 		return options;
@@ -100,14 +109,22 @@ public class StaticIoCCommandLineCompiler
 		
 		if( line.hasOption( ARG_CODE_GENERATOR ) ) { // Output Path
 			codeGeneratorClassName = line.getOptionValue( ARG_CODE_GENERATOR );
-			logger.debug( "Using Code Generator {}", codeGeneratorClassName );
+		}
+		else if (line.hasOption( ARG_TARGET_LANGUAGE ) )
+		{
+			String targetLang = line.getOptionValue( ARG_TARGET_LANGUAGE ); 
+					
+			logger.debug( "Using Target language {}", targetLang );
+			codeGeneratorClassName = CodeGeneratorNameHelper.getGeneratorClass( targetLang );
 		}
 		else
 		{
 			formatter.printHelp( USAGE, options );
-			throw new IllegalArgumentException("Missing code generator");
+			throw new IllegalArgumentException("Missing target language (" + ARG_TARGET_LANGUAGE + ") or code generator (" + ARG_CODE_GENERATOR + "). At least one is required");
 		}
 
+		logger.debug( "Using Code Generator {}", codeGeneratorClassName );
+		
 		try
 		{
 			return IoCCompilerHelper.getCodeGenerator( codeGeneratorClassName );
