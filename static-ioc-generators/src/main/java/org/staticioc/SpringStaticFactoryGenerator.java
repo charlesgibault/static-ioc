@@ -70,11 +70,14 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 	}
 	
 	@Override
-	public void compile( final CodeGenerator generator, final String outputPath, final Map< String, List< String >> inputOutputMapping, String fileExtensionOverride ) throws SAXException,
+	public void compile( final CodeGenerator generator, String outputPath, final Map< String, List< String >> inputOutputMapping, String fileExtensionOverride ) throws SAXException,
 	IOException, ParserConfigurationException
 	{
 		// Check if a valid extension override was provided
 		fileExtensionOverride = (fileExtensionOverride == null) ? generator.getDefaultSourceFileExtension() : fileExtensionOverride;
+		
+		// Check if outputPath actually ends with a trailing / or not
+		outputPath = ( outputPath.endsWith(File.separator) ) ? outputPath : outputPath + File.separator;
 		
 		//Build complete output file path:
 		for( final String targetClass : inputOutputMapping.keySet() )
