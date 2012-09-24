@@ -1,0 +1,22 @@
+
+// Release 0.1
+// Maven shade plugin for uber jar
+// license headers (multproject/each source file / shaded command line jar
+// Maven plugin (no shade)
+// Wiki
+
+// Release 0.2
+// Implement destructor logic
+// Support Python and Jython targets
+// TODO add support for factory bean / factory method
+
+// Release 0.3
+// Objective C and Cpp
+//TODO add (partial) support for PropertyPlaceHolders
+
+// Release 0.4
+// Refactor spring config loader
+//TODO add more control on target class : inheritance, lifecycle
+//TODO add support for init-method and a init() method
+//TODO add support for depends-on (in init-method)
+//TODO add support for destroy-method and a teardDown() method ?	

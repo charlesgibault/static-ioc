@@ -1,28 +1,56 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-         <groupId>org.staticioc</groupId>
-         <artifactId>staticioc-parent</artifactId>
-         <version>0.1-SNAPSHOT</version>
-         <relativePath>../pom.xml</relativePath>
-  </parent>
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.staticioc</groupId>
+		<artifactId>staticioc-parent</artifactId>
+		<version>0.1-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
 
-  <artifactId>staticioc-commandline</artifactId>
-  <packaging>jar</packaging>
-  <name>staticioc command line tool</name>
-  
- <dependencies>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>staticioc-generators</artifactId>
-      <version>${project.version}</version>
-    </dependency>
+	<artifactId>staticioc-commandline</artifactId>
+	<packaging>jar</packaging>
+	<name>staticioc command line tool</name>
 
-	<dependency>
-		<groupId>commons-cli</groupId>
-		<artifactId>commons-cli</artifactId>
-		<version>1.2</version>
-	</dependency>
-  </dependencies>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.0</version>
+				<configuration>
+					<!-- put your configurations here -->
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>staticioc-generators</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-cli</groupId>
+			<artifactId>commons-cli</artifactId>
+			<version>1.2</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>${slf4j-version}</version>
+			<scope>runtime</scope>
+		</dependency>
+	</dependencies>
 </project>

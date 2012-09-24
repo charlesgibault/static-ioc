@@ -52,7 +52,7 @@ public class StaticIoCCommandLineCompiler
 		Option targetLanguage = OptionBuilder.withArgName( "Java" )
 				.hasArg()
 				.withDescription(  "Name of the target language" )
-				.withLongOpt( "language" )
+				.withLongOpt( "target-language" )
 				.create( ARG_TARGET_LANGUAGE );
 		
 		Option outputPath = OptionBuilder.withArgName( "path/to/output/folder" )
@@ -64,13 +64,13 @@ public class StaticIoCCommandLineCompiler
 		Option targetMapping = OptionBuilder.withArgName( "package.name.target1:source1,source2;target2:source1,..." )
 				.hasArg()
 				.withDescription(  "Collection of mappings < target file -> List< source file > >" )
-				.withLongOpt( "target-map" )
+				.withLongOpt( "target-mapping" )
 				.create( ARG_TARGET_MAPPING );
 			
 		Option fileExtension = OptionBuilder.withArgName( ".abc" )
 				.hasArg()
 				.withDescription(  "Generated file extension override (Optional)" )
-				.withLongOpt( "file-extension" )
+				.withLongOpt( "output-file-extension" )
 				.create( ARG_FILE_EXTENSION );
 		
 		Options options = new Options();
@@ -107,7 +107,7 @@ public class StaticIoCCommandLineCompiler
 	{
 		String codeGeneratorClassName = null;
 		
-		if( line.hasOption( ARG_CODE_GENERATOR ) ) { // Output Path
+		if( line.hasOption( ARG_CODE_GENERATOR ) ) {
 			codeGeneratorClassName = line.getOptionValue( ARG_CODE_GENERATOR );
 		}
 		else if (line.hasOption( ARG_TARGET_LANGUAGE ) )
@@ -201,7 +201,7 @@ public class StaticIoCCommandLineCompiler
 	    }
 		
 		// Now instantiate and call the IocCompiler
-		IoCCompiler springStaticFactoryGenerator = new SpringStaticFactoryGenerator();		
+		IoCCompiler springStaticFactoryGenerator = new SpringStaticFactoryGenerator();
 	
 		try
 		{			

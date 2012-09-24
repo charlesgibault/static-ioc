@@ -2,3 +2,4 @@
 .project
 .settings/
 target/
+static-ioc-commandline/dependency-reduced-pom.xml

@@ -52,6 +52,25 @@ public class IoCCompilerHelper
 		}
 	}
 	
+	public static List<String> extractSourcesList(String sourcesListAsString)
+	{
+		String[] sources = sourcesListAsString.trim().split( "," );
+		
+		List<String> sourcesList = new LinkedList<String>();
+		
+		for (String source : sources)
+		{
+			String trimmedSource = source.trim();
+			
+			if( !trimmedSource.isEmpty() )
+			{
+				sourcesList.add(trimmedSource);				
+			}
+		}
+		
+		return sourcesList;
+	}
+	
 	public static Map< String,List<String> > getTargetMapping( String targetMappingAsText )
 	{		
 		//Parse targetMapping definition and build associated map
@@ -79,19 +98,9 @@ public class IoCCompilerHelper
 			}
 			
 			String target = trimmedMapping.substring( 0, targetSourceSeparator );
-			String[] sources = trimmedMapping.substring( targetSourceSeparator + 1 ).split( "," );
+			String sourcesAsString = trimmedMapping.substring( targetSourceSeparator + 1 );
 			
-			List<String> sourcesList = new LinkedList<String>();
-			
-			for (String source : sources)
-			{
-				String trimmedSource = source.trim();
-				
-				if( !trimmedSource.isEmpty() )
-				{
-					sourcesList.add(trimmedSource);				
-				}
-			}
+			List<String> sourcesList = extractSourcesList( sourcesAsString );
 			
 			if( !sourcesList.isEmpty() && !target.isEmpty() )
 			{
