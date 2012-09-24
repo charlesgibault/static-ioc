@@ -14,7 +14,7 @@
 	<developers>
     		<developer>
       			<id>charles.gibault</id>
-      			<name>Charles</name>
+      			<name>Charles Gibault</name>
       			<roles>
         			<role>architect</role>
         			<role>developer</role>
@@ -22,7 +22,10 @@
       			<timezone>+1</timezone>
     		</developer>
 	</developers>
-	
+	<organization>
+		<name>Static IOC OSS project</name>
+		<url>https://code.google.com/p/static-ioc/</url>
+	</organization>
 	<licenses>
 		<license>
 		<name>The Apache Software License, Version 2.0</name>
@@ -45,9 +48,9 @@
 	<modules>
         	<module>static-ioc-core</module>
         	<module>static-ioc-generators</module>
-		<module>static-ioc-commandline</module>
-		<module>static-ioc-maven-plugin</module>
-    	</modules>
+			<module>static-ioc-commandline</module>
+			<module>static-ioc-maven-plugin</module>
+    </modules>
 
 	<properties>
 		<slf4j-version>1.6.6</slf4j-version>
@@ -57,7 +60,8 @@
 		<junit-version>4.10</junit-version>	
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    	<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<main.basedir>${project.basedir}</main.basedir>
 	</properties>
 
 	<build>
@@ -71,7 +75,40 @@
                         			<target>1.6</target>
                     			</configuration>
                			</plugin>
-            		</plugins>
+		
+						<plugin>
+							<groupId>com.mycila.maven-license-plugin</groupId>
+							<artifactId>maven-license-plugin</artifactId>
+							<version>1.9.0</version>
+							<configuration>
+								<header>${basedir}/src/etc/header.txt</header>
+								<failIfMissing>true</failIfMissing>
+								<aggregate>true</aggregate>
+								<strictCheck>true</strictCheck>
+								<properties>
+									<owner>Charles Gibault</owner>
+									<year>${project.inceptionYear}</year>
+									<email>firstname dot lastname @arobase@ gmail.com</email>
+								</properties>
+								<includes>
+									<include>src/main/</include>
+									<include>src/test/**</include>
+								</includes>
+								<excludes>
+									<exclude>LICENSE.txt</exclude>
+									<exclude>target/**</exclude>
+								</excludes>
+							</configuration>
+							<executions>
+								<execution>
+								<phase>none</phase>
+								<goals>
+									<goal>check</goal>
+								</goals>
+								</execution>
+							</executions>
+						</plugin>
+					</plugins>
         	</pluginManagement>
     	</build>
 	
