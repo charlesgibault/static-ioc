@@ -12,6 +12,10 @@
   <packaging>maven-plugin</packaging>
   <name>staticioc maven plugin</name>
   
+  <properties>
+    	<main.basedir>${project.parent.basedir}</main.basedir>
+  </properties>
+  
  <dependencies>
 
     <dependency>

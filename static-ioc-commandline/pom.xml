@@ -12,6 +12,10 @@
 	<packaging>jar</packaging>
 	<name>staticioc command line tool</name>
 
+	<properties>
+    	<main.basedir>${project.parent.basedir}</main.basedir>
+	</properties>
+
 	<build>
 		<plugins>
 			<plugin>

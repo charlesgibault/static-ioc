@@ -11,6 +11,10 @@
 	<packaging>jar</packaging>
 	<name>staticioc core XML configuration parser and API classes</name>
 	
+	<properties>
+    	<main.basedir>${project.parent.basedir}</main.basedir>
+	</properties>
+	
 	<dependencies>
 		<dependency>
 			<groupId>commons-io</groupId>

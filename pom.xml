@@ -81,7 +81,7 @@
 							<artifactId>maven-license-plugin</artifactId>
 							<version>1.9.0</version>
 							<configuration>
-								<header>${basedir}/src/etc/header.txt</header>
+								<header>${main.basedir}/etc/header.txt</header>
 								<failIfMissing>true</failIfMissing>
 								<aggregate>true</aggregate>
 								<strictCheck>true</strictCheck>
@@ -101,7 +101,7 @@
 							</configuration>
 							<executions>
 								<execution>
-								<phase>none</phase>
+								<phase>verify</phase>
 								<goals>
 									<goal>check</goal>
 								</goals>
