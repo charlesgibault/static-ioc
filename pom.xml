@@ -45,6 +45,16 @@
 		<url>https://code.google.com/p/static-ioc/source/browse/</url>
 	</scm>
 
+	<distributionManagement>
+		<repository>
+		  <uniqueVersion>false</uniqueVersion>
+		  <id>local_release</id>
+		  <name>Local release repository</name>
+		  <url>file:///d/java/m2_repo_release</url>
+		  <layout>default</layout>
+		</repository>
+    </distributionManagement>
+	
 	<modules>
         	<module>static-ioc-core</module>
         	<module>static-ioc-generators</module>
@@ -75,7 +85,11 @@
                         			<target>1.6</target>
                     			</configuration>
                			</plugin>
-		
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-release-plugin</artifactId>
+							<version>2.3.2</version>
+						</plugin>
 						<plugin>
 							<groupId>com.mycila.maven-license-plugin</groupId>
 							<artifactId>maven-license-plugin</artifactId>
