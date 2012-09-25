@@ -24,7 +24,7 @@
         <version>0.1-SNAPSHOT</version>
         <configuration>
         	<targetLanguage>Java</targetLanguage>
-        	<outputPath>src/main/java</outputPath>
+        <!-- 	<outputPath>src/main/java</outputPath> -->
         	<targetMapping>
   	 			<org.staticioc.samples.ApplicationContext>src/main/resources/applicationContext.xml</org.staticioc.samples.ApplicationContext>
 	 		</targetMapping>

@@ -82,7 +82,7 @@ public class StaticIocMojo
     
     /**
      * Location of the generated file. By default : put into the src directory
-     * @parameter expression="${staticioc.outputPath}"  default-value="${project.src.directory}"
+     * @parameter expression="${staticioc.outputPath}"  default-value="${project.build.sourceDirectory}"
      */
     private File outputPath;
 
@@ -107,11 +107,14 @@ public class StaticIocMojo
     	//Have the slf4j and maven logs communicate
     	StaticLoggerBinder.getSingleton().setMavenLog( getLog() );
     	
-        File f = outputPath;
-        //TODO check if we throw an error instead 
-        if ( !f.exists() )
+    	if( getLog().isDebugEnabled() )
+    	{
+    		getLog().debug("Using output Path " + outputPath);
+    	}
+    	
+        if ( outputPath == null || !outputPath.exists() )
         {
-            f.mkdirs();
+        	throw new MojoFailureException ( "Output path is not configured" );
         }
 
         IoCCompiler springStaticFactoryGenerator = new SpringStaticFactoryGenerator();
@@ -131,7 +134,10 @@ public class StaticIocMojo
 	{
     	if( generator == null && targetLanguage != null )
     	{		
-    		getLog().debug( "Using Target language " + targetLanguage );
+    		if( getLog().isDebugEnabled() )
+        	{
+    			getLog().debug( "Using Target language " + targetLanguage );
+        	}
     		generator = CodeGeneratorNameHelper.getGeneratorClass( targetLanguage );
     	}
     	
