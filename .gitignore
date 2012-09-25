@@ -3,3 +3,7 @@
 .settings/
 target/
 static-ioc-commandline/dependency-reduced-pom.xml
+pom.xml.next
+pom.xml.tag
+pom.xml.releaseBackup
+release.properties
