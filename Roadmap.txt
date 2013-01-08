@@ -1,18 +1,19 @@
+Please find below some visibility on the planned feature roadmap
 
 // Release 0.1
-// Maven shade plugin for uber jar
-// license headers (multproject/each source file / shaded command line jar
-// Maven plugin (no shade)
-// Wiki
+Initial release. Java target with maven plugin and command line tool.
 
 // Release 0.2
 // Implement destructor logic
-// Support Python and Jython targets
-// TODO add support for factory bean / factory method
+// Add support for factory bean / factory method
+// Add GWT sample project
+// Add Play N sample project?
+// Add (partial) support for PropertyPlaceHolders
+// Wiki
 
 // Release 0.3
-// Objective C and Cpp
-//TODO add (partial) support for PropertyPlaceHolders
+// Support Python and Jython targets
+// Support Objective C and Cpp targets
 
 // Release 0.4
 // Refactor spring config loader
