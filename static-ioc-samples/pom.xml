@@ -22,6 +22,13 @@
         <groupId>org.staticioc</groupId>
         <artifactId>staticioc-maven-plugin</artifactId>
         <version>0.1-SNAPSHOT</version>
+	<executions>
+	 <execution>
+	   <goals>
+	   	<goal>generate</goal>
+	   </goals>
+	 </execution>
+	</executions>
         <configuration>
         	<targetLanguage>Java</targetLanguage>
         <!-- 	<outputPath>src/main/java</outputPath> -->
