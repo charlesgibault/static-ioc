@@ -41,7 +41,7 @@
 	</issueManagement>
 	
 	 <scm>
-		<developerConnection>scm:git: https://code.google.com/p/static-ioc/</developerConnection>
+		<developerConnection>scm:git:https://charles.gibault@code.google.com/p/static-ioc/</developerConnection>
 		<url>https://code.google.com/p/static-ioc/source/browse/</url>
 	</scm>
 
