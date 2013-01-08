@@ -51,7 +51,7 @@
 		  <uniqueVersion>false</uniqueVersion>
 		  <id>local_release</id>
 		  <name>Local release repository</name>
-		  <url>file:///d/java/m2_repo_release</url>
+		  <url>file:///java/m2_repo_release</url>
 		  <layout>default</layout>
 		</repository>
     </distributionManagement>
