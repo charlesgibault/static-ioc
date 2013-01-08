@@ -3,7 +3,7 @@
 	<groupId>org.staticioc</groupId>
 	<artifactId>staticioc-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>0.1</version>
+	<version>0.2-SNAPSHOT</version>
 	<name>staticioc parent project</name>
 	<description>The goal of this project is to allow the use of the Inversion of Control pattern at compile time so it can be applied in any context, and for virtually any langage: IoC configuration files are resolved at compile time and converted into the appropriate piece of code.
 	 
@@ -43,7 +43,7 @@
 	 <scm>
 		<developerConnection>scm:git:https://charles.gibault@code.google.com/p/static-ioc/</developerConnection>
 		<url>https://code.google.com/p/static-ioc/source/browse/</url>
-	  <tag>staticioc-parent-0.1</tag>
+	  <tag>HEAD</tag>
   </scm>
 
 	<distributionManagement>
