@@ -24,7 +24,9 @@ public class ApplicationContext
 		coordinator.setCustomerService( customerService );
 
 
-	}	public void destroyContext()
+	}
+
+	public void destroyContext()
 	{
 
 	}
