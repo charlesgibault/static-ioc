@@ -97,7 +97,6 @@ public class JavaCodeGeneratorTest
 		assertEquals("Incorrect package declaration", "package org.test.package;\n", result.toString());
 	}
 	
-	
 	/**
 	 * Test that generated java file will end by .java
 	 */
@@ -134,6 +133,7 @@ public class JavaCodeGeneratorTest
 		generator.closeConstructor( className );
 		
 		generator.initDestructor( className );
+		generator.deleteBean( bean );
 		generator.closeDestructor( className );
 		
 		generator.closeClass(className);
@@ -147,7 +147,9 @@ public class JavaCodeGeneratorTest
 					+ "bean = new org.staticioc.model.Bean();\n"
 					+ "bean.setName( \"value\" );\n"
 					+"}\n"
-					+ "public void destroyContext() { }\n"
+					+ "public void destroyContext() {\n" +
+					"bean = null;\n" +
+					"}\n"
 					+ "}" );
 		
 		Assert.assertEquals( "Incorrect class definition", expectedResult, normalizeCode( result.toString() ) );

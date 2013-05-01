@@ -22,7 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
+import java.util.NavigableMap;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -106,7 +106,7 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 		codeGenerator.setOutput( res );
 		
 		SpringConfigParser springConfigParser = new SpringConfigParser();
-		SortedMap<String, Bean> beanClassMap = springConfigParser.load( configurationFiles );
+		NavigableMap<String, Bean> beanClassMap = springConfigParser.load( configurationFiles );
 
 		codeGenerator.comment(Level.HEADER, commentHeader );
 
@@ -138,7 +138,6 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 			
 			// Ignore abstract beans and prototypes
 			if ( isHidden(bean) ){ continue; }
-						
 			codeGenerator.instantiateBean( bean );
 		}
 		
@@ -187,7 +186,18 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 		res.append("\n");
 		
 		codeGenerator.initDestructor( generatedClassName );
-		//TODO build destructor : free beans in their reverse order of creation
+		
+		//Destructor : free beans in their reverse order of creation
+		for ( String beanName: beanClassMap.descendingKeySet() )
+		{
+			final Bean bean = beanClassMap.get(beanName);
+			
+			// Ignore abstract beans and prototypes that were not instanciated
+			if ( isHidden(bean) ){ continue; }
+			codeGenerator.deleteBean( bean );
+		}
+		
+		
 		codeGenerator.closeDestructor( generatedClassName );
 
 		codeGenerator.closeClass( generatedClassName );

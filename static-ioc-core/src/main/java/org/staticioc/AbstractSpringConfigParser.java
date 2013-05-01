@@ -42,8 +42,8 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -99,7 +99,7 @@ public abstract class AbstractSpringConfigParser {
 	private static int anonymousBeanIdentifier = 0;
 
 	// Map a bean's id to the actual instanciated beans 
-	private final SortedMap<String,Bean> beans = new TreeMap<String,Bean>();
+	private final NavigableMap<String,Bean> beans = new TreeMap<String,Bean>();
 	
 	// Map a bean's name (alias) to the actual registerd beans 
 	private final Map<String,Bean> aliases = new HashMap<String,Bean>();
@@ -260,7 +260,7 @@ public abstract class AbstractSpringConfigParser {
 		return (bean != null)? bean : aliases.get(id);
 	}
 	
-	protected SortedMap<String, Bean > getBeans()
+	protected NavigableMap<String, Bean > getBeans()
 	{
 		return beans;
 	}

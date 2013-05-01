@@ -23,9 +23,9 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.NavigableMap;
+import java.util.NavigableSet;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 
@@ -645,9 +645,9 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		}
 	}
 
-	public SortedMap<String, Bean> load( Collection<String> configurationFiles) throws SAXException, IOException
+	public NavigableMap<String, Bean> load( Collection<String> configurationFiles) throws SAXException, IOException
 	{
-		final SortedSet<String> loadedContext = new TreeSet<String>();
+		final NavigableSet<String> loadedContext = new TreeSet<String>();
 
 		// Start by loading each configuration file without resolving beans
 		for( String config : configurationFiles )
@@ -670,7 +670,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 	}
 
 	
-	public Map<String, Bean> load( String configurationFile) throws SAXException, IOException
+	public NavigableMap<String, Bean> load( String configurationFile) throws SAXException, IOException
 	{
 		return load( configurationFile, new HashSet<String>(), true );
 	}
@@ -684,7 +684,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	protected Map<String, Bean> load( String configurationFile, Set<String> loadedContext, boolean resolveBean) throws SAXException, IOException
+	protected NavigableMap<String, Bean> load( String configurationFile, Set<String> loadedContext, boolean resolveBean) throws SAXException, IOException
 	{
 		// Start by keeping track of loaded file (after normalizing its name)
 		configurationFile = FilenameUtils.concat( FilenameUtils.getFullPath( configurationFile ), FilenameUtils.getName( configurationFile ) );

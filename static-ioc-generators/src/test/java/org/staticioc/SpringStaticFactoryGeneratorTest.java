@@ -91,7 +91,11 @@ public class SpringStaticFactoryGeneratorTest
 				+ "personBean.setCountry( country );\n"
 								
 				+"}\n"
-				+ "public void destroyContext() { }\n"
+				+ "public void destroyContext() {\n"
+				+ "personBean = null;\n"
+				+ "number10House = null;\n"
+				+ "country = null;\n"
+				+ "}\n"
 				+ "}" );
 		
 		result = factoryGenerator.generate(codeGenerator, packageName, className, Arrays.asList( contexts ) );
