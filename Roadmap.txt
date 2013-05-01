@@ -4,8 +4,13 @@ Please find below some visibility on the planned feature roadmap
 Initial release. Java target with maven plugin and command line tool.
 
 // Release 0.2
-// Implement destructor logic
+- Made beans declaration sorted
+- Added name alias support for bean when id and name are both declared
+- Implement destructor workflow + java generator
+
+// Refactor collection and parent dependency out of the way
 // Add support for factory bean / factory method
+
 // Add GWT sample project
 // Add Play N sample project?
 // Add (partial) support for PropertyPlaceHolders
