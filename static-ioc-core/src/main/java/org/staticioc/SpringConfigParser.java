@@ -24,6 +24,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 
 import javax.xml.parsers.DocumentBuilder;
@@ -220,26 +223,21 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		bean.setAbstract( abstractBean );
 		bean.setScope( scope );
 
-		// read properties
-		handleBeanNode( bean, beanAttributes, beanNode );
+		// read all kind of properties
+		// Handle Spring p:* properties
+		handleSpringPProperties(bean, beanAttributes);
+				
+		// Enrich bean with constructor args
+		handleConstructorArgs( bean, beanNode);
+						
+		// Handle properties
+		final NodeList propsRef = (NodeList) xProps.evaluate(beanNode, XPathConstants.NODESET);
+		handleBeanProperties(bean, propsRef);
 		
 		// register Bean in Map
 		register( bean );
 		
 		return id;
-	}
-
-	protected void handleBeanNode( final Bean bean, final NamedNodeMap beanAttributes, final Node beanNode ) throws XPathExpressionException
-	{
-		// Handle Spring p:* properties
-		handleSpringPProperties(bean, beanAttributes);
-		
-		// Enrich bean with constructor args
-		handleConstructorArgs( bean, beanNode);
-				
-		// Handle properties
-		final NodeList propsRef = (NodeList) xProps.evaluate(beanNode, XPathConstants.NODESET);
-		handleBeanProperties(bean, propsRef);
 	}
 	
 	/**
@@ -314,7 +312,6 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 			
 			if(nameNode != null ) // Ignore properties with no name
 			{
-
 				final String propName = nameNode.getNodeValue();
 
 				final Node valueNode = propAttributes.getNamedItem(VALUE);
@@ -645,9 +642,9 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		}
 	}
 
-	public Map<String, Bean> load( Collection<String> configurationFiles) throws SAXException, IOException
+	public SortedMap<String, Bean> load( Collection<String> configurationFiles) throws SAXException, IOException
 	{
-		final Set<String> loadedContext = new HashSet<String>();
+		final SortedSet<String> loadedContext = new TreeSet<String>();
 
 		// Start by loading each configuration file without resolving beans
 		for( String config : configurationFiles )

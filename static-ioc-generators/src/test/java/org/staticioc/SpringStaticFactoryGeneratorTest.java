@@ -66,17 +66,17 @@ public class SpringStaticFactoryGeneratorTest
 				+ "public class " + className + " {\n"
 				
 				+ "/** * Bean definition */\n"
+				+ "public final test.Country country;\n"
 				+ "public final test.House number10House;\n"
 				+ "public final test.Person personBean;\n"
-				+ "public final test.Country country;\n"
 				
 				+ "/** * Constructor of the Factory */\n"
 				+ "public " + className + "() {\n"
 				
 				+ "// Instanciating beans\n"
+				+ "country = new test.Country(42, new java.util.Integer( 7500000 ));\n"
 				+ "number10House = new test.House();\n"
 				+ "personBean = new test.Person();\n"
-				+ "country = new test.Country(42, new java.util.Integer( 7500000 ));\n"
 
 				+ "// Setting up bean number10House\n"
 				+ "number10House.setPerson( personBean );\n"

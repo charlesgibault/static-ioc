@@ -42,6 +42,8 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.xpath.XPathExpressionException;
@@ -95,8 +97,8 @@ public abstract class AbstractSpringConfigParser {
 	public static final String PROTOTYPE_BEAN_PREFIX = "prototyped_";
 	private static int anonymousBeanIdentifier = 0;
 
-	// Map a bean's name to the actual Bean instance
-	private final Map<String,Bean> beanClassMap = new ConcurrentHashMap<String,Bean>();
+	// Map a bean's name to the actual instanciated beans 
+	private final SortedMap<String,Bean> beans = new TreeMap<String,Bean>();
 	
 	// Map a bean
 	private final Map<String, ParentDependency > parentDependencyMap = new ConcurrentHashMap<String, ParentDependency>();
@@ -185,7 +187,7 @@ public abstract class AbstractSpringConfigParser {
 			logger.debug( "Adding {}", bean );
 		}
 		
-		beanClassMap.put( bean.getName(), bean );
+		beans.put( bean.getName(), bean );
 		
 		if( bean.getScope().equals( Scope.PROTOTYPE ) )
 		{
@@ -243,12 +245,12 @@ public abstract class AbstractSpringConfigParser {
 	 */
 	protected Bean getBeanByName( final String name)
 	{
-		return beanClassMap.get(name);
+		return beans.get(name);
 	}
 	
-	protected Map<String, Bean > getBeans()
+	protected SortedMap<String, Bean > getBeans()
 	{
-		return beanClassMap;
+		return beans;
 	}
 
 	protected Property getVal(String propertyName, String value) {
@@ -408,7 +410,7 @@ public abstract class AbstractSpringConfigParser {
 	{
 		if ( prop.getRef() != null && prototypeBeans.contains( prop.getRef() ) )
 		{
-			Bean prototype = beanClassMap.get( prop.getRef() );
+			Bean prototype = beans.get( prop.getRef() );
 			
 			if( prototype != null)
 			{

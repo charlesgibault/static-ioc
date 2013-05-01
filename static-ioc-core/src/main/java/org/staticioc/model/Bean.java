@@ -23,7 +23,9 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class Bean
+import org.apache.commons.lang.StringUtils;
+
+public class Bean implements Comparable<Bean>
 {
 	public enum Type { SIMPLE, LIST, SET, PROPERTIES, MAP };
 	public enum Scope { SINGLETON, PROTOTYPE };
@@ -104,6 +106,25 @@ public class Bean
 		return true;
 	}
 	
+	
+	@Override
+	public int compareTo(Bean bean)
+	{
+		
+		if( StringUtils.equals(name, bean.name) )
+		{
+			return 0;
+		}
+		
+		if( name == null)
+		{
+			return -1;
+		}
+		
+		// TODO Check if this depends on bean
+		
+		return name.compareTo(bean.name);
+	}
 	@Override
 	public String toString() {
 		return "Bean [name=" + name + ", className=" + className + ", type="

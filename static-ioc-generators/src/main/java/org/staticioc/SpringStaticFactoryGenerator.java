@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -105,7 +106,7 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 		codeGenerator.setOutput( res );
 		
 		SpringConfigParser springConfigParser = new SpringConfigParser();
-		Map<String, Bean> beanClassMap = springConfigParser.load( configurationFiles );
+		SortedMap<String, Bean> beanClassMap = springConfigParser.load( configurationFiles );
 
 		codeGenerator.comment(Level.HEADER, commentHeader );
 
