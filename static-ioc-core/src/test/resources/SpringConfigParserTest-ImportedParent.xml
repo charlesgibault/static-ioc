@@ -34,7 +34,7 @@
 		<property name="age" value="old" />	
 	</bean>
 	
-	<bean id="parent" parent="grandParent" class="parent.Bean">
+	<bean id="parent" name="beanImportParentName" parent="grandParent" class="parent.Bean">
 		<property name="age" value="40" />	
 	</bean>
 	

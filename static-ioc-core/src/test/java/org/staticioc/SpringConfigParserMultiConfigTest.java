@@ -56,7 +56,7 @@ public class SpringConfigParserMultiConfigTest extends AbstractSpringParserTest 
 		Assert.assertNotNull( prototypeBean );		
 
 		// Prototype bean definition checks
-		assertEquals("Bean id not properly set", "prototype", prototypeBean.getName() );
+		assertEquals("Bean id not properly set", "prototype", prototypeBean.getId() );
 		assertEquals("Bean is not a prototype" , Bean.Scope.PROTOTYPE, prototypeBean.getScope() );
 
 		// Property checks
@@ -106,7 +106,7 @@ public class SpringConfigParserMultiConfigTest extends AbstractSpringParserTest 
 		Assert.assertNotNull( foreignChildBean );
 		
 		// Bean definition checks
-		assertEquals("Bean id not properly set", "foreignChildBean", foreignChildBean.getName() );
+		assertEquals("Bean id not properly set", "foreignChildBean", foreignChildBean.getId() );
 		assertEquals("Bean class not properly set", "test.Person", foreignChildBean.getClassName() );		
 		assertFalse("Real bean wrongly considered as abstract" , foreignChildBean.isAbstract() );
 		

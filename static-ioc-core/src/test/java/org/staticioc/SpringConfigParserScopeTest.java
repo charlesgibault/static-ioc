@@ -52,7 +52,7 @@ public class SpringConfigParserScopeTest extends AbstractSpringParserTest {
 		Assert.assertNotNull( singletonBean );		
 		
 		// Bean definition checks
-		assertEquals("Bean id not properly set", "singleton", singletonBean.getName() );
+		assertEquals("Bean id not properly set", "singleton", singletonBean.getId() );
 		assertEquals("Bean class not properly set", "test.Singleton", singletonBean.getClassName() );
 		assertFalse("Real bean wrongly considered as abstract" , singletonBean.isAbstract() );
 		assertEquals("Bean not a singleton" , Bean.Scope.SINGLETON, singletonBean.getScope() );
@@ -61,8 +61,8 @@ public class SpringConfigParserScopeTest extends AbstractSpringParserTest {
 		final Map<String, Property> userBean1Properties = mapProperties( userBean1.getProperties() );
 		final Map<String, Property> userBean2Properties = mapProperties( userBean2.getProperties() );
 
-		checkProperty(userBean1Properties, "singletonBean", null, 	singletonBean.getName() );
-		checkProperty(userBean2Properties, "singletonBean", null, 	singletonBean.getName() );		
+		checkProperty(userBean1Properties, "singletonBean", null, 	singletonBean.getId() );
+		checkProperty(userBean2Properties, "singletonBean", null, 	singletonBean.getId() );		
 	}
 	
 	/**
@@ -81,7 +81,7 @@ public class SpringConfigParserScopeTest extends AbstractSpringParserTest {
 		Assert.assertNotNull( prototypeBean );		
 
 		// Prototype bean definition checks
-		assertEquals("Bean id not properly set", "prototype", prototypeBean.getName() );
+		assertEquals("Bean id not properly set", "prototype", prototypeBean.getId() );
 		assertEquals("Bean class not properly set", "test.Prototype", prototypeBean.getClassName() );
 		assertFalse("Real bean wrongly considered as abstract" , prototypeBean.isAbstract() );
 		assertEquals("Bean is not a prototype" , Bean.Scope.PROTOTYPE, prototypeBean.getScope() );

@@ -162,7 +162,7 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 					
 					if( refBean == null )
 					{
-						logger.warn( "Reference {} does not exist for Bean {}", prop.getRef(), bean.getName() );
+						logger.warn( "Reference {} does not exist for Bean {}", prop.getRef(), bean.getId() );
 						
 						if( isIgnoreUnresolvedRefs() )
 						{
@@ -172,7 +172,7 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 					}
 					else if ( refBean.isAbstract() )
 					{
-						logger.warn( "Reference {} is abstract for Bean {}", prop.getRef(), bean.getName() );
+						logger.warn( "Reference {} is abstract for Bean {}", prop.getRef(), bean.getId() );
 						continue;
 					}
 				}

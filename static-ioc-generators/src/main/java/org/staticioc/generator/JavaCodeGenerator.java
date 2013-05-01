@@ -112,7 +112,7 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 			getBuilder().append("\tpublic final ");
 		}
 			
-		getBuilder().append( getBeanClass( bean ) ).append(" ").append( bean.getName() ).append( ";\n" );
+		getBuilder().append( getBeanClass( bean ) ).append(" ").append( bean.getId() ).append( ";\n" );
 	}
 	
 	protected String getBeanClass( Bean bean )
@@ -135,7 +135,7 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 	@Override
 	public void instantiateBean( Bean bean )
 	{
-		getBuilder().append("\t\t").append( bean.getName() ).append( " = new " ).append( getBeanClass( bean ) ).append("(");
+		getBuilder().append("\t\t").append( bean.getId() ).append( " = new " ).append( getBeanClass( bean ) ).append("(");
 		
 		// handle constructor args
 		boolean isFirstArg = true;
@@ -198,7 +198,7 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 	@Override
 	public void declareProperty( Bean bean, final Property property )
 	{
-		getBuilder().append( "\t\t").append( bean.getName() ).append("." ).append( getAssignMethod( bean, property ) );
+		getBuilder().append( "\t\t").append( bean.getId() ).append("." ).append( getAssignMethod( bean, property ) );
 		appendPropertyValue( property );
 		getBuilder().append( " );\n" );	
 	}
@@ -245,7 +245,7 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 	@Override
 	public void deleteBean( Bean bean )
 	{
-		getBuilder().append( "\t" ).append( bean.getName() ).append(" = null;");
+		getBuilder().append( "\t" ).append( bean.getId() ).append(" = null;");
 	}
 
 	protected String getListClass() {

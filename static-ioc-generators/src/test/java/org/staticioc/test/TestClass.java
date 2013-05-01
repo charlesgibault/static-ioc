@@ -23,7 +23,7 @@ public class TestClass {
 
 	public TestClass() {
 		bean = new org.staticioc.model.Bean();
-		bean.setName("value");
+		bean.setId("value");
 	}
 
 	public void destroyContext() {

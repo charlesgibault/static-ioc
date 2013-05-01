@@ -37,7 +37,6 @@ public class SpringConfigParserSimpleBeanTest extends AbstractSpringParserTest
 		super( TEST_CONTEXT );
 	}
 	
-	
 	/**
 	 * Simple Bean loading validation : personBean
 	 * 
@@ -51,7 +50,7 @@ public class SpringConfigParserSimpleBeanTest extends AbstractSpringParserTest
 		Assert.assertNotNull( bean );
 		
 		// Bean definition checks
-		assertEquals("Bean id not properly set", "personBean", bean.getName() );
+		assertEquals("Bean id not properly set", "personBean", bean.getId() );
 		assertEquals("Bean class not properly set", "test.Person", bean.getClassName() );
 		assertEquals("Bean type not properly set", Bean.Type.SIMPLE , bean.getType() );
 		assertFalse("Named bean wrongly considered as anonymous" , bean.isAnonymous() );
@@ -68,6 +67,34 @@ public class SpringConfigParserSimpleBeanTest extends AbstractSpringParserTest
 		checkProperty(properties, "birthCountry",null, 			"country" );
 		checkProperty(properties, "age", 		"28", 			null );
 		checkProperty(properties, "reference", 	null, 			"number10House" );
+	}
+	
+	/**
+	 * Simple Bean loading validation : personBean
+	 * 
+	 */
+	@Test
+	public void testAliasBeanLoading()
+	{
+		// Retrieve personBean and test properties
+		Bean bean1a = loadedBeans.get("personBean");
+		Bean bean1b = loadedBeans.get("myPersonBean");
+		
+		Bean bean2a = loadedBeans.get("country");
+		Bean bean2b = loadedBeans.get("myCountry");
+		
+		Bean bean = loadedBeans.get("personBean");
+		
+		Assert.assertNotNull( bean1a );
+		Assert.assertNull( bean1b ); // alias bean should not be referenced
+		Assert.assertNotNull( bean2a );
+		Assert.assertNull( bean2b ); // alias bean should not be referenced
+		
+		Assert.assertNotNull( bean );
+		
+		// Property checks
+		final Map<String, Property> properties = mapProperties( bean.getProperties() );
+		checkProperty(properties, "namedCountry", 	null, "country" ); // Reference to myCountry should be resolved to bean's id country 
 	}
 
 	/**
@@ -116,7 +143,7 @@ public class SpringConfigParserSimpleBeanTest extends AbstractSpringParserTest
 		Assert.assertNotNull( bean );
 		
 		// Bean definition checks
-		assertEquals("Bean id not properly set", "number10House", bean.getName() );
+		assertEquals("Bean id not properly set", "number10House", bean.getId() );
 		assertEquals("Bean class not properly set", "test.House", bean.getClassName() );
 		assertEquals("Bean type not properly set", Bean.Type.SIMPLE , bean.getType() );
 		assertFalse("Named bean wrongly considered as anonymous" , bean.isAnonymous() );
@@ -142,7 +169,8 @@ public class SpringConfigParserSimpleBeanTest extends AbstractSpringParserTest
 		Assert.assertNotNull( bean );
 		
 		// Bean definition checks
-		assertEquals("Bean id not properly set", "country", bean.getName() );
+		assertEquals("Bean id not properly set", "country", bean.getId() );
+		assertEquals("Bean alias not properly set", "myCountry", bean.getAlias() );
 		assertEquals("Bean class not properly set", "test.Country", bean.getClassName() );
 		assertEquals("Bean type not properly set", Bean.Type.SIMPLE , bean.getType() );
 		assertFalse("Named bean wrongly considered as anonymous" , bean.isAnonymous() );

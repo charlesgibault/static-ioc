@@ -31,15 +31,15 @@ public class Bean implements Comparable<Bean>
 	public enum Scope { SINGLETON, PROTOTYPE };
 	
 	public Bean(){}
-	public Bean( String name, String className)
+	public Bean( String id, String className)
 	{
-		this.name = name;
+		this.id = id;
 		this.className = className;
 	}
 	
-	public Bean( String name, String className, boolean anonymous)
+	public Bean( String id, String className, boolean anonymous)
 	{
-		this.name = name;
+		this.id = id;
 		this.className = className;
 		this.anonymous = anonymous;
 	}
@@ -50,9 +50,9 @@ public class Bean implements Comparable<Bean>
 	 * @param parent
 	 * @param anonymous
 	 */
-	public Bean( String name, Bean parent, boolean anonymous)
+	public Bean( String id, Bean parent, boolean anonymous)
 	{
-		this.name = name;
+		this.id = id;
 		this.className = parent.className;
 		this.type = parent.type;
 		this.scope = parent.scope;
@@ -70,7 +70,8 @@ public class Bean implements Comparable<Bean>
 		}
 	}
 		
-	private String name;
+	private String id;
+	private String alias=null;
 	private String className;
 	private Type type = Type.SIMPLE;
 	private Scope scope = Scope.SINGLETON;
@@ -85,7 +86,7 @@ public class Bean implements Comparable<Bean>
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		return result;
 	}
 
@@ -98,45 +99,44 @@ public class Bean implements Comparable<Bean>
 		if (getClass() != obj.getClass())
 			return false;
 		Bean other = (Bean) obj;
-		if (name == null) {
-			if (other.name != null)
+		if (id == null) {
+			if (other.id != null)
 				return false;
-		} else if (!name.equals(other.name))
+		} else if (!id.equals(other.id))
 			return false;
 		return true;
 	}
-	
 	
 	@Override
 	public int compareTo(Bean bean)
 	{
 		
-		if( StringUtils.equals(name, bean.name) )
+		if( StringUtils.equals(id, bean.id) )
 		{
 			return 0;
 		}
 		
-		if( name == null)
+		if( id == null)
 		{
 			return -1;
 		}
 		
 		// TODO Check if this depends on bean
 		
-		return name.compareTo(bean.name);
+		return id.compareTo(bean.id);
 	}
 	@Override
 	public String toString() {
-		return "Bean [name=" + name + ", className=" + className + ", type="
+		return "Bean [id=" + id + ", alias=" + alias + ", className=" + className + ", type="
 				+ type + ", anonymous=" + anonymous + ", abstractBean="
 				+ abstractBean + ", properties=" + properties
 				+ ", constructorArgs=" + constructorArgs + "]";
 	}
-	public String getName() {
-		return name;
+	public String getId() {
+		return id;
 	}
-	public void setName(String name) {
-		this.name = name;
+	public void setId(String id) {
+		this.id = id;
 	}
 	public String getClassName() {
 		return className;
@@ -173,5 +173,11 @@ public class Bean implements Comparable<Bean>
 	}
 	public void setScope(Scope scope) {
 		this.scope = scope;
+	}
+	public String getAlias() {
+		return alias;
+	}
+	public void setAlias(String alias) {
+		this.alias = alias;
 	}
 }

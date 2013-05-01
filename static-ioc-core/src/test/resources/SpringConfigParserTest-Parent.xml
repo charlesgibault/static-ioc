@@ -25,7 +25,7 @@
 		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 	
 	<!-- class with constructor args -->
-	<bean id="beanParent" class="test.Bean">
+	<bean id="beanParent" name="beanParentName" class="test.Bean">
   		<constructor-arg index="0"><value>00</value></constructor-arg>
   		<constructor-arg index="1" type="java.util.Integer"><value>10</value></constructor-arg>
   		<property name="nation" value="import" />
@@ -42,6 +42,9 @@
 	<bean id="abstractBean" parent="beanParent" abstract="true" class="test.AnotherBean">
 		<property name="address" value="Somewhere over the rainbow" />
 	</bean>
+	
+	<bean id="namedParentBean" parent="beanParentName"/>
+	<bean id="namedImportedParentBean" parent="beanImportParentName"/>
 	
 	<import resource="SpringConfigParserTest-ImportedParent.xml"/>
 </beans>

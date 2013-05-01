@@ -139,7 +139,8 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		final Node bNameNode = beanAttributes.getNamedItem(NAME);
 		
 		String id = (idNode != null )? idNode.getNodeValue() : (bNameNode != null )? bNameNode.getNodeValue() : null;
-				
+		final String alias = ( idNode != null  && bNameNode != null)? bNameNode.getNodeValue(): null;
+		
 		boolean isAnonymous = false;
 		if( id == null )
 		{
@@ -157,25 +158,25 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 			final String parentName = parentNode.getNodeValue();
 			
 			// Test direct resolution (parent already registered)
-			final Bean parentBean = getBeanByName( parentName );
+			final Bean parentBean = getBean( parentName );
 			
 			if( parentBean == null) // parent not known yet
 			{
-				registerParent( new ParentDependency( parentName, id, isAnonymous,  beanNode) );
+				registerParent( new ParentDependency( parentName, id, alias, isAnonymous,  beanNode) );
 				return id;
 			}
 			else
 			{
 				// Perform bean copy and continues
-				bean = duplicateBean( id, parentBean, isAnonymous );
+				bean = duplicateBean( id, alias, parentBean, isAnonymous );
 			}
 		}
 		
-		return processBeanNode(beanNode, beanAttributes, id, isAnonymous, bean);
+		return processBeanNode(beanNode, beanAttributes, id, alias, isAnonymous, bean);
 	}
 
 	@Override
-	protected String processBeanNode(final Node beanNode, final NamedNodeMap beanAttributes, final String id, boolean isAnonymous, Bean bean) throws XPathExpressionException
+	protected String processBeanNode(final Node beanNode, final NamedNodeMap beanAttributes, final String id, final String alias, boolean isAnonymous, Bean bean) throws XPathExpressionException
 	{
 		String className = (bean != null)? bean.getClassName() : null;
 		boolean abstractBean = false;
@@ -214,10 +215,12 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		if( bean == null )
 		{
 			bean = new Bean(id, className, isAnonymous );
+			bean.setAlias(alias);
 		}
 		else
 		{
 			bean.setClassName(className); // possible override of the parent's class
+			bean.setAlias(alias);
 		}
 		
 		bean.setAbstract( abstractBean );
@@ -533,7 +536,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 						for (int kc = 0 ; kc < keyDef.getChildNodes().getLength() ; ++kc )
 						{
 							final Node kcNode = keyDef.getChildNodes().item( kc );
-							final String keyPropName = collecBean.getName() + "_key";
+							final String keyPropName = collecBean.getId() + "_key";
 							
 							Property keyRefAsProp = handleSubProp( kcNode, keyPropName );
 							if (keyRefAsProp != null)
@@ -578,7 +581,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 					for (int v = 0 ; v < entry.getChildNodes().getLength() ; ++v )
 					{
 						final Node vNode = entry.getChildNodes().item( v );
-						final String valuePropName = collecBean.getName() + "_value";
+						final String valuePropName = collecBean.getId() + "_value";
 						
 						Property keyValueAsProp = handleSubProp( vNode, valuePropName );
 						if (keyValueAsProp != null)
@@ -736,6 +739,9 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 				resolveParentDefinition();
 				resolvePrototypeBeans();
 			}
+			
+			// Finally resolve alias references
+			resolveAliasReference();
 		}
 		catch( XPathExpressionException e)
 		{

@@ -52,9 +52,9 @@ public class SpringConfigParserParentTest extends AbstractSpringParserTest {
 		Assert.assertNotNull( realBean );
 				
 		// Bean definition checks
-		assertEquals("Bean id not properly set", "beanParent", parentBean.getName() );
-		assertEquals("Bean id not properly set", "abstractBean", abstractBean.getName() );
-		assertEquals("Bean id not properly set", "realBean", realBean.getName() );
+		assertEquals("Bean id not properly set", "beanParent", parentBean.getId() );
+		assertEquals("Bean id not properly set", "abstractBean", abstractBean.getId() );
+		assertEquals("Bean id not properly set", "realBean", realBean.getId() );
 
 		assertEquals("Bean class not properly set", "test.Bean", parentBean.getClassName() );
 		assertEquals("Bean class not properly set", "test.AnotherBean", abstractBean.getClassName() );
@@ -136,9 +136,9 @@ public class SpringConfigParserParentTest extends AbstractSpringParserTest {
 		Assert.assertNotNull( childrenBean );
 		
 		// Bean definition checks
-		assertEquals("Bean id not properly set", "parent", parentBean.getName() );
-		assertEquals("Bean id not properly set", "grandParent", grandParentBean.getName() );
-		assertEquals("Bean id not properly set", "children", childrenBean.getName() );
+		assertEquals("Bean id not properly set", "parent", parentBean.getId() );
+		assertEquals("Bean id not properly set", "grandParent", grandParentBean.getId() );
+		assertEquals("Bean id not properly set", "children", childrenBean.getId() );
 
 		assertEquals("Bean class not properly set", "parent.Bean", parentBean.getClassName() );
 		assertEquals("Bean class not properly set", "test.AnotherBean", grandParentBean.getClassName() );
@@ -151,5 +151,22 @@ public class SpringConfigParserParentTest extends AbstractSpringParserTest {
 		assertEquals( "Constructor args not found were expected", 3, parentBean.getConstructorArgs().size() );
 		assertEquals( "Constructor args not found were expected", 3, grandParentBean.getConstructorArgs().size() );
 		assertEquals( "Constructor args not found were expected", 3, childrenBean.getConstructorArgs().size() );
+	}
+	
+	/**
+	 * imported bean loading test with cross file parent dependencies
+	 * 
+	 */
+	@Test
+	public void testNamedParentRef()
+	{
+		final Bean namedParentBean = loadedBeans.get("namedParentBean");
+		final Bean namedImportedParentBean = loadedBeans.get("namedImportedParentBean");
+		
+		Assert.assertNotNull( namedParentBean );
+		Assert.assertNotNull( namedImportedParentBean );
+		
+		assertEquals("Bean class not properly set", "test.Bean", namedParentBean.getClassName() );
+		assertEquals("Bean class not properly set", "parent.Bean", namedImportedParentBean.getClassName() );
 	}
 }

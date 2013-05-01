@@ -37,6 +37,7 @@ package org.staticioc;
  */
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -97,8 +98,11 @@ public abstract class AbstractSpringConfigParser {
 	public static final String PROTOTYPE_BEAN_PREFIX = "prototyped_";
 	private static int anonymousBeanIdentifier = 0;
 
-	// Map a bean's name to the actual instanciated beans 
+	// Map a bean's id to the actual instanciated beans 
 	private final SortedMap<String,Bean> beans = new TreeMap<String,Bean>();
+	
+	// Map a bean's name (alias) to the actual registerd beans 
+	private final Map<String,Bean> aliases = new HashMap<String,Bean>();
 	
 	// Map a bean
 	private final Map<String, ParentDependency > parentDependencyMap = new ConcurrentHashMap<String, ParentDependency>();
@@ -139,9 +143,10 @@ public abstract class AbstractSpringConfigParser {
 		registerPropertyReference( prop);
 	}
 	
-	protected Bean duplicateBean( final String id, final Bean parent, final boolean isAnonymous)
+	protected Bean duplicateBean( final String id, final String alias, final Bean parent, final boolean isAnonymous)
 	{
 		final Bean duplicatedBean = new Bean( id, parent, isAnonymous );
+		duplicatedBean.setAlias(alias);
 		
 		 //Make sure inherited properties are tracked
 		registerPropertiesReference( duplicatedBean );
@@ -187,12 +192,18 @@ public abstract class AbstractSpringConfigParser {
 			logger.debug( "Adding {}", bean );
 		}
 		
-		beans.put( bean.getName(), bean );
+		beans.put( bean.getId(), bean );
+		
+		if( bean.getAlias() != null)
+		{
+			logger.debug( "Adding alias {} for {}", bean.getAlias(), bean.getId() );
+			aliases.put( bean.getAlias(), bean );
+		}
 		
 		if( bean.getScope().equals( Scope.PROTOTYPE ) )
 		{
 			logger.debug( "Referencing bean {} as prototype", bean );
-			prototypeBeans.add( bean.getName() );
+			prototypeBeans.add( bean.getId() );
 		}
 	}
 
@@ -217,7 +228,7 @@ public abstract class AbstractSpringConfigParser {
 			logger.debug( "Adding {}", parent );
 		}
 		
-		parentDependencyMap.put( parent.getName(), parent );
+		parentDependencyMap.put( parent.getId(), parent );
 	}
 	
 	/**
@@ -243,9 +254,10 @@ public abstract class AbstractSpringConfigParser {
 	 * @param name
 	 * @return
 	 */
-	protected Bean getBeanByName( final String name)
+	protected Bean getBean( final String id)
 	{
-		return beans.get(name);
+		final Bean bean = beans.get(id);
+		return (bean != null)? bean : aliases.get(id);
 	}
 	
 	protected SortedMap<String, Bean > getBeans()
@@ -351,7 +363,7 @@ public abstract class AbstractSpringConfigParser {
 		}
 		
 		// Test direct resolution (parent already registered)
-		Bean parentBean = getBeanByName( dependency.getParentName() );
+		Bean parentBean = getBean( dependency.getParentId() );
 		
 		if( parentBean == null) // parent cannot be resolved directly -> Do a depth first approach
 		{
@@ -359,10 +371,10 @@ public abstract class AbstractSpringConfigParser {
 			// This works because our depth first approach visits each node only once O(N) complexity.
 			visitedBeans.add( name );
 			
-			if ( !visitedBeans.contains( dependency.getParentName() ))
+			if ( !visitedBeans.contains( dependency.getParentId() ))
 			{
-				resolveParentBean( dependency.getParentName(), visitedBeans );
-				parentBean = getBeanByName( dependency.getParentName() );
+				resolveParentBean( dependency.getParentId(), visitedBeans );
+				parentBean = getBean( dependency.getParentId() );
 				
 				if( parentBean == null ) // Parent couldn't be resolved still (due to cycle)
 				{
@@ -378,12 +390,29 @@ public abstract class AbstractSpringConfigParser {
 		}
 		
 		// Perform bean copy and continue
-		final Bean bean = duplicateBean( dependency.getName(), parentBean, dependency.isAnonymous() );
+		final Bean bean = duplicateBean( dependency.getId(), dependency.getAlias(), parentBean, dependency.isAnonymous() );
 		final Node beanNode = dependency.getNode();
 		final NamedNodeMap beanAttributes = beanNode.getAttributes();
 		//TODO remove from parentDependencyMap ?
 		
-		processBeanNode(beanNode, beanAttributes, bean.getName(), dependency.isAnonymous(), bean);			
+		processBeanNode(beanNode, beanAttributes, bean.getId(), bean.getAlias(), dependency.isAnonymous(), bean);			
+	}
+	
+	protected void resolveAliasReference()
+	{
+		logger.debug( "Resolving alias for {} beans", beans.size() );
+		for( Bean bean : beans.values() )
+		{
+			for( Property prop : bean.getProperties() )
+			{
+				Bean aliasBean = aliases.get( prop.getRef() );
+				if( aliasBean != null )
+				{
+					logger.debug( "Resolved alias {} for bean {}", prop.getRef(), bean.getId() );
+					prop.setRef( aliasBean.getId() );
+				}
+			}
+		}
 	}
 	
 	protected void resolvePrototypeBeans()
@@ -410,16 +439,16 @@ public abstract class AbstractSpringConfigParser {
 	{
 		if ( prop.getRef() != null && prototypeBeans.contains( prop.getRef() ) )
 		{
-			Bean prototype = beans.get( prop.getRef() );
+			Bean prototype = getBean( prop.getRef() );
 			
 			if( prototype != null)
 			{
 				//duplicate bean with a new identifier and scope it as a singleton
-				Bean prototypedInstance = new Bean( generatePrototypeBeanId( prototype.getName() ), prototype, true );
+				Bean prototypedInstance = new Bean( generatePrototypeBeanId( prototype.getId() ), prototype, true );
 				prototypedInstance.setScope( Scope.SINGLETON );
 
 				// change reference name 
-				prop.setRef( prototypedInstance.getName() );
+				prop.setRef( prototypedInstance.getId() );
 				
 				// register it
 				register( prototypedInstance );
@@ -430,5 +459,5 @@ public abstract class AbstractSpringConfigParser {
 		}
 	}
 
-	abstract protected String processBeanNode(final Node beanNode, final NamedNodeMap beanAttributes, final String id, boolean isAnonymous, Bean bean) throws XPathExpressionException;
+	abstract protected String processBeanNode(final Node beanNode, final NamedNodeMap beanAttributes, final String id, final String alias, boolean isAnonymous, Bean bean) throws XPathExpressionException;
 }
