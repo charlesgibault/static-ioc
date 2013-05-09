@@ -23,11 +23,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.NavigableMap;
-import java.util.NavigableSet;
 import java.util.Set;
-import java.util.TreeSet;
-
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -690,9 +686,9 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		}
 	}
 
-	public NavigableMap<String, Bean> load( Collection<String> configurationFiles) throws SAXException, IOException
+	public Map<String, Bean> load( Collection<String> configurationFiles) throws SAXException, IOException
 	{
-		final NavigableSet<String> loadedContext = new TreeSet<String>();
+		final Set<String> loadedContext = new HashSet<String>();
 
 		// Start by loading each configuration file without resolving beans
 		for( String config : configurationFiles )
@@ -715,7 +711,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 	}
 
 	
-	public NavigableMap<String, Bean> load( String configurationFile) throws SAXException, IOException
+	public Map<String, Bean> load( String configurationFile) throws SAXException, IOException
 	{
 		return load( configurationFile, new HashSet<String>(), true );
 	}
@@ -729,7 +725,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	protected NavigableMap<String, Bean> load( String configurationFile, Set<String> loadedContext, boolean resolveBean) throws SAXException, IOException
+	protected Map<String, Bean> load( String configurationFile, Set<String> loadedContext, boolean resolveBean) throws SAXException, IOException
 	{
 		// Start by keeping track of loaded file (after normalizing its name)
 		configurationFile = FilenameUtils.concat( FilenameUtils.getFullPath( configurationFile ), FilenameUtils.getName( configurationFile ) );
@@ -809,7 +805,6 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 	}
 
 
-	//TODO add support for factory bean / factory method
 	//TODO add more control on target class : inheritance, lifecycle
 	//TODO add (partial) support for PropertyPlaceHolders
 	//TODO add support for init-method and a init() method

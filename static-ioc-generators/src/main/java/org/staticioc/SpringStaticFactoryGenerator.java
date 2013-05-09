@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.TreeSet;
 
@@ -108,7 +107,7 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 		codeGenerator.setOutput( res );
 		
 		SpringConfigParser springConfigParser = new SpringConfigParser();
-		NavigableMap<String, Bean> beanClassMap = springConfigParser.load( configurationFiles );
+		Map<String, Bean> beanClassMap = springConfigParser.load( configurationFiles );
 
 		codeGenerator.comment(Level.HEADER, commentHeader );
 
