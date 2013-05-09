@@ -282,15 +282,28 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 			
 			// Retrieve index
 			final Node indexNode = constAttributes.getNamedItem(INDEX);
-			final String indexValue = ( indexNode != null )? indexNode.getNodeValue(): Integer.toString(++autoIndex);
+			final String indexValue = ( indexNode != null )? indexNode.getNodeValue() : null;
 			
 			try
 			{
-				final int index = Integer.valueOf( indexValue );
-
-				// Now retrieve content:
-				Property argumentProp = handleSubProp( node.getFirstChild(), CONSTRUCTOR_ARGS + indexValue  );
-
+				final int index = ( indexNode != null )? Integer.valueOf( indexValue ):autoIndex++;
+				final String argumentPropName = CONSTRUCTOR_ARGS + index;
+				
+				//handle case where value is set as an attribute 
+				Property argumentProp = handleValueRefAttributes(argumentPropName, node );
+				
+				if( argumentProp == null) // Argument defined as a sub node
+				{
+					final Node argumentNode = node.getFirstChild();
+					if( argumentNode == null)
+					{
+						logger.warn("Ignoring constructor argument {} with neither attribute not node value for bean {}", index, bean.getId());
+						continue;
+					}
+				
+					argumentProp = handleSubProp( argumentNode, argumentPropName );
+				}
+				
 				if (argumentProp != null)
 				{
 					args[index] = argumentProp; // collect arguments in disorder (potentially)
@@ -304,11 +317,11 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 			}
 			catch(NumberFormatException e)
 			{
-				logger.warn( "Cannot parse constructor argument index {}", indexValue );
+				logger.warn( "Cannot parse constructor argument index {}", (indexValue!=null)?indexValue:autoIndex );
 			}
 			catch( IndexOutOfBoundsException e )
 			{
-				logger.warn( "Out of bound constructor argument index {}. Should be < {}" , indexValue, constArgNodes.size() );
+				logger.warn( "Out of bound constructor argument index {}. Should be < {}" , (indexValue!=null)?indexValue:autoIndex, constArgNodes.size() );
 			}
 
 		}
@@ -316,8 +329,41 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		// Now reorder them.
 		for( Property prop : args)
 		{
-			addOrReplaceProperty( prop, bean.getConstructorArgs() );
+			if( prop != null)
+			{
+				logger.debug("Constructor arg : {}", prop.toString());
+				addOrReplaceProperty( prop, bean.getConstructorArgs() );
+			}
 		}
+	}
+	
+	protected Property handleValueRefAttributes(final String propName, final Node node)
+	{
+		Property prop=null;
+		final NamedNodeMap propAttributes = node.getAttributes();
+		
+		final Node valueNode = propAttributes.getNamedItem(VALUE);
+		final String value = (valueNode != null ) ? valueNode.getNodeValue() : null;
+
+		final Node refNode = propAttributes.getNamedItem(REF);
+		final Node idRefNode = propAttributes.getNamedItem(IDREF);
+		final String ref = (refNode != null ) ? refNode.getNodeValue() : ((idRefNode != null ) ? idRefNode.getNodeValue() : null);
+
+		if ( value != null || ref != null ) // Simple property : value or reference
+		{
+			prop  = new Property( propName, value, ref);
+			
+			// Handle type specified as an attribute
+			if( value != null )
+			{
+				final Node typeNode = propAttributes.getNamedItem(TYPE);
+				if( typeNode != null)
+				{
+					prop.setType( typeNode.getNodeValue() );
+				}
+			}
+		}
+		return prop;
 	}
 	
 	protected void handleBeanProperties( final Bean bean, final NodeList propsRef)
@@ -333,28 +379,10 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 			if(nameNode != null ) // Ignore properties with no name
 			{
 				final String propName = nameNode.getNodeValue();
-
-				final Node valueNode = propAttributes.getNamedItem(VALUE);
-				final String value = (valueNode != null ) ? valueNode.getNodeValue() : null;
-
-				final Node refNode = propAttributes.getNamedItem(REF);
-				final Node idRefNode = propAttributes.getNamedItem(IDREF);
-				final String ref = (refNode != null ) ? refNode.getNodeValue() : ((idRefNode != null ) ? idRefNode.getNodeValue() : null);
-
-				if ( value != null || ref != null ) // Simple property : value or reference
+				Property prop = handleValueRefAttributes(propName, node );
+				
+				if ( prop != null ) // Simple property : value or reference
 				{
-					Property prop  = new Property( propName, value, ref);
-					
-					// Handle type specified as an attribute
-					if( value != null )
-					{
-						final Node typeNode = propAttributes.getNamedItem(TYPE);
-						if( typeNode != null)
-						{
-							prop.setType( typeNode.getNodeValue() );
-						}
-					}
-					
 					addOrReplaceProperty(prop, bean.getProperties() );
 				}
 				else
@@ -387,7 +415,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 	}
 	
 	/**
-	 * Handle the following attributes of a property : bean | ref | idref | list | set | map | props | value | null
+	 * Handle the following node : bean | ref | idref | list | set | map | props | value | null
 	 * @param spNode is the XML node representing the properties
 	 * @param propName is the name of the property for the parent bean
 	 * @return a Property representing the appropriate object association for parent bean
