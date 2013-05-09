@@ -204,6 +204,21 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		}
 
 		logger.debug( "id {} scope {} ", id, scope );
+
+		//Handle Factory Bean/Method here
+		String factoryBean=(bean != null)? bean.getFactoryBean() : null;
+		String factoryMethod=(bean != null)? bean.getFactoryMethod() : null;
+		
+		final Node factoryBeanNode = beanAttributes.getNamedItem(FACTORY_BEAN);
+		final Node factoryMethodNode = beanAttributes.getNamedItem(FACTORY_METHOD);
+		if ( factoryBeanNode != null )
+		{
+			factoryBean = factoryBeanNode.getNodeValue();
+		}
+		if ( factoryMethodNode != null )
+		{
+			factoryMethod = factoryMethodNode.getNodeValue();
+		}
 		
 		// Class is mandatory for non abstract beans
 		if( className == null && !abstractBean)
@@ -226,7 +241,11 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		bean.setAbstract( abstractBean );
 		bean.setScope( scope );
 
+		bean.setFactoryBean(factoryBean);
+		bean.setFactoryMethod(factoryMethod);
+		
 		// read all kind of properties
+		
 		// Handle Spring p:* properties
 		handleSpringPProperties(bean, beanAttributes);
 				
@@ -255,45 +274,43 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		
 		final Property[] args = new Property[ constArgNodes.size() ];
 		
+		int autoIndex=0;
+		
 		for ( Node node : constArgNodes )
 		{
 			final NamedNodeMap constAttributes = node.getAttributes();
 			
 			// Retrieve index
 			final Node indexNode = constAttributes.getNamedItem(INDEX);
+			final String indexValue = ( indexNode != null )? indexNode.getNodeValue(): Integer.toString(++autoIndex);
 			
-			
-			if( indexNode != null )
+			try
 			{
-				final String indexValue = indexNode.getNodeValue();
-				
-				try
+				final int index = Integer.valueOf( indexValue );
+
+				// Now retrieve content:
+				Property argumentProp = handleSubProp( node.getFirstChild(), CONSTRUCTOR_ARGS + indexValue  );
+
+				if (argumentProp != null)
 				{
-					final int index = Integer.valueOf( indexValue );
-					
-					// Now retrieve content:
-					Property argumentProp = handleSubProp( node.getFirstChild(), CONSTRUCTOR_ARGS + indexValue  );
-					
-					if (argumentProp != null)
+					args[index] = argumentProp; // collect arguments in disorder (potentially)
+
+					final Node typeNode = constAttributes.getNamedItem(TYPE);
+					if( typeNode != null)
 					{
-						args[index] = argumentProp; // collect arguments in disorder (potentially)
-						
-						final Node typeNode = constAttributes.getNamedItem(TYPE);
-						if( typeNode != null)
-						{
-							argumentProp.setType( typeNode.getNodeValue() );
-						}
+						argumentProp.setType( typeNode.getNodeValue() );
 					}
 				}
-				catch(NumberFormatException e)
-				{
-					logger.warn( "Cannot parse constructor argument index {}", indexValue );
-				}
-				catch( IndexOutOfBoundsException e )
-				{
-					logger.warn( "Out of bound constructor argument index {}. Should be < {}" , indexValue, constArgNodes.size() );
-				}
 			}
+			catch(NumberFormatException e)
+			{
+				logger.warn( "Cannot parse constructor argument index {}", indexValue );
+			}
+			catch( IndexOutOfBoundsException e )
+			{
+				logger.warn( "Out of bound constructor argument index {}. Should be < {}" , indexValue, constArgNodes.size() );
+			}
+
 		}
 		
 		// Now reorder them.

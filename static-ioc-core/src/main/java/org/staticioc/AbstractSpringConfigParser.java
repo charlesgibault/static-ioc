@@ -80,6 +80,8 @@ public abstract class AbstractSpringConfigParser {
 	protected static final String SCOPE = "scope";
 	protected static final String PROTOTYPE = "prototype";
 	protected static final String SINGLETON = "singleton";
+	protected static final String FACTORY_BEAN = "factory-bean";
+	protected static final String FACTORY_METHOD = "factory-method";
 	protected static final String MAP = "map";
 	protected static final String LIST = "list";
 	protected static final String SET = "set";

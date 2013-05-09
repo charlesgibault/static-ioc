@@ -102,4 +102,53 @@ public class SpringStaticFactoryGeneratorTest
 		
 		Assert.assertEquals( "Incorrect generated result", expectedResult, normalizeCode( result.toString() ) );
 	}
+	
+	/**
+	 * Factory bean context test
+	 * @throws ParserConfigurationException 
+	 * @throws IOException 
+	 * @throws SAXException 
+	 */
+	@Test
+	public void testFactoryBeanContextDefinition() throws SAXException, IOException, ParserConfigurationException
+	{
+		final CodeGenerator codeGenerator = new JavaCodeGenerator();
+		StringBuilder result = new StringBuilder();
+		codeGenerator.setOutput(result);
+		
+		final String packageName = "org.staticioc.test";
+		final String className = "TestClass";
+
+		String[] contexts = {"src/test/resources/SpringStaticFactoryGeneratorTest-factoryBeanContext.xml"};
+		
+		final String expectedResult = normalizeCode( 
+				"/** This code has been generated using Static IoC framework (http://code.google.com/p/static-ioc/). DO NOT EDIT MANUALLY HAS CHANGES MAY BE OVERRIDEN */\n" +
+				"package " + packageName + ";\n" 
+				+ "public class " + className + " {\n"
+				
+				+ "/** * Bean definition */\n"
+				+ "public final test.ProductFactory productFactory;\n"
+				+ "public final test.Product product;\n"
+				+ "public final test.RpcService rpcService;\n"
+				
+				+ "/** * Constructor of the Factory */\n"
+				+ "public " + className + "() {\n"
+				
+				+ "// Instanciating beans\n"
+				+ "productFactory = new test.ProductFactory();\n"
+				+ "product = productFactory.createProduct();\n"
+				+ "rpcService = new GWT.create(\"test.RpcService\");\n"
+								
+				+"}\n"
+				+ "public void destroyContext() {\n"
+				+ "rpcService = null;\n"
+				+ "product = null;\n"
+				+ "productFactory = null;\n"
+				+ "}\n"
+				+ "}" );
+		
+		result = factoryGenerator.generate(codeGenerator, packageName, className, Arrays.asList( contexts ) );
+		
+		Assert.assertEquals( "Incorrect generated result", expectedResult, normalizeCode( result.toString() ) );
+	}
 }

@@ -30,6 +30,21 @@ public class Bean implements Comparable<Bean>
 	public enum Type { SIMPLE, LIST, SET, PROPERTIES, MAP };
 	public enum Scope { SINGLETON, PROTOTYPE };
 	
+	private String id;
+	private String alias=null;
+	private String className;
+	private Type type = Type.SIMPLE;
+	private Scope scope = Scope.SINGLETON;
+	
+	private boolean anonymous = false;
+	private boolean isAbstract = false;
+
+	private Collection<Property> properties = new HashSet<Property>();
+	private Set<Property> constructorArgs = new LinkedHashSet<Property>();
+	
+	private String factoryBean=null;
+	private String factoryMethod=null;
+	
 	public Bean(){}
 	public Bean( String id, String className)
 	{
@@ -56,6 +71,8 @@ public class Bean implements Comparable<Bean>
 		this.className = parent.className;
 		this.type = parent.type;
 		this.scope = parent.scope;
+		this.factoryBean=parent.factoryBean;
+		this.factoryMethod=parent.factoryMethod;
 		
 		this.anonymous = anonymous; // not inherited, as with abstract attribute
 		
@@ -69,18 +86,21 @@ public class Bean implements Comparable<Bean>
 			this.constructorArgs.add( prop.clone() );
 		}
 	}
-		
-	private String id;
-	private String alias=null;
-	private String className;
-	private Type type = Type.SIMPLE;
-	private Scope scope = Scope.SINGLETON;
 	
-	private boolean anonymous = false;
-	private boolean abstractBean = false;
-
-	private Collection<Property> properties = new HashSet<Property>();
-	private Set<Property> constructorArgs = new LinkedHashSet<Property>();
+	/**
+	 * Construct a bean that is to be created by a factoryBean
+	 * @param id
+	 * @param className
+	 * @param factoryBean
+	 * @param factoryMethod
+	 */
+	public Bean( String id, String className, String factoryBean, String factoryMethod)
+	{
+		this.id = id;
+		this.className = className;
+		this.factoryBean = factoryBean;
+		this.factoryMethod = factoryMethod;
+	}
 	
 	@Override
 	public int hashCode() {
@@ -110,7 +130,6 @@ public class Bean implements Comparable<Bean>
 	@Override
 	public int compareTo(Bean bean)
 	{
-		
 		if( StringUtils.equals(id, bean.id) )
 		{
 			return 0;
@@ -121,15 +140,25 @@ public class Bean implements Comparable<Bean>
 			return -1;
 		}
 		
-		// TODO Check if this depends on bean
-		
+		// Check if there's a factoryBean dependency between the 2 beans as this puts a constraint on init order
+		if( (factoryBean != null) && (StringUtils.equals(factoryBean, bean.id) || StringUtils.equals(factoryBean, bean.alias) ) )
+		{
+			return 1;
+		}
+		else if( (bean.factoryBean != null)  && ( StringUtils.equals(bean.factoryBean, id) || StringUtils.equals(bean.factoryBean, alias) ) )
+		{
+			return -1;
+		}
+				
 		return id.compareTo(bean.id);
 	}
 	@Override
 	public String toString() {
-		return "Bean [id=" + id + ", alias=" + alias + ", className=" + className + ", type="
-				+ type + ", anonymous=" + anonymous + ", abstractBean="
-				+ abstractBean + ", properties=" + properties
+		return "Bean [id=" + id + ", alias=" + alias + ", className=" + className
+				+ ", type=" + type + ", anonymous=" + anonymous
+				+ ", abstract=" + isAbstract
+				+ ", factoryBean=" + factoryBean + ", factoryMethod=" + factoryMethod
+				+ ", properties=" + properties
 				+ ", constructorArgs=" + constructorArgs + "]";
 	}
 	public String getId() {
@@ -157,10 +186,10 @@ public class Bean implements Comparable<Bean>
 		this.anonymous = anonymous;
 	}	
 	public boolean isAbstract() {
-		return abstractBean;
+		return isAbstract;
 	}
 	public void setAbstract(boolean abstractBean) {
-		this.abstractBean = abstractBean;
+		this.isAbstract = abstractBean;
 	}
 	public Type getType() {
 		return type;
@@ -179,5 +208,17 @@ public class Bean implements Comparable<Bean>
 	}
 	public void setAlias(String alias) {
 		this.alias = alias;
+	}
+	public String getFactoryBean() {
+		return factoryBean;
+	}
+	public void setFactoryBean(String factoryBean) {
+		this.factoryBean = factoryBean;
+	}
+	public String getFactoryMethod() {
+		return factoryMethod;
+	}
+	public void setFactoryMethod(String factoryMethod) {
+		this.factoryMethod = factoryMethod;
 	}
 }
