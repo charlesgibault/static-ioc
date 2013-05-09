@@ -18,6 +18,9 @@
  */
 package org.staticioc.generator;
 
+import org.staticioc.model.Bean;
+import org.staticioc.model.Property;
+
 public abstract class AbstractCodeGenerator implements CodeGenerator
 {
 	private StringBuilder builder;
@@ -82,5 +85,82 @@ public abstract class AbstractCodeGenerator implements CodeGenerator
 		}
 		
 		return fullClassName.substring( 0, lastPackageIndex );
+	}
+	
+	protected void appendPropertyValue( final Property property )
+	{
+		if ( property == null )
+		{
+			getBuilder().append( getNull() );
+		}
+		else if ( property.getRef() != null )
+		{
+			getBuilder().append( property.getRef() );	
+		}
+		else if ( property.getValue() != null ) // Value case :
+		{
+			if( property.getType() != null )				
+			{
+				getBuilder().append( "new " ).append(  property.getType() ).append("( ").append( property.getValue() ).append( " )");
+			}
+			else if( "true".equalsIgnoreCase( property.getValue() ) ) // Must be careful with char encoding here, so using equalsIgnoreCase
+			{
+				getBuilder().append( "true" );	
+			}
+			else if( "false".equalsIgnoreCase( property.getValue() ) ) // Must be careful with char encoding here, so using equalsIgnoreCase
+			{
+				getBuilder().append( "false" );	
+			}
+			else
+			{
+				try
+				{
+					Double.parseDouble( property.getValue() );
+					getBuilder().append( property.getValue() );	
+
+				} catch (NumberFormatException nfe) {
+					// Not a number -> add quotes around the value
+					getBuilder().append('"').append( property.getValue() ).append('"');	
+				}
+			}
+
+		}
+		else // ref == null, value == null --> <null/> value
+		{
+			getBuilder().append( getNull() );
+		}
+	}
+	
+	protected void appendConstructorArgs(Bean bean)
+	{
+		// handle constructor args
+		boolean isFirstArg = true;
+		for( Property prop : bean.getConstructorArgs())
+		{
+			// handle parameter separation
+			if( !isFirstArg ) { getBuilder().append( getSeparator() ); }
+			isFirstArg = false;
+			
+			appendPropertyValue( prop );
+		}
+	}
+	
+	protected String getFactoryMethod(Bean bean)
+	{
+		return bean.getFactoryMethod()!=null?bean.getFactoryMethod():getDefaultFactoryMethod();
+	}
+	
+	protected String getNull() {
+		return "null";
+	}
+	
+	protected String getSeparator()
+	{
+		return ", ";
+	}
+	
+	protected String getDefaultFactoryMethod()
+	{
+		return "create";
 	}
 }

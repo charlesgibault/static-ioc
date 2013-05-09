@@ -85,6 +85,12 @@ public interface CodeGenerator
 	void instantiateBean( Bean bean);
 
 	/**
+	 * Perform bean instantiation using provided factory bean and methods, eventually passing any constructor args
+	 * @param bean
+	 */
+	void instantiateBeanWithFactory(Bean bean);
+	
+	/**
 	 * Perform bean setup for a given property
 	 * @param bean
 	 * @param property

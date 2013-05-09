@@ -138,7 +138,15 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 			
 			// Ignore abstract beans and prototypes
 			if ( isHidden(bean) ){ continue; }
-			codeGenerator.instantiateBean( bean );
+			
+			if( bean.getFactoryBean()!=null )
+			{
+				codeGenerator.instantiateBeanWithFactory( bean );
+			}
+			else
+			{
+				codeGenerator.instantiateBean( bean );
+			}
 		}
 		
 		res.append("\n");

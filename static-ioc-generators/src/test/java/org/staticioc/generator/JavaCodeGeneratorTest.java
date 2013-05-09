@@ -298,7 +298,7 @@ public class JavaCodeGeneratorTest
 		generator.declareProperty(bean, prop1);
 		generator.declareProperty(bean, prop2);
 		
-		final String expectedResult = normalizeCode(	"mapBean = new java.util.HashMap();\n"
+		final String expectedResult = normalizeCode(	"mapBean = new java.util.ConcurrentHashMap();\n"
 				+	"mapBean.put( \"name\", \"nameValue\" );\n"
 				+ 	"mapBean.put( \"id\", idRef );\n" );
 

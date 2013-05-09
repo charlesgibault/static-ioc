@@ -72,7 +72,6 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 			getBuilder().append( "\t\t// ").append(comment).append("\n");
 			break;
 		}
-		
 	}
 		
 	@Override
@@ -117,16 +116,16 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 	
 	protected String getBeanClass( Bean bean )
 	{
-		switch ( bean.getType() )
+		switch ( bean.getType() ) //TODO replace with thread safe concurrent collection for list/set/properties ?
 		{
 			case LIST:
-				return getListClass();
+				return "java.util.LinkedList";
 			case SET:
-				return getSetClass();
+				return "java.util.HashSet";
 			case MAP:
-				return getMapClass();
+				return "java.util.ConcurrentHashMap";
 			case PROPERTIES:
-				return getPropertiesClass();
+				return "java.util.Properties";
 			default:
 				return bean.getClassName();
 		}
@@ -136,65 +135,18 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 	public void instantiateBean( Bean bean )
 	{
 		getBuilder().append("\t\t").append( bean.getId() ).append( " = new " ).append( getBeanClass( bean ) ).append("(");
-		
-		// handle constructor args
-		boolean isFirstArg = true;
-		for( Property prop : bean.getConstructorArgs())
-		{
-			// handle parameter separation
-			if( !isFirstArg ) { getBuilder().append( ", " ); }
-			isFirstArg = false;
-			
-			appendPropertyValue( prop );
-		}
-		
+		appendConstructorArgs(bean);
 		getBuilder().append(");\n");
 	}
 	
-	protected void appendPropertyValue( final Property property )
+	@Override
+	public void instantiateBeanWithFactory( Bean bean )
 	{
-		if ( property == null )
-		{
-			getBuilder().append( getNull() );
-		}
-		else if ( property.getRef() != null )
-		{
-			getBuilder().append( property.getRef() );	
-		}
-		else if ( property.getValue() != null ) // Value case :
-		{
-			if( property.getType() != null )				
-			{
-				getBuilder().append( "new " ).append(  property.getType() ).append("( ").append( property.getValue() ).append( " )");
-			}
-			else if( "true".equalsIgnoreCase( property.getValue() ) ) // Must be careful with char encoding here, so using equalsIgnoreCase
-			{
-				getBuilder().append( "true" );	
-			}
-			else if( "false".equalsIgnoreCase( property.getValue() ) ) // Must be careful with char encoding here, so using equalsIgnoreCase
-			{
-				getBuilder().append( "false" );	
-			}
-			else
-			{
-				try
-				{
-					Double.parseDouble( property.getValue() );
-					getBuilder().append( property.getValue() );	
-
-				} catch (NumberFormatException nfe) {
-					// Not a number -> add quotes around the value
-					getBuilder().append('"').append( property.getValue() ).append('"');	
-				}
-			}
-
-		}
-		else // ref == null, value == null --> <null/> value
-		{
-			getBuilder().append( getNull() );
-		}
+		getBuilder().append("\t\t").append( bean.getId() ).append( " = " ).append( bean.getFactoryBean() ).append(".").append(bean.getFactoryMethod()).append("(");		
+		appendConstructorArgs(bean);
+		getBuilder().append(");\n");
 	}
-
+	
 	@Override
 	public void declareProperty( Bean bean, final Property property )
 	{
@@ -246,25 +198,5 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 	public void deleteBean( Bean bean )
 	{
 		getBuilder().append( "\t" ).append( bean.getId() ).append(" = null;");
-	}
-
-	protected String getListClass() {
-		return "java.util.LinkedList";
-	}
-
-	protected String getSetClass() {
-		return "java.util.HashSet";
-	}
-
-	protected String getMapClass() {
-		return "java.util.HashMap";
-	}
-
-	protected String getPropertiesClass() {
-		return "java.util.Properties";
-	}
-
-	protected String getNull() {
-		return "null";
 	}
 }
