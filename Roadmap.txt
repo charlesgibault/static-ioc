@@ -3,25 +3,26 @@ Please find below some visibility on the planned feature roadmap
 // Release 0.1
 Initial release. Java target with maven plugin and command line tool.
 
-// Release 0.2
-- Made beans declaration sorted
+// Release 0.2 (in progress):
+DONE
+- Made beans declaration, instanciation, and setup order predictable 
 - Added name alias support for bean when id and name are both declared
 - Implement destructor workflow + java generator
+- Fixed constructor arguments support when no index was provided or when using direct value/ref/idref attribute
+- Add support for factory bean / factory method
 
-// Refactor collection and parent dependency out of the way
-// Add support for factory bean / factory method
-
+TODO
+// Refactor collection and parent dependency for cleaner static-ioc core module classes 
 // Add GWT sample project
 // Add Play N sample project?
-// Add (partial) support for PropertyPlaceHolders
 // Wiki
 
 // Release 0.3
 // Support Python and Jython targets
 // Support Objective C and Cpp targets
+// Add (partial) support for PropertyPlaceHolders
 
-// Release 0.4
-// Refactor spring config loader
+// Release 0.4+
 //TODO add more control on target class : inheritance, lifecycle
 //TODO add support for init-method and a init() method
 //TODO add support for depends-on (in init-method)
