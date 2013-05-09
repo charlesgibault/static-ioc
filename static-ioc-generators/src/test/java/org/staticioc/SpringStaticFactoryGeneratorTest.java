@@ -145,7 +145,7 @@ public class SpringStaticFactoryGeneratorTest
 				+ "product = null;\n"
 				+ "productFactory = null;\n"
 				+ "}\n"
-				+ "}" );
+				+ "}");
 		
 		result = factoryGenerator.generate(codeGenerator, packageName, className, Arrays.asList( contexts ) );
 		

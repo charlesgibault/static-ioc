@@ -24,8 +24,7 @@
 		xmlns:p="http://www.springframework.org/schema/p"
 		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 	
-	<bean id="product" class="test.Product" factory-bean="productFactory" factory-method="createProduct">
-	</bean>			
+	<bean id="product" class="test.Product" factory-bean="productFactory" factory-method="createProduct"/>
 	
 	<bean id="rpcService" class="test.RpcService" factory-bean="GWT" factory-method="create">
  		<constructor-arg value="test.RpcService"/>		
