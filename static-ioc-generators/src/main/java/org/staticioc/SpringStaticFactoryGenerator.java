@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.NavigableSet;
+import java.util.TreeSet;
 
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
@@ -113,12 +115,12 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 		codeGenerator.initPackage( generatedPackageName );		
 		codeGenerator.initClass( generatedClassName );
 		
+		final NavigableSet<Bean> orderedBean = new TreeSet<Bean>( beanClassMap.values() );
+		
 		// declare beans
 		codeGenerator.comment(Level.CLASS, "Bean definition" );
-		for ( String beanName: beanClassMap.keySet() )
+		for ( final Bean bean: orderedBean )
 		{
-			final Bean bean = beanClassMap.get(beanName);
-			
 			// Ignore abstract beans and prototypes
 			if ( isHidden(bean) ){ continue; }
 						
@@ -132,10 +134,8 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 		// Instantiate beans
 		codeGenerator.comment(Level.METHOD, "Instanciating beans" );			
 		
-		for ( String beanName: beanClassMap.keySet() )
+		for ( final Bean bean: orderedBean )
 		{
-			final Bean bean = beanClassMap.get(beanName);
-			
 			// Ignore abstract beans and prototypes
 			if ( isHidden(bean) ){ continue; }
 			
@@ -152,14 +152,12 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 		res.append("\n");
 		
 		// Set properties
-		for ( String beanName: beanClassMap.keySet() )
+		for ( final Bean bean: orderedBean )
 		{
-			final Bean bean = beanClassMap.get(beanName);
-			
 			// Ignore abstract beans and beans with no properties
 			if ( isHidden(bean) || bean.getProperties().isEmpty() ){ continue; }
 			
-			codeGenerator.comment(Level.METHOD, "Setting up bean " + beanName );			
+			codeGenerator.comment(Level.METHOD, "Setting up bean " + bean.getId() );			
 			for( Property prop : bean.getProperties() )
 			{
 				// Check that the reference exists and is not abstract
@@ -196,10 +194,8 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 		codeGenerator.initDestructor( generatedClassName );
 		
 		//Destructor : free beans in their reverse order of creation
-		for ( String beanName: beanClassMap.descendingKeySet() )
+		for ( final Bean bean: orderedBean.descendingSet() )
 		{
-			final Bean bean = beanClassMap.get(beanName);
-			
 			// Ignore abstract beans and prototypes that were not instanciated
 			if ( isHidden(bean) ){ continue; }
 			codeGenerator.deleteBean( bean );
