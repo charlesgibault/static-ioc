@@ -4,24 +4,24 @@
   <parent>
          <groupId>org.staticioc</groupId>
          <artifactId>staticioc-parent</artifactId>
-         <version>0.1-SNAPSHOT</version>
-         <relativePath>../pom.xml</relativePath>
+         <version>0.2-SNAPSHOT</version>
+         <relativePath>../../pom.xml</relativePath>
   </parent>
 
-  <artifactId>staticioc-samples</artifactId>
+  <artifactId>statiocioc-samples-simple</artifactId>
   <packaging>jar</packaging>
-  <name>staticioc usage sample</name>
-  
+  <name>staticioc simple usage sample</name>
+ <!-- 
   <properties>
-    	<main.basedir>${project.parent.basedir}</main.basedir>
+    	<main.basedir>${project.basedir}</main.basedir>
   </properties>
-  
+  -->
   <build>
     <plugins>
       <plugin>
         <groupId>org.staticioc</groupId>
         <artifactId>staticioc-maven-plugin</artifactId>
-        <version>0.1-SNAPSHOT</version>
+        <version>${project.version}</version>
 	<executions>
 	 <execution>
 	   <goals>
@@ -33,7 +33,7 @@
         	<targetLanguage>Java</targetLanguage>
         <!-- 	<outputPath>src/main/java</outputPath> -->
         	<targetMapping>
-  	 			<org.staticioc.samples.ApplicationContext>src/main/resources/applicationContext.xml</org.staticioc.samples.ApplicationContext>
+  	 			<org.staticioc.samples.ApplicationContext>${basedir}/src/main/resources/applicationContext.xml</org.staticioc.samples.ApplicationContext>
 	 		</targetMapping>
         </configuration>
       </plugin>
