@@ -142,7 +142,7 @@ public class JavaCodeGeneratorTest
 	
 		final String expectedResult = normalizeCode( "package " + packageName + ";\n" 
 					+ "public class " + className + " {\n"
-					+ "public final org.staticioc.model.Bean bean;\n"
+					+ "public org.staticioc.model.Bean bean;\n"
 					+ "public " + className + "() {\n"
 					+ "bean = new org.staticioc.model.Bean();\n"
 					+ "bean.setName( \"value\" );\n"
@@ -168,8 +168,8 @@ public class JavaCodeGeneratorTest
 		generator.declareBean(anonymousBean);
 
 		Assert.assertEquals( "Incorrect bean definition", normalizeCode(
-					"public final org.staticioc.model.Bean bean;\n"
-				+  	"private final org.staticioc.model.Bean anonymousBean;\n"),
+					"public org.staticioc.model.Bean bean;\n"
+				+  	"private org.staticioc.model.Bean anonymousBean;\n"),
 				 	normalizeCode( result.toString() ) );
 	}
 

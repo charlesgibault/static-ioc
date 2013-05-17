@@ -66,9 +66,9 @@ public class SpringStaticFactoryGeneratorTest
 				+ "public class " + className + " {\n"
 				
 				+ "/** * Bean definition */\n"
-				+ "public final test.Country country;\n"
-				+ "public final test.House number10House;\n"
-				+ "public final test.Person personBean;\n"
+				+ "public test.Country country;\n"
+				+ "public test.House number10House;\n"
+				+ "public test.Person personBean;\n"
 				
 				+ "/** * Constructor of the Factory */\n"
 				+ "public " + className + "() {\n"
@@ -127,9 +127,9 @@ public class SpringStaticFactoryGeneratorTest
 				+ "public class " + className + " {\n"
 				
 				+ "/** * Bean definition */\n"
-				+ "public final test.ProductFactory productFactory;\n"
-				+ "public final test.Product product;\n"
-				+ "public final test.RpcService rpcService;\n"
+				+ "public test.ProductFactory productFactory;\n"
+				+ "public test.Product product;\n"
+				+ "public test.RpcService rpcService;\n"
 				
 				+ "/** * Constructor of the Factory */\n"
 				+ "public " + className + "() {\n"

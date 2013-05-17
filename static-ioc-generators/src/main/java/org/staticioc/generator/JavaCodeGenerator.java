@@ -104,11 +104,11 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 	{
 		if ( bean.isAnonymous() )
 		{
-			getBuilder().append("\tprivate final ");
+			getBuilder().append("\tprivate ");
 		}
 		else
 		{
-			getBuilder().append("\tpublic final ");
+			getBuilder().append("\tpublic ");
 		}
 			
 		getBuilder().append( getBeanClass( bean ) ).append(" ").append( bean.getId() ).append( ";\n" );
