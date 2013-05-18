@@ -140,9 +140,11 @@ public class JavaCodeGeneratorTest
 		
 		generator.closePackage(packageName);
 	
-		final String expectedResult = normalizeCode( "package " + packageName + ";\n" 
+		final String expectedResult = normalizeCode( "package " + packageName + ";\n"
+					+ "@SuppressWarnings(\"rawtypes\")\n"
 					+ "public class " + className + " {\n"
 					+ "public org.staticioc.model.Bean bean;\n"
+					+ "@SuppressWarnings(\"unchecked\")\n"
 					+ "public " + className + "() {\n"
 					+ "bean = new org.staticioc.model.Bean();\n"
 					+ "bean.setName( \"value\" );\n"

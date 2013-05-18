@@ -77,7 +77,7 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 	@Override
 	public void initClass( String className )
 	{
-		getBuilder().append( "public class ").append( className ).append( "\n{\n" );
+		getBuilder().append( "@SuppressWarnings(\"rawtypes\")\n").append("public class ").append( className ).append( "\n{\n" );
 	}
 	
 
@@ -90,7 +90,7 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 	@Override
 	public void initConstructor( String className )
 	{
-		getBuilder().append("\tpublic ").append(className).append("()\n\t{\n" );	
+		getBuilder().append("\t@SuppressWarnings(\"unchecked\")\n").append("\tpublic ").append(className).append("()\n\t{\n" );	
 	}
 	
 	@Override

@@ -63,6 +63,7 @@ public class SpringStaticFactoryGeneratorTest
 		final String expectedResult = normalizeCode( 
 				"/** This code has been generated using Static IoC framework (http://code.google.com/p/static-ioc/). DO NOT EDIT MANUALLY HAS CHANGES MAY BE OVERRIDEN */\n" +
 				"package " + packageName + ";\n" 
+				+ "@SuppressWarnings(\"rawtypes\")\n"
 				+ "public class " + className + " {\n"
 				
 				+ "/** * Bean definition */\n"
@@ -71,6 +72,7 @@ public class SpringStaticFactoryGeneratorTest
 				+ "public test.Person personBean;\n"
 				
 				+ "/** * Constructor of the Factory */\n"
+				+ "@SuppressWarnings(\"unchecked\")\n"
 				+ "public " + className + "() {\n"
 				
 				+ "// Instanciating beans\n"
@@ -124,6 +126,7 @@ public class SpringStaticFactoryGeneratorTest
 		final String expectedResult = normalizeCode( 
 				"/** This code has been generated using Static IoC framework (http://code.google.com/p/static-ioc/). DO NOT EDIT MANUALLY HAS CHANGES MAY BE OVERRIDEN */\n" +
 				"package " + packageName + ";\n" 
+				+ "@SuppressWarnings(\"rawtypes\")\n"
 				+ "public class " + className + " {\n"
 				
 				+ "/** * Bean definition */\n"
@@ -133,6 +136,7 @@ public class SpringStaticFactoryGeneratorTest
 				+ "public test.RpcService rpcService;\n"
 				
 				+ "/** * Constructor of the Factory */\n"
+				+ "@SuppressWarnings(\"unchecked\")\n"
 				+ "public " + className + "() {\n"
 				
 				+ "// Instanciating beans\n"
