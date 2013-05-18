@@ -142,7 +142,7 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 	@Override
 	public void instantiateBeanWithFactory( Bean bean )
 	{
-		getBuilder().append("\t\t").append( bean.getId() ).append( " = " ).append( bean.getFactoryBean() ).append(".").append(bean.getFactoryMethod()).append("(");		
+		getBuilder().append("\t\t").append( bean.getId() ).append( " = " ).append( bean.getFactoryBean() ).append(".").append(getFactoryMethod(bean)).append("(");		
 		appendConstructorArgs(bean);
 		getBuilder().append(");\n");
 	}

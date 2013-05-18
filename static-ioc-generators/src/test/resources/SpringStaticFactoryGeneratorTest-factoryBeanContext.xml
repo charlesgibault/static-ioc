@@ -28,6 +28,11 @@
 	
 	<bean id="rpcService" class="test.RpcService" factory-bean="com.google.gwt.core.client.GWT" factory-method="create">
  		<constructor-arg value="test.RpcService.class"/>		
+	</bean>		
+	
+	<!-- Testing the default "create" value for factory method-->
+	<bean id="customerService" class="test.CustomerService" factory-bean="com.google.gwt.core.client.GWT">
+ 		<constructor-arg value="test.CustomerService.class"/>		
 	</bean>			
 	
 	<bean id="productFactory" class="test.ProductFactory"/>
