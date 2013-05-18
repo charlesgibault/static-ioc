@@ -14,7 +14,7 @@
 
   <modules>
     <module>staticioc-samples-simple</module>
- <!--   <module>staticioc-samples-gwt</module> -->
+    <module>staticioc-samples-gwt</module>
   </modules>
   
 </project>
