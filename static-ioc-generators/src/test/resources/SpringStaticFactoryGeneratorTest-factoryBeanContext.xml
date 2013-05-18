@@ -26,8 +26,8 @@
 	
 	<bean id="product" class="test.Product" factory-bean="productFactory" factory-method="createProduct"/>
 	
-	<bean id="rpcService" class="test.RpcService" factory-bean="GWT" factory-method="create">
- 		<constructor-arg value="test.RpcService"/>		
+	<bean id="rpcService" class="test.RpcService" factory-bean="com.google.gwt.core.client.GWT" factory-method="create">
+ 		<constructor-arg value="test.RpcService.class"/>		
 	</bean>			
 	
 	<bean id="productFactory" class="test.ProductFactory"/>

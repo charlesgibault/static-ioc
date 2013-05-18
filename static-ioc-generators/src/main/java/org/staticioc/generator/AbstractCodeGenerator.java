@@ -87,6 +87,35 @@ public abstract class AbstractCodeGenerator implements CodeGenerator
 		return fullClassName.substring( 0, lastPackageIndex );
 	}
 	
+	/** 
+	 * Overridable extra logic that analyze a String value and determines whether it should be quoted
+	 * or not when declaring property
+	 * @param value
+	 * @return true if quotes must be used
+	 */
+	protected boolean useQuotes( String value )
+	{
+		if( value.endsWith(getClassExtension()) ) // Handle class type without quotes 
+		{
+			return false;
+		}
+		else
+		{
+			try
+			{
+				Double.parseDouble( value );
+				return false;
+
+			} catch (NumberFormatException nfe) {
+				return true;
+			}
+		}
+	}
+	
+	/**
+	 * Append a property's value to the generated source
+	 * @param property
+	 */
 	protected void appendPropertyValue( final Property property )
 	{
 		if ( property == null )
@@ -105,23 +134,19 @@ public abstract class AbstractCodeGenerator implements CodeGenerator
 			}
 			else if( "true".equalsIgnoreCase( property.getValue() ) ) // Must be careful with char encoding here, so using equalsIgnoreCase
 			{
-				getBuilder().append( "true" );	
+				getBuilder().append( getTrue() );	
 			}
 			else if( "false".equalsIgnoreCase( property.getValue() ) ) // Must be careful with char encoding here, so using equalsIgnoreCase
 			{
-				getBuilder().append( "false" );	
+				getBuilder().append( getFalse() );	
+			}
+			else if( useQuotes( property.getValue() ) )
+			{
+				getBuilder().append('"').append( property.getValue() ).append('"');	
 			}
 			else
 			{
-				try
-				{
-					Double.parseDouble( property.getValue() );
-					getBuilder().append( property.getValue() );	
-
-				} catch (NumberFormatException nfe) {
-					// Not a number -> add quotes around the value
-					getBuilder().append('"').append( property.getValue() ).append('"');	
-				}
+				getBuilder().append( property.getValue() );	
 			}
 
 		}
@@ -162,5 +187,20 @@ public abstract class AbstractCodeGenerator implements CodeGenerator
 	protected String getDefaultFactoryMethod()
 	{
 		return "create";
+	}
+	
+	protected String getClassExtension()
+	{
+		return ".class";
+	}
+	
+	protected String getTrue()
+	{
+		return "true";
+	}
+
+	protected String getFalse()
+	{
+		return "false";
 	}
 }

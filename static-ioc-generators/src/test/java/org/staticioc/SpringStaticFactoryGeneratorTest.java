@@ -137,7 +137,7 @@ public class SpringStaticFactoryGeneratorTest
 				+ "// Instanciating beans\n"
 				+ "productFactory = new test.ProductFactory();\n"
 				+ "product = productFactory.createProduct();\n"
-				+ "rpcService = GWT.create(\"test.RpcService\");\n"
+				+ "rpcService = com.google.gwt.core.client.GWT.create(test.RpcService.class);\n"
 								
 				+"}\n"
 				+ "public void destroyContext() {\n"
