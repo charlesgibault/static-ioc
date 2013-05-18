@@ -85,6 +85,12 @@ public class StaticIocMojo
      * @parameter expression="${staticioc.outputPath}"  default-value="${project.build.sourceDirectory}"
      */
     private File outputPath;
+    
+    /**
+     * Indicate whether to create the outputPath structure if not present. Allows to output to ${project.build.directory}/generated-sources.
+     * @parameter expression="${staticioc.createOutputPathIfMissing}"  default-value="true"
+     */
+    private boolean createOutputPathIfMissing;
 
     /**
      * Target mapping configuration
@@ -114,7 +120,14 @@ public class StaticIocMojo
     	
         if ( outputPath == null || !outputPath.exists() )
         {
-        	throw new MojoFailureException ( "Output path is not configured" );
+        	if(  outputPath != null && createOutputPathIfMissing)
+        	{
+        		outputPath.mkdirs();
+        	}
+        	else
+        	{
+        		throw new MojoFailureException ( "Output path is not configured" );
+        	}
         }
 
         IoCCompiler springStaticFactoryGenerator = new SpringStaticFactoryGenerator();

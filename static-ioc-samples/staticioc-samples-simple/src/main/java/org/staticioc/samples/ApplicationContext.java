@@ -1,5 +1,6 @@
 /** This code has been generated using Static IoC framework (http://code.google.com/p/static-ioc/). DO NOT EDIT MANUALLY HAS CHANGES MAY BE OVERRIDEN */
 package org.staticioc.samples;
+@SuppressWarnings("rawtypes")
 public class ApplicationContext
 {
 	/**
@@ -12,6 +13,7 @@ public class ApplicationContext
 	/**
 	 * Constructor of the Factory
 */	
+	@SuppressWarnings("unchecked")
 	public ApplicationContext()
 	{
 		// Instanciating beans
