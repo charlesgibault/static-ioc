@@ -11,11 +11,6 @@
   <artifactId>statiocioc-samples-simple</artifactId>
   <packaging>jar</packaging>
   <name>staticioc simple usage sample</name>
- <!-- 
-  <properties>
-    	<main.basedir>${project.basedir}</main.basedir>
-  </properties>
-  -->
   <build>
     <plugins>
       <plugin>
