@@ -1,14 +1,16 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder
   xmlns:ui="urn:ui:com.google.gwt.uibinder"
-  xmlns:g="urn:import:com.google.gwt.user.client.ui">
+  xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:c="urn:import:com.google.gwt.user.cellview.client">
 
   <ui:style>
     .contactsViewButtonHPanel {
       margin: 5px 0px 0x 5px;
     }
-    .contactsViewContactsFlexTable {
+    .contactsViewContactsCellTable {
       margin: 5px 0px 5px 0px;
+	  width: 100%;
     }
 
   </ui:style>
@@ -27,7 +29,7 @@
         
         <g:Button ui:field="addButton">Add</g:Button>
       </g:HorizontalPanel>
-      <g:FlexTable ui:field="contactsTable" addStyleNames="{style.contactsViewContactsFlexTable}"/>
+      <c:CellTable ui:field="contactsTable" addStyleNames="{style.contactsViewContactsCellTable}"/>
       <g:HorizontalPanel addStyleNames="{style.contactsViewButtonHPanel}">
         <g:Button ui:field="deleteButton">Delete selected</g:Button>
       </g:HorizontalPanel>

@@ -1,6 +1,6 @@
 package org.staticioc.samples.gwt.client.service;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.staticioc.samples.gwt.shared.model.Contact;
 
@@ -17,19 +17,19 @@ public interface ContactsService extends RemoteService
    * Retrieve all known contacts
    * @return contacts listing
    */
-  Collection<Contact> retrieveContacts();
+	List<Contact> retrieveContacts();
   
   /**
    * add a contact 
    * @param contact
    * @return updated contacts listing
    */
-  Collection<Contact> addContact(Contact contact);
+  List<Contact> addContact(Contact contact);
 
   /**
    * Removes a contact 
    * @param contact
    * @return updated contacts listing
    */
-  Collection<Contact> deleteContact(Contact contact);  
+  List<Contact> deleteContact(Contact contact);  
 }

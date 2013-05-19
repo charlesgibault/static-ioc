@@ -1,17 +1,21 @@
 package org.staticioc.samples.gwt.client.view;
 
-import java.util.LinkedList;
-import java.util.Collection;
+import java.util.List;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.*;
+import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy.KeyboardSelectionPolicy;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.SelectionChangeEvent;
+import com.google.gwt.view.client.SingleSelectionModel;
+
 import org.staticioc.samples.gwt.client.Messages;
 import org.staticioc.samples.gwt.shared.model.Contact;
 
@@ -24,47 +28,38 @@ public class ContactsViewImpl extends Composite implements EditableListView<Cont
 	@UiField Label firstName; 
 	@UiField Label lastName;
 	@UiField Label email;
-	
+
 	@UiField TextBox firstNameValue;
 	@UiField TextBox lastNameValue;
 	@UiField TextBox emailValue;
-	
-	@UiField FlexTable contactsTable;
+
+	@UiField(provided = true) CellTable<Contact> contactsTable;
 	@UiField Button addButton;
 	@UiField Button deleteButton;
 
 	private Presenter<Contact> presenter;
 	private Messages messages;
-	private Collection<Contact> contacts = new LinkedList<Contact>();
+	private Contact selectedItem;
 
-	public ContactsViewImpl() {
-		initWidget( uiBinder.createAndBindUi(this));
+	public ContactsViewImpl()
+	{	
+		buildCellTable();
+		initWidget( uiBinder.createAndBindUi(this));		 
 	}
 
-	private void translate()
-	{
-		firstName.setText(messages.firstNameField());
-		lastName.setText(messages.lastNameField());
-		email.setText(messages.emailField());
-		addButton.setText(messages.addButton());
-		deleteButton.setText(messages.removeButton());
-	}
-	
 	@UiHandler("addButton")
 	void onAddButtonClicked(ClickEvent event) {
-		if (presenter != null) {
-			Contact contact= new Contact(firstNameValue.getValue(), lastNameValue.getValue(), emailValue.getValue());
-			presenter.onAddButtonClicked(contact);
-		}
+		Contact contact= new Contact(firstNameValue.getValue(), lastNameValue.getValue(), emailValue.getValue());
+		presenter.onAddButtonClicked(contact);
 	}
 
 	@UiHandler("deleteButton")
 	void onDeleteButtonClicked(ClickEvent event) {
-		if (presenter != null) {
-			presenter.onDeleteButtonClicked(null);//TODO retrieve selected item
+		if ( selectedItem != null) {
+			presenter.onDeleteButtonClicked(selectedItem);//TODO retrieve selected item
 		}
 	}
-	
+
 	@Override
 	public void resetUserInput() {
 		firstNameValue.setValue("");
@@ -73,13 +68,8 @@ public class ContactsViewImpl extends Composite implements EditableListView<Cont
 	}
 
 	@Override
-	public void setModel(Collection<Contact> entries) {
-		this.contacts = entries;
-
-		for( Contact contact : contacts)
-		{
-			// TODO Display contacts			
-		}
+	public void setModel(List<Contact> entries) {
+		contactsTable.setRowData(entries);
 	}
 
 	@Override
@@ -87,10 +77,64 @@ public class ContactsViewImpl extends Composite implements EditableListView<Cont
 		this.presenter = presenter;
 	}
 
-	public Messages getMessages() {
-		return messages;
+
+	private void buildCellTable()
+	{
+		contactsTable = new CellTable<Contact>();
+		contactsTable.setTableLayoutFixed(false);
+		contactsTable.setFocus(false);
+		contactsTable.setPageSize(10);
+
+		// Adding columns
+		TextColumn<Contact> firstNameColumn = new TextColumn<Contact>() {
+			@Override
+			public String getValue(Contact contact) {
+				return contact.getFirstName();
+			}
+		};
+		TextColumn<Contact> lastNameColumn = new TextColumn<Contact>() {
+			@Override
+			public String getValue(Contact contact) {
+				return contact.getLastName();
+			}
+		};
+		TextColumn<Contact> emailColumn = new TextColumn<Contact>() {
+			@Override
+			public String getValue(Contact contact) {
+				return contact.getEmail();
+			}
+		};
+
+		contactsTable.addColumn(firstNameColumn, "First Name");
+		contactsTable.addColumn(lastNameColumn, "Last Name");
+		contactsTable.addColumn(emailColumn, "Email");
+		
+		// Set-up selected contact selection model
+		final SingleSelectionModel<Contact> selectionModel = new SingleSelectionModel<Contact>();
+		contactsTable.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.ENABLED);
+		contactsTable.setSelectionModel(selectionModel);
+
+		selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+			public void onSelectionChange(SelectionChangeEvent event) {
+				Contact selected = selectionModel.getSelectedObject();
+				selectedItem=selected;
+			}
+		});
 	}
 
+	// Would go in an afterPropertiesSet() method when mechanism is available in staticioc
+	private void translate()
+	{
+		firstName.setText(messages.firstNameField());
+		lastName.setText(messages.lastNameField());
+		email.setText(messages.emailField());
+		addButton.setText(messages.addButton());
+		deleteButton.setText(messages.removeButton());
+
+		contactsTable.getColumn(0).setDataStoreName(messages.firstNameField());
+		contactsTable.getColumn(1).setDataStoreName(messages.lastNameField());
+		contactsTable.getColumn(2).setDataStoreName(messages.emailField());
+	}
 	public void setMessages(Messages messages) {
 		this.messages = messages;
 		translate();

@@ -2,7 +2,7 @@ package org.staticioc.samples.gwt.client.view;
 
 import com.google.gwt.user.client.ui.Widget;
 
-import java.util.Collection;
+import java.util.List;
 
 /**
  * Pure view here: no link to Model specificities and Presenter access through interface contract only
@@ -17,7 +17,7 @@ public interface EditableListView<T> {
   }
   
   void setPresenter(Presenter<T> presenter);
-  void setModel(Collection<T> models);
+  void setModel(List<T> models);
   void resetUserInput();
 
   Widget asWidget();

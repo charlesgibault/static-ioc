@@ -1,6 +1,6 @@
 package org.staticioc.samples.gwt.server;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.staticioc.samples.gwt.client.service.ContactsService;
 import org.staticioc.samples.gwt.shared.model.Contact;
@@ -16,15 +16,15 @@ public class ContactsServiceImpl extends RemoteServiceServlet implements
 ContactsService
 {	
 	ApplicationContext applicationContext = new ApplicationContext();
-	Collection<Contact> contacts = applicationContext.defaultContactDatabase.getContacts();
+	List<Contact> contacts = applicationContext.defaultContactDatabase.getContacts();
 	
 	@Override
-	public Collection<Contact> retrieveContacts() {
+	public List<Contact> retrieveContacts() {
 		return contacts;
 	}
 
 	@Override
-	public Collection<Contact> addContact(Contact contact)
+	public List<Contact> addContact(Contact contact)
 	{
 		// Verify that the input is valid.
 		if (!FieldVerifier.isValidName(contact.getFirstName())) {
@@ -39,7 +39,7 @@ ContactsService
 	}
 
 	@Override
-	public Collection<Contact> deleteContact(Contact contact) {
+	public List<Contact> deleteContact(Contact contact) {
 		contacts.remove(contact);
 		return contacts;
 	}

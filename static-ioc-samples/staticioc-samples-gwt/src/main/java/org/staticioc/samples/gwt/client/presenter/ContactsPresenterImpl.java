@@ -1,6 +1,6 @@
 package org.staticioc.samples.gwt.client.presenter;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.staticioc.samples.gwt.client.service.ContactsServiceAsync;
 import org.staticioc.samples.gwt.client.view.EditableListView;
@@ -26,13 +26,13 @@ public class ContactsPresenterImpl implements EditableListView.Presenter<Contact
 	@Override
 	public void onAddButtonClicked(final Contact contact) {
 		// Display add Contact pop-up
-		contactsService.addContact(contact, new AsyncCallback<Collection<Contact>>() {
+		contactsService.addContact(contact, new AsyncCallback<List<Contact>>() {
 			public void onFailure(Throwable caught) {
 				displayError("Error adding contact " + ( (contact!=null)?contact.getLastName():"null") );
 			}
 
 			@Override
-			public void onSuccess(Collection<Contact> contacts) {
+			public void onSuccess(List<Contact> contacts) {
 				contactsView.setModel(contacts);
 				contactsView.resetUserInput();
 			}
@@ -41,13 +41,13 @@ public class ContactsPresenterImpl implements EditableListView.Presenter<Contact
 
 	@Override
 	public void onDeleteButtonClicked(final Contact contact) {
-		contactsService.deleteContact(contact, new AsyncCallback<Collection<Contact>>() {
+		contactsService.deleteContact(contact, new AsyncCallback<List<Contact>>() {
 			public void onFailure(Throwable caught) {
 				displayError("Error deleting contact " + ( (contact!=null)?contact.getLastName():"null") );
 			}
 
 			@Override
-			public void onSuccess(Collection<Contact> contacts) {
+			public void onSuccess(List<Contact> contacts) {
 				contactsView.setModel(contacts);
 			}
 		});
@@ -55,13 +55,13 @@ public class ContactsPresenterImpl implements EditableListView.Presenter<Contact
 	}
 	
 	public void fetchContacts() {
-		contactsService.retrieveContacts( new AsyncCallback<Collection<Contact>>() {
+		contactsService.retrieveContacts( new AsyncCallback<List<Contact>>() {
 			public void onFailure(Throwable caught) {
 				displayError("Error retrieving contacts" );
 			}
 
 			@Override
-			public void onSuccess(Collection<Contact> contacts) {
+			public void onSuccess(List<Contact> contacts) {
 				contactsView.setModel(contacts);
 			}
 		});
