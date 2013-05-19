@@ -9,3 +9,6 @@ pom.xml.releaseBackup
 release.properties
 *.launch
 .gwt
+static-ioc-samples/staticioc-samples-gwt/gwt-unitCache
+static-ioc-samples/staticioc-samples-gwt/www-test/
+static-ioc-samples/staticioc-samples-gwt/src/main/webapp/WEB-INF/lib/gwt-servlet.jar

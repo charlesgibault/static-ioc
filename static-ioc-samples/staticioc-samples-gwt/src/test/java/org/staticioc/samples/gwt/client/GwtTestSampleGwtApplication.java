@@ -1,7 +1,10 @@
 package org.staticioc.samples.gwt.client;
 
+import java.util.List;
+
 import org.staticioc.samples.gwt.client.service.ContactsService;
 import org.staticioc.samples.gwt.client.service.ContactsServiceAsync;
+import org.staticioc.samples.gwt.shared.model.Contact;
 import org.staticioc.samples.gwt.shared.validator.FieldVerifier;
 
 import com.google.gwt.core.client.GWT;
@@ -44,35 +47,35 @@ public class GwtTestSampleGwtApplication extends GWTTestCase {
    * This test will send a request to the server using the greetServer method in
    * GreetingService and verify the response.
    */
-  public void testGreetingService() {
+  public void testContactService() {
     // Create the service that we will test.
-    ContactsServiceAsync greetingService = GWT.create(ContactsService.class);
-    ServiceDefTarget target = (ServiceDefTarget) greetingService;
-    target.setServiceEntryPoint(GWT.getModuleBaseURL() + "SampleGwtApplication/greet");
+    ContactsServiceAsync contactService = GWT.create(ContactsService.class);
+    ServiceDefTarget target = (ServiceDefTarget) contactService;
+    target.setServiceEntryPoint(GWT.getModuleBaseURL() + "SampleGwtApplication/contact");
 
     // Since RPC calls are asynchronous, we will need to wait for a response
     // after this test method returns. This line tells the test runner to wait
     // up to 10 seconds before timing out.
     delayTestFinish(10000);
 
-    /*
+    
     // Send a request to the server.
-    greetingService.greetServer("GWT User", new AsyncCallback<String>() {
+    contactService.retrieveContacts( new AsyncCallback<List<Contact>>() {
       public void onFailure(Throwable caught) {
         // The request resulted in an unexpected error.
         fail("Request failure: " + caught.getMessage());
       }
 
-      public void onSuccess(String result) {
+      public void onSuccess(List<Contact> contacts) {
         // Verify that the response is correct.
-        assertTrue(result.startsWith("Hello, GWT User!"));
+        assertFalse(contacts.isEmpty());
 
         // Now that we have received a response, we need to tell the test runner
         // that the test is complete. You must call finishTest() after an
         // asynchronous test finishes successfully, or the test will time out.
         finishTest();
       }
-    });*/
+    });
   }
 
 

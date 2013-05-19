@@ -4,6 +4,6 @@
   <inherits name='org.staticioc.samples.gwt.SampleGwtApplication' />
 
   <!-- Specify the path to any remote services.                   -->
-  <servlet path="/SampleGwtApplication/greet" class="org.staticioc.samples.gwt.server.ContactsServiceImpl" />
+  <servlet path="/SampleGwtApplication/contact" class="org.staticioc.samples.gwt.server.ContactsServiceImpl" />
 
 </module>
