@@ -35,6 +35,7 @@ public class ContactsPresenterImpl implements EditableListView.Presenter<Contact
 			public void onSuccess(List<Contact> contacts) {
 				contactsView.setModel(contacts);
 				contactsView.resetUserInput();
+				// In a real application, we would probably send an Event there too.
 			}
 		});
 	}
@@ -49,6 +50,7 @@ public class ContactsPresenterImpl implements EditableListView.Presenter<Contact
 			@Override
 			public void onSuccess(List<Contact> contacts) {
 				contactsView.setModel(contacts);
+				// In a real application, we would probably send an Event there too.
 			}
 		});
 
