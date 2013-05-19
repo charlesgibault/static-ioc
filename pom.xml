@@ -47,7 +47,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
   </issueManagement>
   <scm>
     <developerConnection>
-    scm:git:https://charles.gibault@code.google.com/p/static-ioc/</developerConnection>
+    scm:git:https://code.google.com/p/static-ioc/</developerConnection>
     <url>https://code.google.com/p/static-ioc/source/browse/</url>
     <tag>HEAD</tag>
   </scm>
