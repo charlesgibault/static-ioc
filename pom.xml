@@ -1,12 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.staticioc</groupId>
   <artifactId>staticioc-parent</artifactId>
   <packaging>pom</packaging>
-  <version>0.2-SNAPSHOT</version>
+  <version>0.2</version>
   <name>staticioc parent project</name>
   <description>The goal of this project is to allow the use of the
   Inversion of Control pattern at compile time so it can be applied
@@ -49,7 +47,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
     <developerConnection>
     scm:git:https://code.google.com/p/static-ioc/</developerConnection>
     <url>https://code.google.com/p/static-ioc/source/browse/</url>
-    <tag>HEAD</tag>
+    <tag>staticioc-parent-0.2</tag>
   </scm>
   <distributionManagement>
     <repository>
