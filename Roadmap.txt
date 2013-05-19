@@ -1,23 +1,19 @@
 Please find below some visibility on the planned feature roadmap
 
 // Release 0.1
-Initial release. Java target with maven plugin and command line tool.
+  * Initial release. Java target with maven plugin and command line tool.
 
-// Release 0.2 (in progress):
-DONE
-- [Core] Made beans declaration, instanciation, and setup order predictable 
-- [Core] Added name alias support for bean when id and name are both declared
-- [Core] Fixed constructor arguments support when no index was provided or when using direct value/ref/idref attribute
-- [Core] Add support for factory bean / factory method
-- [Generator] Implement destructor workflow
-- [Java Generator] Add proper @SuppressWarnings to have warnings free class when generics are in use
-- [Java Generator] Fix handling of .class parameters 
-- [Samples] Add GWT sample project
+// Release 0.2
+  * *Core* - Made beans declaration, instanciation, and setup order predictable 
+  * *Core* - Added name alias support for bean when id and name are both declared
+  * *Core* - Fixed constructor arguments support when no index was provided or when using direct value/ref/idref attribute
+  * *Core* - Add support for factory bean / factory method
+  * *Generator* - Implement destructor workflow
+  * *Java Generator* - Add proper @SuppressWarnings to have warnings free class when generics are in use
+  * *Java Generator* - Fix handling of .class parameters 
+  * *Samples* - Add full GWT sample project using MVP
 
-TODO
-// [Doc] Wiki
-
-// Release 0.3
+// Release 0.3 (To be started)
 // [Core] Refactor collection and parent dependency for cleaner static-ioc core module classes
 // [Core] Add plugin mechanism to support 
 // [Core] Add plugin for GWT to make bean definition less versbose
@@ -31,7 +27,7 @@ TODO
 // Add (partial) support for PropertyPlaceHolders
 
 // Release 0.5+
-//TODO add more control on target class : inheritance, lifecycle
-//TODO add support for init-method and a init() method
-//TODO add support for depends-on (in init-method)
-//TODO add support for destroy-method and a teardDown() method ?	
+// add more control on target class : inheritance, lifecycle
+// add support for init-method and a init() method
+// add support for depends-on (in init-method)
+// add support for destroy-method and a teardDown() method ?	
