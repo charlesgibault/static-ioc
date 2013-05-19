@@ -5,24 +5,32 @@ Initial release. Java target with maven plugin and command line tool.
 
 // Release 0.2 (in progress):
 DONE
-- Made beans declaration, instanciation, and setup order predictable 
-- Added name alias support for bean when id and name are both declared
-- Implement destructor workflow + java generator
-- Fixed constructor arguments support when no index was provided or when using direct value/ref/idref attribute
-- Add support for factory bean / factory method
+- [Core] Made beans declaration, instanciation, and setup order predictable 
+- [Core] Added name alias support for bean when id and name are both declared
+- [Core] Fixed constructor arguments support when no index was provided or when using direct value/ref/idref attribute
+- [Core] Add support for factory bean / factory method
+- [Generator] Implement destructor workflow
+- [Java Generator] Add proper @SuppressWarnings to have warnings free class when generics are in use
+- [Java Generator] Fix handling of .class parameters 
+- [Samples] Add GWT sample project
 
 TODO
-// Refactor collection and parent dependency for cleaner static-ioc core module classes 
-// Add GWT sample project
-// Add Play N sample project?
-// Wiki
+// [Doc] Wiki
 
 // Release 0.3
+// [Core] Refactor collection and parent dependency for cleaner static-ioc core module classes
+// [Core] Add plugin mechanism to support 
+// [Core] Add plugin for GWT to make bean definition less versbose
+// [Samples] Use GWT bean plugin to simplify GWT sample
+
+// Release 0.4
+// Add some onPropertiesSet kind of mechanism for post initing bean
+// Add Play N sample project?
 // Support Python and Jython targets
 // Support Objective C and Cpp targets
 // Add (partial) support for PropertyPlaceHolders
 
-// Release 0.4+
+// Release 0.5+
 //TODO add more control on target class : inheritance, lifecycle
 //TODO add support for init-method and a init() method
 //TODO add support for depends-on (in init-method)
