@@ -53,46 +53,14 @@ import org.staticioc.model.Bean;
 import org.staticioc.model.ParentDependency;
 import org.staticioc.model.Property;
 import org.staticioc.model.Bean.Scope;
+import org.staticioc.parser.BeanContainer;
+import org.staticioc.parser.ParserConstants;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
-public abstract class AbstractSpringConfigParser {
+public abstract class AbstractSpringConfigParser implements ParserConstants, BeanContainer {
 
 	protected static final Logger logger = LoggerFactory.getLogger(SpringConfigParser.class);
-	protected static final String BEAN_PROPERTY_PREFIX = "p:";
-	protected static final String BEAN_PROPERTY_REF_SUFFIX = "-ref";
-	protected static final String XPATH_BEAN = "/beans/bean";
-	protected static final String XPATH_PROPERTY = "property[@name]";
-	protected static final String XPATH_IMPORT = "/beans/import[@resource]";
-	protected static final String BEAN = "bean";
-	protected static final String REF = "ref";
-	protected static final String ID = "id";
-	protected static final String IDREF = "idref";
-	protected static final String CLASS = "class";
-	protected static final String NAME = "name";
-	protected static final String VALUE = "value";
-	protected static final String TYPE = "type";
-	protected static final String ABSTRACT = "abstract";
-	protected static final String PARENT = "parent";
-	protected static final String SCOPE = "scope";
-	protected static final String PROTOTYPE = "prototype";
-	protected static final String SINGLETON = "singleton";
-	protected static final String FACTORY_BEAN = "factory-bean";
-	protected static final String FACTORY_METHOD = "factory-method";
-	protected static final String MAP = "map";
-	protected static final String LIST = "list";
-	protected static final String SET = "set";
-	protected static final String PROPS = "props";
-	protected static final String ENTRY = "entry";
-	protected static final String KEY = "key";
-	protected static final String KEY_REF = "key-ref";
-	protected static final String VALUE_REF = "value-ref";
-	protected static final String PROP = "prop";
-	public static final String CONSTRUCTOR_ARGS = "constructor-arg";
-	protected static final String INDEX = "index";
-	protected static final String NULL = "null";
-	protected static final String RESOURCE = "resource";
 	
 	public static final String ANONYMOUS_BEAN_PREFIX = "bean_";
 	public static final String PROTOTYPE_BEAN_PREFIX = "prototyped_";
@@ -117,7 +85,8 @@ public abstract class AbstractSpringConfigParser {
 	 * 
 	 * @return
 	 */
-	protected String generateAnonymousBeanId() {
+	@Override
+	public String generateAnonymousBeanId() {
 		return ANONYMOUS_BEAN_PREFIX + (++anonymousBeanIdentifier);
 	}
 	
@@ -132,7 +101,8 @@ public abstract class AbstractSpringConfigParser {
 	 * @param prop
 	 * @param set
 	 */
-	protected void addOrReplaceProperty(final Property prop, final Collection<Property> set) {
+	@Override
+	public void addOrReplaceProperty(final Property prop, final Collection<Property> set) {
 		if( ! set.add( prop ) )
 		{
 			set.remove(prop);
@@ -186,7 +156,8 @@ public abstract class AbstractSpringConfigParser {
 	 * Register a bean in the bean map
 	 * @param bean to be registered
 	 */
-	protected void register(final Bean bean) {	
+	@Override
+	public void register(final Bean bean) {	
 		if( logger.isDebugEnabled())
 		{
 			logger.debug( "Adding {}", bean );
@@ -211,7 +182,8 @@ public abstract class AbstractSpringConfigParser {
 	 * Register a set of beans in the bean map
 	 * @param beans
 	 */
-	protected void register(final Map<String, Bean> beans) {	
+	@Override
+	public void register(final Map<String, Bean> beans) {	
 		for( final Bean bean : beans.values() )
 		{
 			register(bean);
@@ -222,7 +194,8 @@ public abstract class AbstractSpringConfigParser {
 	 * Register a bean in the bean map
 	 * @param bean to be registered
 	 */
-	protected void registerParent( ParentDependency parent ) {	
+	@Override
+	public void registerParent( ParentDependency parent ) {	
 		if( logger.isDebugEnabled())
 		{
 			logger.debug( "Adding {}", parent );
@@ -236,7 +209,8 @@ public abstract class AbstractSpringConfigParser {
 	 * Merge parent dependencies, prototypeBeans and propertyReferencesMap
 	 * @param bean to be registered
 	 */
-	protected void register( final AbstractSpringConfigParser parser) {	
+	@Override
+	public void register( final AbstractSpringConfigParser parser) {	
 		if( logger.isDebugEnabled())
 		{
 			logger.debug( "Adding {} parent dependencies", parser.parentDependencyMap );
@@ -263,76 +237,6 @@ public abstract class AbstractSpringConfigParser {
 	protected Map<String, Bean > getBeans()
 	{
 		return beans;
-	}
-
-	protected Property getVal(String propertyName, String value) {
-		if ( value == null) { return null; }
-		return new Property( propertyName, value, null );
-	}
-
-	protected Property getRef(String propertyName, String ref) {
-		if ( ref == null) { return null; }
-		return new Property( propertyName, null, ref );
-	}
-
-	/**
-	 * Extract text value for nodes like <value>text</value>
-	 * @param node
-	 * @return
-	 */
-	protected String extractFirstChildValue(final Node node) {
-		final Node valueSubNode = node.getFirstChild();
-		
-		if ( valueSubNode == null ) { return null; }
-		return valueSubNode.getNodeValue();
-	}
-
-	/**
-	 * Go through a node list a extract the first matching node given its name
-	 * @param nodes
-	 * @param name
-	 * @return
-	 */
-	protected Node extractFirstNodeByName(final NodeList nodes, final String name) {
-		if(nodes != null && name != null )
-		{	
-			for( int n = 0 ; n<nodes.getLength() ; ++n )
-			{
-				final Node node = nodes.item( n );
-	
-				if ( name.equals(node.getNodeName()) )
-				{
-					return node;
-				}
-			}
-		}
-		
-		return null;
-	}
-
-	/**
-	 * Go through a node list a extract the first matching node given its name
-	 * @param nodes
-	 * @param name
-	 * @return
-	 */
-	protected Collection<Node> extractNodesByName(final NodeList nodes, final String name) {
-		Collection<Node> result = new LinkedList<Node>();
-		
-		if(nodes != null && name != null )
-		{	
-			for( int n = 0 ; n<nodes.getLength() ; ++n )
-			{
-				final Node node = nodes.item( n );
-	
-				if ( name.equals(node.getNodeName()) )
-				{
-					result.add( node );
-				}
-			}
-		}
-		
-		return result;
 	}
 	
 	protected void resolveParentDefinition() throws XPathExpressionException

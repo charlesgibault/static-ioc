@@ -22,8 +22,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -37,6 +39,8 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.commons.io.FilenameUtils;
 import org.staticioc.model.*;
 import org.staticioc.model.Bean.Scope;
+import org.staticioc.parser.*;
+import org.staticioc.parser.plugins.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -52,7 +56,11 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 	private final XPathExpression xBeans;
 	private final XPathExpression xProps;
 	private final XPathExpression xImports;
-		
+	
+	//TODO put that into a PluginChain
+	private final Collection<AttributesParserPlugin> attributesParserPlugins = new LinkedList<AttributesParserPlugin>();
+	private final Map<String, NodeParserPlugin> nodesParserPlugins = new ConcurrentHashMap<String, NodeParserPlugin>();	
+	
 	public SpringConfigParser() throws ParserConfigurationException
 	{
 		// Init DocumentBuilderFactory
@@ -85,42 +93,28 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		{
 			throw new ParserConfigurationException( "Error compiling XPaths :" + e.getMessage() );
 		}
+		
+		// Load plugins
+		AttributesParserPlugin springPPluging = new SpringPParserPlugin();
+		springPPluging.setBeanContainer(this);
+		attributesParserPlugins.add( springPPluging );
+		
+		NodeParserPlugin listPlugin = new ListPlugin();
+		NodeParserPlugin setPlugin = new SetPlugin();
+		NodeParserPlugin mapPlugin = new MapPlugin();
+		NodeParserPlugin propertiesPlugin = new PropertiesPlugin();
+		
+		listPlugin.setBeanContainer(this);
+		setPlugin.setBeanContainer(this);
+		mapPlugin.setBeanContainer(this);
+		propertiesPlugin.setBeanContainer(this);
+		
+		nodesParserPlugins.put(listPlugin.getSupportedNode(), listPlugin);
+		nodesParserPlugins.put(setPlugin.getSupportedNode(), setPlugin);
+		nodesParserPlugins.put(mapPlugin.getSupportedNode(), mapPlugin);
+		nodesParserPlugins.put(propertiesPlugin.getSupportedNode(), propertiesPlugin);
 	}
 	
-	/**
-	 * Handle property written using Spring p: syntactic sugar 
-	 * @param bean
-	 * @param beanAttributes
-	 */
-	protected void handleSpringPProperties(Bean bean, NamedNodeMap beanAttributes)
-	{
-		// Handle Spring p:* properties
-		for ( int a=0 ; a < beanAttributes.getLength() ; ++a )
-		{
-			Node beanAttr = beanAttributes.item( a ); 
-			if ( beanAttr.getNodeName().startsWith( BEAN_PROPERTY_PREFIX ) )
-			{
-				String propertyName = beanAttr.getNodeName().substring( BEAN_PROPERTY_PREFIX.length() );
-				String ref = null;
-				String value = null;
-
-				// Check if value is a reference
-				if ( propertyName.endsWith( BEAN_PROPERTY_REF_SUFFIX) )
-				{
-					propertyName = propertyName.substring(0, propertyName.length() - BEAN_PROPERTY_REF_SUFFIX.length() );
-					ref = beanAttr.getNodeValue();
-				}
-				else // Value is a value
-				{
-					value = beanAttr.getNodeValue();
-				}
-
-				Property prop = new Property( propertyName, value, ref );
-				addOrReplaceProperty(prop, bean.getProperties() );
-			}
-		}
-	}
-		
 	protected String populateBeansMap( final Node beanNode ) throws XPathExpressionException
 	{
 		if (beanNode == null) // if Bean doesn't exist, there's nothing to do
@@ -242,9 +236,12 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		
 		// read all kind of properties
 		
-		// Handle Spring p:* properties
-		handleSpringPProperties(bean, beanAttributes);
-				
+		// Specific attributes plugin
+		for( AttributesParserPlugin plugin: attributesParserPlugins )
+		{
+			plugin.handleAttributes(bean, beanAttributes);
+		}
+		
 		// Enrich bean with constructor args
 		handleConstructorArgs( bean, beanNode);
 						
@@ -266,7 +263,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 	 */
 	protected void handleConstructorArgs( final Bean bean, final Node beanNode ) throws XPathExpressionException
 	{
-		final Collection<Node> constArgNodes = extractNodesByName(beanNode.getChildNodes(), CONSTRUCTOR_ARGS);
+		final Collection<Node> constArgNodes = ParserHelper.extractNodesByName(beanNode.getChildNodes(), CONSTRUCTOR_ARGS);
 		
 		final Property[] args = new Property[ constArgNodes.size() ];
 		
@@ -396,7 +393,8 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 	 * @param propChilds attributes of the property node
 	 * @throws XPathExpressionException
 	 */
-	protected void handleSubProps( final Bean bean, final String propName, final NodeList propChilds) throws XPathExpressionException
+	@Override
+	public void handleSubProps( final Bean bean, final String propName, final NodeList propChilds) throws XPathExpressionException
 	{
 		for (int sp = 0 ; sp < propChilds.getLength() ; ++sp )
 		{
@@ -417,28 +415,34 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 	 * @return a Property representing the appropriate object association for parent bean
 	 * @throws XPathExpressionException
 	 */
-	protected Property handleSubProp( final Node spNode, final String propName )
+	@Override
+	public Property handleSubProp( final Node spNode, final String propName )
 			 throws XPathExpressionException
 	{
 		final String spNodeName = spNode.getNodeName();
-
-		if ( spNodeName.equals( REF ) || spNodeName.equals( IDREF ) ) // Look at children named ref / idref
+		
+		if( nodesParserPlugins.containsKey( spNodeName) )
+		{
+			NodeParserPlugin plugin = nodesParserPlugins.get(spNodeName);
+			return plugin.handleProperty(spNode, propName);
+		}
+		else if ( spNodeName.equals( REF ) || spNodeName.equals( IDREF ) ) // Look at children named ref / idref
 		{
 			final NamedNodeMap spNodeAttributes = spNode.getAttributes();
 			final Node refNode = spNodeAttributes.getNamedItem(BEAN);
 		
 			if( refNode != null) // handle <ref bean="">
 			{
-				return getRef( propName, refNode.getNodeValue() );
+				return ParserHelper.getRef( propName, refNode.getNodeValue() );
 			} 
 			else //Handle <ref>value</ref>
 			{
-				return getRef( propName, extractFirstChildValue(spNode) );
+				return ParserHelper.getRef( propName, ParserHelper.extractFirstChildValue(spNode) );
 			}
 		}
 		else if ( spNodeName.equals( VALUE ) ) // Look at children named value
 		{						
-			final Property res =  getVal( propName, extractFirstChildValue(spNode) ); 
+			final Property res =  ParserHelper.getVal( propName, ParserHelper.extractFirstChildValue(spNode) ); 
 			
 			// Handle type specified as an attribute
 			final NamedNodeMap spNodeAttributes = spNode.getAttributes();
@@ -457,233 +461,14 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 			
 			if (subBeanName != null) // Wire this bean as a reference
 			{
-				return getRef( propName, subBeanName );
+				return ParserHelper.getRef( propName, subBeanName );
 			}
 		}
 		else if  ( spNodeName.equals( NULL ) ) // null value
 		{
 			return new Property( propName, null, null );
 		}
-		else if  ( spNodeName.equals( LIST ) )
-		{
-			return handleCollection( propName, spNode, Bean.Type.LIST);
-		}
-		else if ( spNodeName.equals( SET ) )
-		{
-			return handleCollection( propName, spNode, Bean.Type.SET);
-		}	
-		else if ( spNodeName.equals( MAP ) )
-		{
-			return handleCollection( propName, spNode, Bean.Type.MAP);
-		}	
-		else if ( spNodeName.equals( PROPS ) )
-		{
-			return handleCollection( propName, spNode, Bean.Type.PROPERTIES);
-		}
 		return null;
-	}
-
-	/**
-	 * Handle collection related tags of a property : list | set | map | properties
-	 * @param parent
-	 * @param propName
-	 * @param node
-	 * @param type
-	 * @throws XPathExpressionException
-	 */
-	protected Property handleCollection( final String propName, final Node node, final Bean.Type type )
-			 throws XPathExpressionException
-	{
-		// create an anonymous bean of appropriate collection type
-		final String beanId = generateAnonymousBeanId();
-		final Bean collecBean;
-		
-		switch( type ) 
-		{
-		case LIST:
-			collecBean = new CollectionBean( beanId, Bean.Type.LIST.toString(), type );
-			handleSubProps( collecBean, "add", node.getChildNodes() ); // recursively set it's property
-			break;
-		case SET:
-			collecBean = new CollectionBean( beanId, Bean.Type.SET.toString(), type );
-			handleSubProps( collecBean, "add", node.getChildNodes() ); // recursively set it's property
-			break;
-		case MAP:
-			collecBean = new CollectionBean( beanId, Bean.Type.MAP.toString(), type );
-			handleMap( collecBean, node.getChildNodes() );
-			break;
-		case PROPERTIES:
-			collecBean = new CollectionBean( beanId, Bean.Type.PROPERTIES.toString(), type );
-			handleProperties( collecBean, node.getChildNodes() );
-			break;
-		default:
-			collecBean=null;
-		}
-		
-		if ( collecBean == null) { return null; }
-				
-		// register Bean in Map
-		register( collecBean  );
-		
-		// Wire this bean as a reference
-		return getRef( propName, beanId );
-	}
-	
-	/**
-	 * Handle a map definition
-	 * @param collecBean (anonymous) bean representing the collection
-	 * @param entries list of XML node representing the Map
-	 * @throws XPathExpressionException
-	 */
-	private void handleMap( final Bean collecBean, final NodeList entries ) throws XPathExpressionException
-	{		
-		for (int e = 0 ; e < entries.getLength() ; ++e )
-		{
-			final Node entry = entries.item( e );
-			final String entryNodeName = entry.getNodeName();
-			
-			if( !entryNodeName.equals( ENTRY ) ) // ignore non <entry> nodes
-			{
-				continue;
-			}
-			
-			final NamedNodeMap entryAttributes = entry.getAttributes();
-			
-			// entry has a 'key' attribute or a 'key-ref' attribute or an inner entry
-			final Node keyNode = entryAttributes.getNamedItem(KEY);
-			
-			String keyValue=null;
-			boolean isKeyRef = false;
-			
-			if(keyNode != null)
-			{
-				keyValue = keyNode.getNodeValue();
-			}
-			else
-			{
-				final Node keyRefNode = entryAttributes.getNamedItem(KEY_REF);
-			
-				if(keyRefNode != null)
-				{
-					keyValue = keyRefNode.getNodeValue();
-					isKeyRef = true;
-				}
-				else
-				{
-					final Node keyDef = extractFirstNodeByName( entry.getChildNodes(), KEY);
-					
-					if(keyDef != null)
-					{
-						for (int kc = 0 ; kc < keyDef.getChildNodes().getLength() ; ++kc )
-						{
-							final Node kcNode = keyDef.getChildNodes().item( kc );
-							final String keyPropName = collecBean.getId() + "_key";
-							
-							Property keyRefAsProp = handleSubProp( kcNode, keyPropName );
-							if (keyRefAsProp != null)
-							{
-								if( keyRefAsProp.getValue() != null )
-								{
-									keyValue = keyRefAsProp.getValue();
-									break;
-								}
-								else if( keyRefAsProp.getRef() != null )
-								{
-									keyValue = keyRefAsProp.getRef();
-									isKeyRef = true;
-									break;
-								}
-							}
-						}
-					}
-				}
-			}			
-			
-			// entry has a 'value' attribute or a 'value-ref' attribute or an inner entry.
-			final Node valueNode = entryAttributes.getNamedItem(VALUE);
-			
-			String value = null;
-			String refValue = null;
-			
-			if(valueNode != null)
-			{
-				value = valueNode.getNodeValue();
-			}
-			else
-			{
-				final Node valueRefNode = entryAttributes.getNamedItem(VALUE_REF);
-			
-				if(valueRefNode != null)
-				{
-					refValue = valueRefNode.getNodeValue();
-				}
-				else
-				{
-					for (int v = 0 ; v < entry.getChildNodes().getLength() ; ++v )
-					{
-						final Node vNode = entry.getChildNodes().item( v );
-						final String valuePropName = collecBean.getId() + "_value";
-						
-						Property keyValueAsProp = handleSubProp( vNode, valuePropName );
-						if (keyValueAsProp != null)
-						{
-							if( keyValueAsProp.getValue() != null )
-							{
-								value = keyValueAsProp.getValue();
-								break;
-							}
-							else if( keyValueAsProp.getRef() != null )
-							{
-								refValue = keyValueAsProp.getRef();
-								break;
-							}
-						}
-					}
-				}
-			}
-			
-			if ( keyValue != null)
-			{
-				Property prop  = new Property( keyValue, value, refValue);
-				prop.setKeyRef( isKeyRef );
-			
-				addOrReplaceProperty(prop, collecBean.getProperties() );
-			}
-		}
-	}
-		
-	/**
-	 * Handle properties node (which is a kind of Map<String,String>)
-	 * @param collecBean
-	 * @param entries
-	 */
-	protected void handleProperties( final Bean collecBean, final NodeList entries )
-	{
-		for (int e = 0 ; e < entries.getLength() ; ++e )
-		{
-			final Node entry = entries.item( e );
-			final String entryNodeName = entry.getNodeName();
-			
-			if( !entryNodeName.equals( PROP ) ) // ignore non <entry> nodes
-			{
-				continue;
-			}
-			
-			// Prop has a key attribute and an extractFirstChildValue
-			final NamedNodeMap entryAttributes = entry.getAttributes();
-			final Node keyNode = entryAttributes.getNamedItem(KEY);
-			
-			if ( keyNode != null)
-			{
-				final String value = extractFirstChildValue( entry );
-				Property prop = getVal( keyNode.getNodeValue(), value);
-				
-				if( prop != null )
-				{
-					addOrReplaceProperty(prop, collecBean.getProperties() );
-				}
-			}
-		}
 	}
 
 	public Map<String, Bean> load( Collection<String> configurationFiles) throws SAXException, IOException
@@ -737,6 +522,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		{
 			final NodeList importsRef = (NodeList) xImports.evaluate(confFileDom, XPathConstants.NODESET);
 			final NodeList beansRef = (NodeList) xBeans.evaluate(confFileDom, XPathConstants.NODESET);
+			// TODO plug special namespace plugins here
 
 			// Start by recursively resolve all imports
 			for( int i = 0 ; i< importsRef.getLength() ; ++i )
