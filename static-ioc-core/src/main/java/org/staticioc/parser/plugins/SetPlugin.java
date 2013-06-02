@@ -26,7 +26,7 @@ public class SetPlugin implements NodeSupportPlugin, ParserConstants
 		// create an anonymous bean of appropriate collection type
 		final String beanId = container.generateAnonymousBeanId();
 		final Bean collecBean = new CollectionBean( beanId, Bean.Type.SET.toString(), Bean.Type.SET );
-		container.handleSubProps( collecBean, "add", node.getChildNodes() ); // recursively set it's property
+		container.handleNodes( collecBean, "add", node.getChildNodes() ); // recursively set it's property
 
 		// register Bean in Map
 		container.register( collecBean  );

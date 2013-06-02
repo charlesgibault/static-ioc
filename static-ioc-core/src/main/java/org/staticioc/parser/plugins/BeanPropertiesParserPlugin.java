@@ -54,7 +54,7 @@ public class BeanPropertiesParserPlugin implements NodeParserPlugin, ParserConst
 				}
 				else
 				{
-					container.handleSubProps( bean, propName, node.getChildNodes());				
+					container.handleNodes( bean, propName, node.getChildNodes());				
 				}
 			}
 		}

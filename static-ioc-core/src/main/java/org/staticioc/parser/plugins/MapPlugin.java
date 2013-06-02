@@ -87,7 +87,7 @@ public class MapPlugin implements NodeSupportPlugin, ParserConstants
 							final Node kcNode = keyDef.getChildNodes().item( kc );
 							final String keyPropName = collecBean.getId() + "_key";
 							
-							Property keyRefAsProp = container.handleSubProp( kcNode, keyPropName );
+							Property keyRefAsProp = container.handleNode( kcNode, keyPropName );
 							if (keyRefAsProp != null)
 							{
 								if( keyRefAsProp.getValue() != null )
@@ -132,7 +132,7 @@ public class MapPlugin implements NodeSupportPlugin, ParserConstants
 						final Node vNode = entry.getChildNodes().item( v );
 						final String valuePropName = collecBean.getId() + "_value";
 						
-						Property keyValueAsProp = container.handleSubProp( vNode, valuePropName );
+						Property keyValueAsProp = container.handleNode( vNode, valuePropName );
 						if (keyValueAsProp != null)
 						{
 							if( keyValueAsProp.getValue() != null )

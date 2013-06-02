@@ -61,7 +61,7 @@ public class ConstructorArgsPlugin implements NodeParserPlugin, ParserConstants
 						continue;
 					}
 				
-					argumentProp = container.handleSubProp( argumentNode, argumentPropName );
+					argumentProp = container.handleNode( argumentNode, argumentPropName );
 				}
 				
 				if (argumentProp != null)

@@ -29,7 +29,7 @@ public interface BeanContainer
 	 * @param propChilds then children property that the container must resolve
 	 * @throws XPathExpressionException
 	 */
-	void handleSubProps( final Bean bean, final String propName, final NodeList propChilds) throws XPathExpressionException;
+	void handleNodes( final Bean bean, final String propName, final NodeList propChilds) throws XPathExpressionException;
 
 	/**
 	 * Handle a <property> sub-node
@@ -38,7 +38,7 @@ public interface BeanContainer
 	 * @return
 	 * @throws XPathExpressionException
 	 */
-	Property handleSubProp( final Node subNode, final String propName ) throws XPathExpressionException;
+	Property handleNode( final Node subNode, final String propName ) throws XPathExpressionException;
 	
 	/**
 	 * 

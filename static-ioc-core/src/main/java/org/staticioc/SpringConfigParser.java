@@ -262,19 +262,19 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 
 	/**
 	 * Handle all bean's properties nodes
-	 * @param bean : reference to the bean owning this attribute
+	 * @param bean : reference to the bean owning this attributes
 	 * @param propName name of the property being inspected
-	 * @param propChilds attributes of the property node
+	 * @param nodes list to process
 	 * @throws XPathExpressionException
 	 */
 	@Override
-	public void handleSubProps( final Bean bean, final String propName, final NodeList propChilds) throws XPathExpressionException
+	public void handleNodes( final Bean bean, final String propName, final NodeList nodes) throws XPathExpressionException
 	{
-		for (int sp = 0 ; sp < propChilds.getLength() ; ++sp )
+		for (int sp = 0 ; sp < nodes.getLength() ; ++sp )
 		{
-			final Node spNode = propChilds.item( sp );
+			final Node spNode = nodes.item( sp );
 
-			Property prop = handleSubProp(  spNode, propName );
+			Property prop = handleNode(  spNode, propName );
 			if (prop != null )
 			{
 				addOrReplaceProperty(prop, bean.getProperties() );
@@ -284,25 +284,25 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 
 	/**
 	 * Handle the following node :
-	 * @param spNode is the XML node representing the properties
+	 * @param node is the XML node representing the properties
 	 * @param propName is the name of the property for the parent bean
 	 * @return a Property representing the appropriate object association for parent bean
 	 * @throws XPathExpressionException
 	 */
 	@Override
-	public Property handleSubProp( final Node spNode, final String propName )
+	public Property handleNode( final Node node, final String propName )
 			throws XPathExpressionException
 			{
-		final String spNodeName = spNode.getNodeName();
+		final String spNodeName = node.getNodeName();
 
 		if( nodesSupportPlugins.containsKey( spNodeName) )
 		{
 			NodeSupportPlugin plugin = nodesSupportPlugins.get(spNodeName);
-			return plugin.handleNode(spNode, propName);
+			return plugin.handleNode(node, propName);
 		}
 		else if ( spNodeName.equals( REF ) || spNodeName.equals( IDREF ) ) // Look at children named ref / idref
 		{
-			final NamedNodeMap spNodeAttributes = spNode.getAttributes();
+			final NamedNodeMap spNodeAttributes = node.getAttributes();
 			final Node refNode = spNodeAttributes.getNamedItem(BEAN);
 
 			if( refNode != null) // handle <ref bean="">
@@ -311,15 +311,15 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 			} 
 			else //Handle <ref>value</ref>
 			{
-				return ParserHelper.getRef( propName, ParserHelper.extractFirstChildValue(spNode) );
+				return ParserHelper.getRef( propName, ParserHelper.extractFirstChildValue(node) );
 			}
 		}
 		else if ( spNodeName.equals( VALUE ) ) // Look at children named value
 		{						
-			final Property res =  ParserHelper.getVal( propName, ParserHelper.extractFirstChildValue(spNode) ); 
+			final Property res =  ParserHelper.getVal( propName, ParserHelper.extractFirstChildValue(node) ); 
 
 			// Handle type specified as an attribute
-			final NamedNodeMap spNodeAttributes = spNode.getAttributes();
+			final NamedNodeMap spNodeAttributes = node.getAttributes();
 			final Node typeNode = spNodeAttributes.getNamedItem(TYPE);
 			if( typeNode != null)
 			{
@@ -331,7 +331,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		else if  ( spNodeName.equals( BEAN ) ) // anonymous bean
 		{
 			// recursively create bean
-			final String subBeanName = createBean( spNode );
+			final String subBeanName = createBean( node );
 
 			if (subBeanName != null) // Wire this bean as a reference
 			{

@@ -119,7 +119,7 @@ public abstract class AbstractSpringConfigParser implements ParserConstants, Bea
 		duplicatedBean.setAlias(alias);
 		
 		 //Make sure inherited properties are tracked
-		registerPropertiesReference( duplicatedBean );
+		registerPropertiesReferences( duplicatedBean );
 		return duplicatedBean;
 	}
 	
@@ -139,7 +139,7 @@ public abstract class AbstractSpringConfigParser implements ParserConstants, Bea
 		}
 	}
 	
-	private void registerPropertiesReference( final Bean bean)
+	private void registerPropertiesReferences( final Bean bean)
 	{
 		for( Property prop : bean.getProperties() )
 		{
