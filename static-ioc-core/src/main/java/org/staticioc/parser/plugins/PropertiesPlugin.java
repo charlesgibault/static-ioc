@@ -23,7 +23,7 @@ public class PropertiesPlugin implements NodeSupportPlugin, ParserConstants
 	}
 
 	@Override
-	public Property handleProperty( final Node node, final String propName ) throws XPathExpressionException
+	public Property handleNode( final Node node, final String propName ) throws XPathExpressionException
 	{
 		// create an anonymous bean of appropriate collection type
 		final String beanId = container.generateAnonymousBeanId();

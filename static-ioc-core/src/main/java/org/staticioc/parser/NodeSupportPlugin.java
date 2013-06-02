@@ -14,12 +14,13 @@ public interface NodeSupportPlugin
 	String getSupportedNode();
 	
 	/**
-	 * 
-	 * @param spNode
-	 * @param propName
-	 * @return a property representing this special type
+	 * Process a special node type and encapsulate the result as a Property
+	 * @param node Node to process
+	 * @param name of the property representing the content of the node 
+	 * @return a Property encapsulating the loaded node
+	 * @throws XPathExpressionException
 	 */
-	Property handleProperty( final Node node, final String propName ) throws XPathExpressionException;
+	Property handleNode( final Node node, final String name ) throws XPathExpressionException;
 	
 	/**
 	 * A reference to the bean container

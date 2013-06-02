@@ -52,15 +52,14 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 	private final DocumentBuilderFactory dbf;
 	private final DocumentBuilder db;
 	private final XPathFactory xPathFactory; 
-	
+
 	private final XPathExpression xBeans;
-	private final XPathExpression xProps;
 	private final XPathExpression xImports;
-	
+
 	//TODO put that into a PluginChain
 	private final Collection<NodeParserPlugin> nodeParserPlugins = new LinkedList<NodeParserPlugin>();
 	private final Map<String, NodeSupportPlugin> nodesSupportPlugins = new ConcurrentHashMap<String, NodeSupportPlugin>();	
-	
+
 	public SpringConfigParser() throws ParserConfigurationException
 	{
 		// Init DocumentBuilderFactory
@@ -77,14 +76,11 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		db = dbf.newDocumentBuilder();
 
 		xPathFactory = XPathFactory.newInstance();
-		
+
 		try
 		{
 			final XPath xPathBeans  = xPathFactory.newXPath();
 			xBeans = xPathBeans.compile(XPATH_BEAN);
-
-			final XPath xPathProperties  = xPathFactory.newXPath();
-			xProps = xPathProperties.compile(XPATH_PROPERTY);
 
 			final XPath xPathImports  = xPathFactory.newXPath();
 			xImports = xPathImports.compile(XPATH_IMPORT);
@@ -93,69 +89,77 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		{
 			throw new ParserConfigurationException( "Error compiling XPaths :" + e.getMessage() );
 		}
-		
+
 		// Load plugins
 		NodeParserPlugin springPPluging = new SpringPParserPlugin();
 		NodeParserPlugin constructorArgsPlugin = new ConstructorArgsPlugin();
-		
+		NodeParserPlugin beanPropertiesPlugin = new BeanPropertiesParserPlugin();
+
 		springPPluging.setBeanContainer(this);
 		constructorArgsPlugin.setBeanContainer(this);
-		
+		beanPropertiesPlugin.setBeanContainer(this);
+
 		nodeParserPlugins.add( springPPluging );
 		nodeParserPlugins.add( constructorArgsPlugin );
+		nodeParserPlugins.add( beanPropertiesPlugin );
 
-		
+
 		NodeSupportPlugin listPlugin = new ListPlugin();
 		NodeSupportPlugin setPlugin = new SetPlugin();
 		NodeSupportPlugin mapPlugin = new MapPlugin();
 		NodeSupportPlugin propertiesPlugin = new PropertiesPlugin();
-		
+
 		listPlugin.setBeanContainer(this);
 		setPlugin.setBeanContainer(this);
 		mapPlugin.setBeanContainer(this);
 		propertiesPlugin.setBeanContainer(this);
-		
+
 		nodesSupportPlugins.put(listPlugin.getSupportedNode(), listPlugin);
 		nodesSupportPlugins.put(setPlugin.getSupportedNode(), setPlugin);
 		nodesSupportPlugins.put(mapPlugin.getSupportedNode(), mapPlugin);
 		nodesSupportPlugins.put(propertiesPlugin.getSupportedNode(), propertiesPlugin);
 	}
-	
-	protected String populateBeansMap( final Node beanNode ) throws XPathExpressionException
+
+	@Override
+	public XPathFactory getXPathFactory() {
+		return xPathFactory;
+	}
+
+	protected String createBean( final Node beanNode ) throws XPathExpressionException
 	{
 		if (beanNode == null) // if Bean doesn't exist, there's nothing to do
 		{
 			return null;
 		}
-		
+
 		final NamedNodeMap beanAttributes = beanNode.getAttributes();
-		
+
 		// use Id if defined, name otherwise (if defined), auto-generated bean name otherwise.
 		final Node idNode = beanAttributes.getNamedItem(ID);
 		final Node bNameNode = beanAttributes.getNamedItem(NAME);
-		
+
 		String id = (idNode != null )? idNode.getNodeValue() : (bNameNode != null )? bNameNode.getNodeValue() : null;
 		final String alias = ( idNode != null  && bNameNode != null)? bNameNode.getNodeValue(): null;
-		
+
 		boolean isAnonymous = false;
 		if( id == null )
 		{
 			id = generateAnonymousBeanId(); 
 			isAnonymous = true;
 		}
-			
+
 		// Check if this node has a parent
 		final Node parentNode = beanAttributes.getNamedItem(PARENT);
-		
+
 		Bean bean = null;
-		
+
 		if (parentNode != null )
 		{
 			final String parentName = parentNode.getNodeValue();
-			
+
 			// Test direct resolution (parent already registered)
 			final Bean parentBean = getBean( parentName );
-			
+
 			if( parentBean == null) // parent not known yet
 			{
 				registerParent( new ParentDependency( parentName, id, alias, isAnonymous,  beanNode) );
@@ -167,34 +171,38 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 				bean = duplicateBean( id, alias, parentBean, isAnonymous );
 			}
 		}
-		
+
+		// Perform actual node content processing
 		return processBeanNode(beanNode, beanAttributes, id, alias, isAnonymous, bean);
 	}
 
+	/**
+	 * Process a <bean/> node's content.
+	 */
 	@Override
 	protected String processBeanNode(final Node beanNode, final NamedNodeMap beanAttributes, final String id, final String alias, boolean isAnonymous, Bean bean) throws XPathExpressionException
 	{
 		String className = (bean != null)? bean.getClassName() : null;
 		boolean abstractBean = false;
-		
+
 		final Node classNode = beanAttributes.getNamedItem(CLASS);
 		if ( classNode != null )
 		{
 			className = classNode.getNodeValue();
 		}
-		
+
 		final Node abstractNode = beanAttributes.getNamedItem( ABSTRACT );
 		if( abstractNode != null )
 		{
 			abstractBean = Boolean.valueOf( abstractNode.getNodeValue() );
 		}
-		
+
 		final Node scopeNode = beanAttributes.getNamedItem(SCOPE);
 		final Node singletonNode = beanAttributes.getNamedItem(SINGLETON);
-		
+
 		Scope scope = Scope.SINGLETON;
 		if( scopeNode != null && PROTOTYPE.equalsIgnoreCase( scopeNode.getNodeValue() ) 
-			|| singletonNode != null && !Boolean.valueOf( singletonNode.getNodeValue() ) )
+				|| singletonNode != null && !Boolean.valueOf( singletonNode.getNodeValue() ) )
 		{
 			scope = Scope.PROTOTYPE;
 		}
@@ -204,7 +212,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		//Handle Factory Bean/Method here
 		String factoryBean=(bean != null)? bean.getFactoryBean() : null;
 		String factoryMethod=(bean != null)? bean.getFactoryMethod() : null;
-		
+
 		final Node factoryBeanNode = beanAttributes.getNamedItem(FACTORY_BEAN);
 		final Node factoryMethodNode = beanAttributes.getNamedItem(FACTORY_METHOD);
 		if ( factoryBeanNode != null )
@@ -215,14 +223,14 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		{
 			factoryMethod = factoryMethodNode.getNodeValue();
 		}
-		
+
 		// Class is mandatory for non abstract beans
 		if( className == null && !abstractBean)
 		{
 			logger.warn( "No class defined for bean {}. Skipping", id );
 			return null;
 		}
-		
+
 		if( bean == null )
 		{
 			bean = new Bean(id, className, isAnonymous );
@@ -233,58 +241,25 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 			bean.setClassName(className); // possible override of the parent's class
 			bean.setAlias(alias);
 		}
-		
+
 		bean.setAbstract( abstractBean );
 		bean.setScope( scope );
 
 		bean.setFactoryBean(factoryBean);
 		bean.setFactoryMethod(factoryMethod);
-		
-		// read all kind of properties
-		
+
 		// Specific attributes plugin
 		for( NodeParserPlugin plugin: nodeParserPlugins )
 		{
 			plugin.handleNode(bean, beanNode);
 		}
-								
-		// Handle properties
-		final NodeList propsRef = (NodeList) xProps.evaluate(beanNode, XPathConstants.NODESET);
-		handleBeanProperties(bean, propsRef);
-		
+
 		// register Bean in Map
 		register( bean );
-		
+
 		return id;
 	}
-	
-	protected void handleBeanProperties( final Bean bean, final NodeList propsRef)
-			 throws XPathExpressionException
-	{
-		for( int p = 0 ; p< propsRef.getLength() ; ++p )
-		{
-			final Node node = propsRef.item( p );
-			final NamedNodeMap propAttributes = node.getAttributes();
-			
-			final Node nameNode = propAttributes.getNamedItem(NAME);
-			
-			if(nameNode != null ) // Ignore properties with no name
-			{
-				final String propName = nameNode.getNodeValue();
-				Property prop = ParserHelper.handleValueRefAttributes(propName, node );
-				
-				if ( prop != null ) // Simple property : value or reference
-				{
-					addOrReplaceProperty(prop, bean.getProperties() );
-				}
-				else
-				{
-					handleSubProps( bean, propName, node.getChildNodes());				
-				}
-			}
-		}
-	}
-	
+
 	/**
 	 * Handle all bean's properties nodes
 	 * @param bean : reference to the bean owning this attribute
@@ -298,7 +273,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		for (int sp = 0 ; sp < propChilds.getLength() ; ++sp )
 		{
 			final Node spNode = propChilds.item( sp );
-			
+
 			Property prop = handleSubProp(  spNode, propName );
 			if (prop != null )
 			{
@@ -306,9 +281,9 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 			}
 		}
 	}
-	
+
 	/**
-	 * Handle the following node : bean | ref | idref | list | set | map | props | value | null
+	 * Handle the following node :
 	 * @param spNode is the XML node representing the properties
 	 * @param propName is the name of the property for the parent bean
 	 * @return a Property representing the appropriate object association for parent bean
@@ -316,20 +291,20 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 	 */
 	@Override
 	public Property handleSubProp( final Node spNode, final String propName )
-			 throws XPathExpressionException
-	{
+			throws XPathExpressionException
+			{
 		final String spNodeName = spNode.getNodeName();
-		
+
 		if( nodesSupportPlugins.containsKey( spNodeName) )
 		{
 			NodeSupportPlugin plugin = nodesSupportPlugins.get(spNodeName);
-			return plugin.handleProperty(spNode, propName);
+			return plugin.handleNode(spNode, propName);
 		}
 		else if ( spNodeName.equals( REF ) || spNodeName.equals( IDREF ) ) // Look at children named ref / idref
 		{
 			final NamedNodeMap spNodeAttributes = spNode.getAttributes();
 			final Node refNode = spNodeAttributes.getNamedItem(BEAN);
-		
+
 			if( refNode != null) // handle <ref bean="">
 			{
 				return ParserHelper.getRef( propName, refNode.getNodeValue() );
@@ -342,7 +317,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		else if ( spNodeName.equals( VALUE ) ) // Look at children named value
 		{						
 			final Property res =  ParserHelper.getVal( propName, ParserHelper.extractFirstChildValue(spNode) ); 
-			
+
 			// Handle type specified as an attribute
 			final NamedNodeMap spNodeAttributes = spNode.getAttributes();
 			final Node typeNode = spNodeAttributes.getNamedItem(TYPE);
@@ -356,8 +331,8 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		else if  ( spNodeName.equals( BEAN ) ) // anonymous bean
 		{
 			// recursively create bean
-			final String subBeanName = populateBeansMap( spNode );
-			
+			final String subBeanName = createBean( spNode );
+
 			if (subBeanName != null) // Wire this bean as a reference
 			{
 				return ParserHelper.getRef( propName, subBeanName );
@@ -370,6 +345,13 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		return null;
 	}
 
+	/**
+	 * Load a set of configuration files
+	 * @param configurationFiles
+	 * @return
+	 * @throws SAXException
+	 * @throws IOException
+	 */
 	public Map<String, Bean> load( Collection<String> configurationFiles) throws SAXException, IOException
 	{
 		final Set<String> loadedContext = new HashSet<String>();
@@ -394,12 +376,19 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		return getBeans();
 	}
 
-	
+
+	/**
+	 * Load a single configuration file
+	 * @param configurationFile
+	 * @return
+	 * @throws SAXException
+	 * @throws IOException
+	 */
 	public Map<String, Bean> load( String configurationFile) throws SAXException, IOException
 	{
 		return load( configurationFile, new HashSet<String>(), true );
 	}
-	
+
 	/**
 	 * 
 	 * @param configurationFile
@@ -412,11 +401,12 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 	protected Map<String, Bean> load( String configurationFile, Set<String> loadedContext, boolean resolveBean) throws SAXException, IOException
 	{
 		// Start by keeping track of loaded file (after normalizing its name)
-		configurationFile = FilenameUtils.concat( FilenameUtils.getFullPath( configurationFile ), FilenameUtils.getName( configurationFile ) );
+		final String fullPath = FilenameUtils.getFullPath( configurationFile ) ; 
+		configurationFile = FilenameUtils.concat( fullPath, FilenameUtils.getName( configurationFile ) );
 		loadedContext.add( configurationFile);
-		
+
 		final Document confFileDom = db.parse( configurationFile );
-		
+
 		try
 		{
 			final NodeList importsRef = (NodeList) xImports.evaluate(confFileDom, XPathConstants.NODESET);
@@ -424,48 +414,21 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 			// TODO plug special namespace plugins here
 
 			// Start by recursively resolve all imports
-			for( int i = 0 ; i< importsRef.getLength() ; ++i )
-			{
-				final Node importNode = importsRef.item( i );
-				final NamedNodeMap ImportAttributes = importNode.getAttributes();
-				final Node resourceNode = ImportAttributes.getNamedItem(RESOURCE);
-				
-				if( resourceNode != null)
-				{
-					String importedFileName = resourceNode.getNodeValue();
-					final File importedFilePath = new File(importedFileName);
-					
-					if ( !importedFilePath.isAbsolute() ) // handle relative paths
-					{
-						final String fullPath = FilenameUtils.getFullPath( configurationFile ) ; 
-						importedFileName = FilenameUtils.concat(fullPath, importedFileName);
-					}
-					
-					// Check for infinite loops
-					if ( !loadedContext.contains( importedFileName ) )
-					{
-						SpringConfigParser subParser = new SpringConfigParser();
-						Map<String,Bean> importedBeans = subParser.load( importedFileName, loadedContext, false );
-						
-						register( importedBeans );
-						register( subParser ); // handle parents (in case of cross file parent/child relationship), prototype listing and reference tracking
-					}
-				}
-			}
-			
+			resolveImports(importsRef, loadedContext, fullPath);
+
 			// the parse bean definition 
 			for( int i = 0 ; i< beansRef.getLength() ; ++i )
 			{
-				populateBeansMap( beansRef.item( i ) );
+				createBean( beansRef.item( i ) );
 			}
-			
+
 			// resolve parent definition that couldn't be resolved in the first pass.
 			if( resolveBean)
 			{
 				resolveParentDefinition();
 				resolvePrototypeBeans();
 			}
-			
+
 			// Finally resolve alias references
 			resolveAliasReference();
 		}
@@ -477,7 +440,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		{
 			logger.error( "Unexpected error loading " + configurationFile, e );
 		}
-		
+
 		if( logger.isDebugEnabled() )
 		{
 			for( String beanName : getBeans().keySet() )
@@ -485,10 +448,49 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 				logger.debug( "Registered bean {}", beanName);
 			}
 		}
-	
+
 		return getBeans();
 	}
 
+	/**
+	 * Recursively resolves a list of import directive and enrich the loadedContext
+	 * @param importsRef
+	 * @param loadedContext
+	 * @param fullPath
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 */
+	protected void resolveImports(final NodeList importsRef, final Set<String> loadedContext, final String fullPath) throws ParserConfigurationException, SAXException, IOException
+	{
+		for( int i = 0 ; i< importsRef.getLength() ; ++i )
+		{
+			final Node importNode = importsRef.item( i );
+			final NamedNodeMap ImportAttributes = importNode.getAttributes();
+			final Node resourceNode = ImportAttributes.getNamedItem(RESOURCE);
+
+			if( resourceNode != null)
+			{
+				String importedFileName = resourceNode.getNodeValue();
+				final File importedFilePath = new File(importedFileName);
+
+				if ( !importedFilePath.isAbsolute() ) // handle relative paths
+				{
+					importedFileName = FilenameUtils.concat(fullPath, importedFileName);
+				}
+
+				// Check for infinite loops
+				if ( !loadedContext.contains( importedFileName ) )
+				{
+					SpringConfigParser subParser = new SpringConfigParser();
+					Map<String,Bean> importedBeans = subParser.load( importedFileName, loadedContext, false );
+
+					register( importedBeans );
+					register( subParser ); // handle parents (in case of cross file parent/child relationship), prototype listing and reference tracking
+				}
+			}
+		}
+	}
 
 	//TODO add more control on target class : inheritance, lifecycle
 	//TODO add (partial) support for PropertyPlaceHolders

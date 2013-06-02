@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.staticioc.AbstractSpringConfigParser;
 import org.staticioc.model.Bean;
@@ -69,4 +70,9 @@ public interface BeanContainer
 	 * @param bean to be registered
 	 */
 	void register( final AbstractSpringConfigParser parser);
+	
+	/**
+	 * @return an XPathFactory for node analysis
+	 */
+	XPathFactory getXPathFactory();
 }
