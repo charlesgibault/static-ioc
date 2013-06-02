@@ -6,14 +6,14 @@ import org.staticioc.model.Bean;
 import org.staticioc.model.CollectionBean;
 import org.staticioc.model.Property;
 import org.staticioc.parser.BeanContainer;
-import org.staticioc.parser.NodeParserPlugin;
+import org.staticioc.parser.NodeSupportPlugin;
 import org.staticioc.parser.ParserConstants;
 import org.staticioc.parser.ParserHelper;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class MapPlugin implements NodeParserPlugin, ParserConstants
+public class MapPlugin implements NodeSupportPlugin, ParserConstants
 {
 	protected BeanContainer container;
 

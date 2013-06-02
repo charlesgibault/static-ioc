@@ -58,8 +58,8 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 	private final XPathExpression xImports;
 	
 	//TODO put that into a PluginChain
-	private final Collection<AttributesParserPlugin> attributesParserPlugins = new LinkedList<AttributesParserPlugin>();
-	private final Map<String, NodeParserPlugin> nodesParserPlugins = new ConcurrentHashMap<String, NodeParserPlugin>();	
+	private final Collection<NodeParserPlugin> nodeParserPlugins = new LinkedList<NodeParserPlugin>();
+	private final Map<String, NodeSupportPlugin> nodesSupportPlugins = new ConcurrentHashMap<String, NodeSupportPlugin>();	
 	
 	public SpringConfigParser() throws ParserConfigurationException
 	{
@@ -95,24 +95,30 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		}
 		
 		// Load plugins
-		AttributesParserPlugin springPPluging = new SpringPParserPlugin();
-		springPPluging.setBeanContainer(this);
-		attributesParserPlugins.add( springPPluging );
+		NodeParserPlugin springPPluging = new SpringPParserPlugin();
+		NodeParserPlugin constructorArgsPlugin = new ConstructorArgsPlugin();
 		
-		NodeParserPlugin listPlugin = new ListPlugin();
-		NodeParserPlugin setPlugin = new SetPlugin();
-		NodeParserPlugin mapPlugin = new MapPlugin();
-		NodeParserPlugin propertiesPlugin = new PropertiesPlugin();
+		springPPluging.setBeanContainer(this);
+		constructorArgsPlugin.setBeanContainer(this);
+		
+		nodeParserPlugins.add( springPPluging );
+		nodeParserPlugins.add( constructorArgsPlugin );
+
+		
+		NodeSupportPlugin listPlugin = new ListPlugin();
+		NodeSupportPlugin setPlugin = new SetPlugin();
+		NodeSupportPlugin mapPlugin = new MapPlugin();
+		NodeSupportPlugin propertiesPlugin = new PropertiesPlugin();
 		
 		listPlugin.setBeanContainer(this);
 		setPlugin.setBeanContainer(this);
 		mapPlugin.setBeanContainer(this);
 		propertiesPlugin.setBeanContainer(this);
 		
-		nodesParserPlugins.put(listPlugin.getSupportedNode(), listPlugin);
-		nodesParserPlugins.put(setPlugin.getSupportedNode(), setPlugin);
-		nodesParserPlugins.put(mapPlugin.getSupportedNode(), mapPlugin);
-		nodesParserPlugins.put(propertiesPlugin.getSupportedNode(), propertiesPlugin);
+		nodesSupportPlugins.put(listPlugin.getSupportedNode(), listPlugin);
+		nodesSupportPlugins.put(setPlugin.getSupportedNode(), setPlugin);
+		nodesSupportPlugins.put(mapPlugin.getSupportedNode(), mapPlugin);
+		nodesSupportPlugins.put(propertiesPlugin.getSupportedNode(), propertiesPlugin);
 	}
 	
 	protected String populateBeansMap( final Node beanNode ) throws XPathExpressionException
@@ -237,14 +243,11 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		// read all kind of properties
 		
 		// Specific attributes plugin
-		for( AttributesParserPlugin plugin: attributesParserPlugins )
+		for( NodeParserPlugin plugin: nodeParserPlugins )
 		{
-			plugin.handleAttributes(bean, beanAttributes);
+			plugin.handleNode(bean, beanNode);
 		}
-		
-		// Enrich bean with constructor args
-		handleConstructorArgs( bean, beanNode);
-						
+								
 		// Handle properties
 		final NodeList propsRef = (NodeList) xProps.evaluate(beanNode, XPathConstants.NODESET);
 		handleBeanProperties(bean, propsRef);
@@ -253,110 +256,6 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		register( bean );
 		
 		return id;
-	}
-	
-	/**
-	 * Parse the XML <bean/> nodes's children for constructor arguments and enrich the Bean object accordingly
-	 * @param bean
-	 * @param beanNode
-	 * @throws XPathExpressionException 
-	 */
-	protected void handleConstructorArgs( final Bean bean, final Node beanNode ) throws XPathExpressionException
-	{
-		final Collection<Node> constArgNodes = ParserHelper.extractNodesByName(beanNode.getChildNodes(), CONSTRUCTOR_ARGS);
-		
-		final Property[] args = new Property[ constArgNodes.size() ];
-		
-		int autoIndex=0;
-		
-		for ( Node node : constArgNodes )
-		{
-			final NamedNodeMap constAttributes = node.getAttributes();
-			
-			// Retrieve index
-			final Node indexNode = constAttributes.getNamedItem(INDEX);
-			final String indexValue = ( indexNode != null )? indexNode.getNodeValue() : null;
-			
-			try
-			{
-				final int index = ( indexNode != null )? Integer.valueOf( indexValue ):autoIndex++;
-				final String argumentPropName = CONSTRUCTOR_ARGS + index;
-				
-				//handle case where value is set as an attribute 
-				Property argumentProp = handleValueRefAttributes(argumentPropName, node );
-				
-				if( argumentProp == null) // Argument defined as a sub node
-				{
-					final Node argumentNode = node.getFirstChild();
-					if( argumentNode == null)
-					{
-						logger.warn("Ignoring constructor argument {} with neither attribute not node value for bean {}", index, bean.getId());
-						continue;
-					}
-				
-					argumentProp = handleSubProp( argumentNode, argumentPropName );
-				}
-				
-				if (argumentProp != null)
-				{
-					args[index] = argumentProp; // collect arguments in disorder (potentially)
-
-					final Node typeNode = constAttributes.getNamedItem(TYPE);
-					if( typeNode != null)
-					{
-						argumentProp.setType( typeNode.getNodeValue() );
-					}
-				}
-			}
-			catch(NumberFormatException e)
-			{
-				logger.warn( "Cannot parse constructor argument index {}", (indexValue!=null)?indexValue:autoIndex );
-			}
-			catch( IndexOutOfBoundsException e )
-			{
-				logger.warn( "Out of bound constructor argument index {}. Should be < {}" , (indexValue!=null)?indexValue:autoIndex, constArgNodes.size() );
-			}
-
-		}
-		
-		// Now reorder them.
-		for( Property prop : args)
-		{
-			if( prop != null)
-			{
-				logger.debug("Constructor arg : {}", prop.toString());
-				addOrReplaceProperty( prop, bean.getConstructorArgs() );
-			}
-		}
-	}
-	
-	protected Property handleValueRefAttributes(final String propName, final Node node)
-	{
-		Property prop=null;
-		final NamedNodeMap propAttributes = node.getAttributes();
-		
-		final Node valueNode = propAttributes.getNamedItem(VALUE);
-		final String value = (valueNode != null ) ? valueNode.getNodeValue() : null;
-
-		final Node refNode = propAttributes.getNamedItem(REF);
-		final Node idRefNode = propAttributes.getNamedItem(IDREF);
-		final String ref = (refNode != null ) ? refNode.getNodeValue() : ((idRefNode != null ) ? idRefNode.getNodeValue() : null);
-
-		if ( value != null || ref != null ) // Simple property : value or reference
-		{
-			prop  = new Property( propName, value, ref);
-			
-			// Handle type specified as an attribute
-			if( value != null )
-			{
-				final Node typeNode = propAttributes.getNamedItem(TYPE);
-				if( typeNode != null)
-				{
-					prop.setType( typeNode.getNodeValue() );
-				}
-			}
-		}
-		return prop;
 	}
 	
 	protected void handleBeanProperties( final Bean bean, final NodeList propsRef)
@@ -372,7 +271,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 			if(nameNode != null ) // Ignore properties with no name
 			{
 				final String propName = nameNode.getNodeValue();
-				Property prop = handleValueRefAttributes(propName, node );
+				Property prop = ParserHelper.handleValueRefAttributes(propName, node );
 				
 				if ( prop != null ) // Simple property : value or reference
 				{
@@ -421,9 +320,9 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 	{
 		final String spNodeName = spNode.getNodeName();
 		
-		if( nodesParserPlugins.containsKey( spNodeName) )
+		if( nodesSupportPlugins.containsKey( spNodeName) )
 		{
-			NodeParserPlugin plugin = nodesParserPlugins.get(spNodeName);
+			NodeSupportPlugin plugin = nodesSupportPlugins.get(spNodeName);
 			return plugin.handleProperty(spNode, propName);
 		}
 		else if ( spNodeName.equals( REF ) || spNodeName.equals( IDREF ) ) // Look at children named ref / idref
@@ -596,5 +495,4 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 	//TODO add support for init-method and a init() method
 	//TODO add support for depends-on (in init-method)
 	//TODO add support for destroy-method and a teardDown() method ?	
-	//TODO refactor this class : split it between Delegate that are responsible for handling a particular type of element?
 }

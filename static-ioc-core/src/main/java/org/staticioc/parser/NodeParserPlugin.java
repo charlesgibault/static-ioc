@@ -2,24 +2,21 @@ package org.staticioc.parser;
 
 import javax.xml.xpath.XPathExpressionException;
 
-import org.staticioc.model.Property;
+import org.staticioc.model.Bean;
 import org.w3c.dom.Node;
 
+/**
+ * Interface for plugins that parse special attributes on a Bean node
+ * @author charles
+ */
 public interface NodeParserPlugin
 {
 	/**
-	 * Define which XML keyword this plugin supports
-	 * @return name of the supported type
+	 * Handle a specific node to enrich the passed bean
+	 * @param bean Bean to enrich
+	 * @param node full Node to parse
 	 */
-	String getSupportedNode();
-	
-	/**
-	 * 
-	 * @param spNode
-	 * @param propName
-	 * @return a property representing this special type
-	 */
-	Property handleProperty( final Node node, final String propName ) throws XPathExpressionException;
+	void handleNode( final Bean bean, final Node node ) throws XPathExpressionException;
 	
 	/**
 	 * A reference to the bean container

@@ -6,12 +6,12 @@ import org.staticioc.model.Bean;
 import org.staticioc.model.CollectionBean;
 import org.staticioc.model.Property;
 import org.staticioc.parser.BeanContainer;
-import org.staticioc.parser.NodeParserPlugin;
+import org.staticioc.parser.NodeSupportPlugin;
 import org.staticioc.parser.ParserConstants;
 import org.staticioc.parser.ParserHelper;
 import org.w3c.dom.Node;
 
-public class SetPlugin implements NodeParserPlugin, ParserConstants
+public class SetPlugin implements NodeSupportPlugin, ParserConstants
 {
 	protected BeanContainer container;
 

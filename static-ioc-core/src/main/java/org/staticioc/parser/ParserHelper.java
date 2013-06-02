@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import org.staticioc.model.Property;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -12,7 +13,7 @@ import org.w3c.dom.NodeList;
  * @author charles
  *
  */
-public class ParserHelper
+public class ParserHelper implements ParserConstants
 {
 	public static Property getVal(String propertyName, String value) {
 		if ( value == null) { return null; }
@@ -24,6 +25,35 @@ public class ParserHelper
 		return new Property( propertyName, null, ref );
 	}
 
+	public static Property handleValueRefAttributes(final String propName, final Node node)
+	{
+		Property prop=null;
+		final NamedNodeMap propAttributes = node.getAttributes();
+		
+		final Node valueNode = propAttributes.getNamedItem(VALUE);
+		final String value = (valueNode != null ) ? valueNode.getNodeValue() : null;
+
+		final Node refNode = propAttributes.getNamedItem(REF);
+		final Node idRefNode = propAttributes.getNamedItem(IDREF);
+		final String ref = (refNode != null ) ? refNode.getNodeValue() : ((idRefNode != null ) ? idRefNode.getNodeValue() : null);
+
+		if ( value != null || ref != null ) // Simple property : value or reference
+		{
+			prop  = new Property( propName, value, ref);
+			
+			// Handle type specified as an attribute
+			if( value != null )
+			{
+				final Node typeNode = propAttributes.getNamedItem(TYPE);
+				if( typeNode != null)
+				{
+					prop.setType( typeNode.getNodeValue() );
+				}
+			}
+		}
+		return prop;
+	}
+	
 	/**
 	 * Extract text value for nodes like <value>text</value>
 	 * @param node
