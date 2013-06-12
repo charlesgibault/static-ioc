@@ -40,6 +40,7 @@
 	</bean>
 	
 	<bean name="contactsPresenter" class="org.staticioc.samples.gwt.client.presenter.ContactsPresenterImpl">
+ 		<property name="messages" ref="messages"/>
 	    <property name="contactsView" ref="contactsView"/>
 	    <property name="errorView">
 	        <bean class="org.staticioc.samples.gwt.client.view.MessagePopUpViewImpl" p:presenter-ref="contactsPresenter"/>

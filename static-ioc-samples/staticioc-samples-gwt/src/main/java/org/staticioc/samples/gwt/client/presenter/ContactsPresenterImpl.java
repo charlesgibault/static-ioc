@@ -2,6 +2,7 @@ package org.staticioc.samples.gwt.client.presenter;
 
 import java.util.List;
 
+import org.staticioc.samples.gwt.client.Messages;
 import org.staticioc.samples.gwt.client.service.ContactsServiceAsync;
 import org.staticioc.samples.gwt.client.view.EditableListView;
 import org.staticioc.samples.gwt.client.view.MessagePopUpView;
@@ -15,6 +16,7 @@ public class ContactsPresenterImpl implements EditableListView.Presenter<Contact
 	private EditableListView<Contact> contactsView;
 	private MessagePopUpView errorView;
 	private ContactsServiceAsync contactsService;
+	private Messages messages;
 
 	@Override
 	public void display(HasWidgets container) {
@@ -28,7 +30,7 @@ public class ContactsPresenterImpl implements EditableListView.Presenter<Contact
 		// Display add Contact pop-up
 		contactsService.addContact(contact, new AsyncCallback<List<Contact>>() {
 			public void onFailure(Throwable caught) {
-				displayError("Error adding contact " + ( (contact!=null)?contact.getLastName():"null") );
+				displayError( messages.errorAddingContactMessage( (contact!=null)?contact.getLastName():"null") );
 			}
 
 			@Override
@@ -44,7 +46,7 @@ public class ContactsPresenterImpl implements EditableListView.Presenter<Contact
 	public void onDeleteButtonClicked(final Contact contact) {
 		contactsService.deleteContact(contact, new AsyncCallback<List<Contact>>() {
 			public void onFailure(Throwable caught) {
-				displayError("Error deleting contact " + ( (contact!=null)?contact.getLastName():"null") );
+				displayError( messages.errorDeletingContactMessage( (contact!=null)?contact.getLastName():"null")  );
 			}
 
 			@Override
@@ -59,7 +61,7 @@ public class ContactsPresenterImpl implements EditableListView.Presenter<Contact
 	public void fetchContacts() {
 		contactsService.retrieveContacts( new AsyncCallback<List<Contact>>() {
 			public void onFailure(Throwable caught) {
-				displayError("Error retrieving contacts" );
+				displayError( messages.errorRetrievingContactsMessage() );
 			}
 
 			@Override
@@ -91,5 +93,9 @@ public class ContactsPresenterImpl implements EditableListView.Presenter<Contact
 
 	public void setContactsService(ContactsServiceAsync contactsService) {
 		this.contactsService = contactsService;
+	}
+
+	public void setMessages(Messages messages) {
+		this.messages = messages;
 	}
 }
