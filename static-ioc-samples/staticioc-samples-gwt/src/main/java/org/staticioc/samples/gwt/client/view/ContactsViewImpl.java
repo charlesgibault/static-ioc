@@ -10,7 +10,6 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy.KeyboardSelectionPolicy;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
@@ -24,10 +23,6 @@ public class ContactsViewImpl extends Composite implements EditableListView<Cont
 	@UiTemplate("EditableListView.ui.xml")
 	interface ContactsViewUiBinder extends UiBinder<Widget, ContactsViewImpl> {}
 	private static ContactsViewUiBinder uiBinder = GWT.create(ContactsViewUiBinder.class);
-
-	@UiField Label firstName; 
-	@UiField Label lastName;
-	@UiField Label email;
 
 	@UiField TextBox firstNameValue;
 	@UiField TextBox lastNameValue;
@@ -125,12 +120,6 @@ public class ContactsViewImpl extends Composite implements EditableListView<Cont
 	// Would go in an afterPropertiesSet() method when mechanism is available in staticioc
 	private void translate()
 	{
-		firstName.setText(messages.firstNameField());
-		lastName.setText(messages.lastNameField());
-		email.setText(messages.emailField());
-		addButton.setText(messages.addButton());
-		deleteButton.setText(messages.removeButton());
-
 		contactsTable.getColumn(0).setDataStoreName(messages.firstNameField());
 		contactsTable.getColumn(1).setDataStoreName(messages.lastNameField());
 		contactsTable.getColumn(2).setDataStoreName(messages.emailField());
