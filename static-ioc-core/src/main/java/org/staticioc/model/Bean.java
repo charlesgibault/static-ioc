@@ -45,6 +45,9 @@ public class Bean implements Comparable<Bean>
 	private String factoryBean=null;
 	private String factoryMethod=null;
 	
+	private String initMethod=null;
+	private String destroyMethod=null;
+	
 	public Bean(){}
 	public Bean( String id, String className)
 	{
@@ -73,6 +76,8 @@ public class Bean implements Comparable<Bean>
 		this.scope = parent.scope;
 		this.factoryBean=parent.factoryBean;
 		this.factoryMethod=parent.factoryMethod;
+		this.initMethod=parent.initMethod;
+		this.destroyMethod=parent.destroyMethod;
 		
 		this.anonymous = anonymous; // not inherited, as with abstract attribute
 		
@@ -158,6 +163,7 @@ public class Bean implements Comparable<Bean>
 				+ ", type=" + type + ", anonymous=" + anonymous
 				+ ", abstract=" + isAbstract
 				+ ", factoryBean=" + factoryBean + ", factoryMethod=" + factoryMethod
+				+ ", initMethod=" + initMethod + ", destroyMethod=" + destroyMethod
 				+ ", properties=" + properties
 				+ ", constructorArgs=" + constructorArgs + "]";
 	}
@@ -220,5 +226,17 @@ public class Bean implements Comparable<Bean>
 	}
 	public void setFactoryMethod(String factoryMethod) {
 		this.factoryMethod = factoryMethod;
+	}
+	public String getInitMethod() {
+		return initMethod;
+	}
+	public void setInitMethod(String initMethod) {
+		this.initMethod = initMethod;
+	}
+	public String getDestroyMethod() {
+		return destroyMethod;
+	}
+	public void setDestroyMethod(String destroyMethod) {
+		this.destroyMethod = destroyMethod;
 	}
 }

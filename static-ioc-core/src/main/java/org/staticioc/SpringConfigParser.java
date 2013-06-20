@@ -224,6 +224,21 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 			factoryMethod = factoryMethodNode.getNodeValue();
 		}
 
+		// Handle init/destroy methods here:
+		String initMethod=(bean != null)? bean.getInitMethod() : null;
+		String destroyMethod=(bean != null)? bean.getDestroyMethod() : null;
+		
+		final Node initMethodBeanNode = beanAttributes.getNamedItem(INIT_METHOD);
+		final Node destroyMethodNode = beanAttributes.getNamedItem(DESTROY_METHOD);
+		if ( initMethodBeanNode != null )
+		{
+			initMethod = initMethodBeanNode.getNodeValue();
+		}
+		if ( destroyMethodNode != null )
+		{
+			destroyMethod = destroyMethodNode.getNodeValue();
+		}
+		
 		// Class is mandatory for non abstract beans
 		if( className == null && !abstractBean)
 		{
@@ -247,6 +262,9 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 
 		bean.setFactoryBean(factoryBean);
 		bean.setFactoryMethod(factoryMethod);
+		
+		bean.setInitMethod(initMethod);
+		bean.setDestroyMethod(destroyMethod);
 
 		// Specific attributes plugin
 		for( NodeParserPlugin plugin: nodeParserPlugins )
