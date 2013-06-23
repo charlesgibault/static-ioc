@@ -34,7 +34,7 @@
 	     <constructor-arg value="org.staticioc.samples.gwt.client.service.ContactsService.class"/>
 	</bean>
 	
-	<bean name="contactsView" class="org.staticioc.samples.gwt.client.view.ContactsViewImpl">
+	<bean name="contactsView" class="org.staticioc.samples.gwt.client.view.ContactsViewImpl" init-method="afterPropertiesSet">
 	    <property name="messages" ref="messages"/>
 	    <property name="presenter" ref="contactsPresenter"/>
 	</bean>

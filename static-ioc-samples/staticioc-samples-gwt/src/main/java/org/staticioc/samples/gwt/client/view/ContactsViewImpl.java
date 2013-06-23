@@ -80,7 +80,22 @@ public class ContactsViewImpl extends Composite implements EditableListView<Cont
 		contactsTable.setFocus(false);
 		contactsTable.setPageSize(10);
 
-		// Adding columns
+		// Set-up selected contact selection model
+		final SingleSelectionModel<Contact> selectionModel = new SingleSelectionModel<Contact>();
+		contactsTable.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.ENABLED);
+		contactsTable.setSelectionModel(selectionModel);
+
+		selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+			public void onSelectionChange(SelectionChangeEvent event) {
+				Contact selected = selectionModel.getSelectedObject();
+				selectedItem=selected;
+			}
+		});
+	}
+
+	public void afterPropertiesSet()
+	{
+		// Add  columns to Contact Table
 		TextColumn<Contact> firstNameColumn = new TextColumn<Contact>() {
 			@Override
 			public String getValue(Contact contact) {
@@ -100,33 +115,13 @@ public class ContactsViewImpl extends Composite implements EditableListView<Cont
 			}
 		};
 
-		contactsTable.addColumn(firstNameColumn, "First Name");
-		contactsTable.addColumn(lastNameColumn, "Last Name");
-		contactsTable.addColumn(emailColumn, "Email");
-		
-		// Set-up selected contact selection model
-		final SingleSelectionModel<Contact> selectionModel = new SingleSelectionModel<Contact>();
-		contactsTable.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.ENABLED);
-		contactsTable.setSelectionModel(selectionModel);
-
-		selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
-			public void onSelectionChange(SelectionChangeEvent event) {
-				Contact selected = selectionModel.getSelectedObject();
-				selectedItem=selected;
-			}
-		});
+		contactsTable.addColumn(firstNameColumn, messages.firstNameField() );
+		contactsTable.addColumn(lastNameColumn, messages.lastNameField() );
+		contactsTable.addColumn(emailColumn, messages.emailField() );
 	}
 
-	// Would go in an afterPropertiesSet() method when mechanism is available in staticioc
-	private void translate()
-	{
-		contactsTable.getColumn(0).setDataStoreName(messages.firstNameField());
-		contactsTable.getColumn(1).setDataStoreName(messages.lastNameField());
-		contactsTable.getColumn(2).setDataStoreName(messages.emailField());
-	}
 	public void setMessages(Messages messages) {
 		this.messages = messages;
-		translate();
 	}
 
 	@Override
