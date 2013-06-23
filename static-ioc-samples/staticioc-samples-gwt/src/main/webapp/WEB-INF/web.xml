@@ -15,7 +15,7 @@
     <servlet-name>contactServlet</servlet-name>
     <url-pattern>/SampleGwtApplication/contact</url-pattern>
   </servlet-mapping>
-
+ 
   <!-- Default page to serve -->
   <welcome-file-list>
     <welcome-file>SampleGwtApplication.html</welcome-file>

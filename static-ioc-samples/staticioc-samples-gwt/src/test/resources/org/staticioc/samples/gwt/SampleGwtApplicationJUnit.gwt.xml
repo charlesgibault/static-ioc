@@ -3,6 +3,8 @@
   <!-- Inherit our applications main module.                      -->
   <inherits name='org.staticioc.samples.gwt.SampleGwtApplication' />
 
+ <inherits name='com.google.gwt.junit.JUnit' />
+ 
   <!-- Specify the path to any remote services.                   -->
   <servlet path="/SampleGwtApplication/contact" class="org.staticioc.samples.gwt.server.ContactsServiceImpl" />
 

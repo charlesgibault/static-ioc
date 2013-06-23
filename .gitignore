@@ -13,4 +13,7 @@ gwt-unitCache
 static-ioc-samples/staticioc-samples-gwt/www-test/
 static-ioc-samples/staticioc-samples-gwt/src/main/webapp/WEB-INF/lib/gwt-servlet.jar
 static-ioc-samples/staticioc-samples-gwt/src/main/webapp/WEB-INF/classes/
-
+static-ioc-samples/staticioc-samples-gwt/src/main/webapp/WEB-INF/deploy/
+static-ioc-samples/staticioc-samples-gwt/src/main/webapp/SampleGwtApplication/
+static-ioc-samples/staticioc-samples-gwt/src/main/webapp/org.staticioc.samples.gwt.SampleGwtApplicationJUnit/
+static-ioc-samples/staticioc-samples-gwt/war/
