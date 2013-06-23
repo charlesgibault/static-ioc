@@ -49,13 +49,13 @@ public abstract class AbstractCodeGenerator implements CodeGenerator
 		{
 			if( i!= 0)
 			{
-				getBuilder().append(" ,");
+				getBuilder().append(", ");
 			}
 			getBuilder().append(params[i]);
 			
 		}
 		
-		getBuilder().append(");");
+		getBuilder().append(");\n");
 		
 	}
 

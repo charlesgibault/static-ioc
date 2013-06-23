@@ -42,7 +42,7 @@
 	<bean class="test.House" name="number10House" p:name="10 Downing Street" p:p-ref="personBean" p:person-ref="personBean"/>
 		
 	<!-- class with constructor args -->
-	<bean id="country" class="test.Country">
+	<bean id="country" class="test.Country" init-method="initMethod">
   		<constructor-arg index="1"><value type="java.util.Integer">7500000</value></constructor-arg>
   		<constructor-arg index="0"><value>42</value></constructor-arg>
 	</bean>

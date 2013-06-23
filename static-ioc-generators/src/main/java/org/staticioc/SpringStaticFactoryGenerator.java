@@ -210,6 +210,7 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 		
 		for ( Bean bean : initRequiredBeans)
 		{
+			res.append("\t\t");
 			codeGenerator.invokeMethod(bean, bean.getInitMethod(), EMPTY_STRING_ARRAY);
 		}
 		
@@ -220,8 +221,9 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 		codeGenerator.initDestructor( generatedClassName );
 		
 		// Call destroy-methods
-		for ( Bean bean : initRequiredBeans)
+		for ( Bean bean : destroyRequiredBeans)
 		{
+			res.append("\t\t");
 			codeGenerator.invokeMethod(bean, bean.getDestroyMethod(), EMPTY_STRING_ARRAY);
 		}
 		

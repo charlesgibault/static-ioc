@@ -141,10 +141,9 @@ public class JavaCodeGeneratorTest
 		generator.closePackage(packageName);
 	
 		final String expectedResult = normalizeCode( "package " + packageName + ";\n"
-					+ "@SuppressWarnings(\"rawtypes\")\n"
+					+ "@SuppressWarnings(\"all\")\n"
 					+ "public class " + className + " {\n"
 					+ "public org.staticioc.model.Bean bean;\n"
-					+ "@SuppressWarnings(\"unchecked\")\n"
 					+ "public " + className + "() {\n"
 					+ "bean = new org.staticioc.model.Bean();\n"
 					+ "bean.setName( \"value\" );\n"
@@ -330,4 +329,27 @@ public class JavaCodeGeneratorTest
 		Assert.assertEquals( "Incorrect collection definition", expectedResult, normalizeCode( result.toString() ) );
 	}
 	
+	/**
+	 * Test that various Java Collections are properly defined
+	 */
+	@Test
+	public void testInvokeMethodDeclaration()
+	{
+		Bean bean = new Bean("propBean", "classname");
+		String methodName = "initMethod";
+		
+		String[] emptyArgs = new String[]{};
+		String[] singleArgs = new String[]{"arg1"};
+		String[] multiArgs = new String[]{"arg1", "arg2", "arg3"};
+		
+		generator.invokeMethod(bean, methodName, emptyArgs);
+		generator.invokeMethod(bean, methodName, singleArgs);
+		generator.invokeMethod(bean, methodName, multiArgs);
+		
+		final String expectedResult = normalizeCode("propBean.initMethod();\n"
+				+ "propBean.initMethod(arg1);\n"
+				+ "propBean.initMethod(arg1, arg2, arg3);\n");
+		
+		Assert.assertEquals( "Incorrect invoked Method definition", expectedResult, normalizeCode( result.toString() ) );
+	}
 }
