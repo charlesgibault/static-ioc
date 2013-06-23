@@ -39,7 +39,26 @@ public abstract class AbstractCodeGenerator implements CodeGenerator
 	 * eg : "." for java, ":" for Cpp
 	 */
 	protected abstract String getPackageSeparator();
+
 	
+	@Override
+	public void invokeMethod(Bean bean, String methodName, String[] params) {
+		getBuilder().append( bean.getId() ).append( "." ).append( methodName ).append("(");
+		
+		for( int i=0; i<params.length; ++i)
+		{
+			if( i!= 0)
+			{
+				getBuilder().append(" ,");
+			}
+			getBuilder().append(params[i]);
+			
+		}
+		
+		getBuilder().append(");");
+		
+	}
+
 	@Override
 	public String getFilePath( final String fullClassName )
 	{

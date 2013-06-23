@@ -91,9 +91,13 @@ public class SpringStaticFactoryGeneratorTest
 				+ "personBean.setBirthCountry( country );\n"
 				+ "personBean.setAge( 28 );\n"
 				+ "personBean.setCountry( country );\n"
+				
+				+ "// Init methods calls\n"
+				+ "personBean.afterPropertiesSet();\n"
 								
 				+"}\n"
 				+ "public void destroyContext() {\n"
+				+ "personBean.onTearDown();\n"
 				+ "personBean = null;\n"
 				+ "number10House = null;\n"
 				+ "country = null;\n"

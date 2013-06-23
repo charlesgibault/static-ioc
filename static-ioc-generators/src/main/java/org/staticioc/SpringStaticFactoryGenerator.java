@@ -20,6 +20,7 @@ package org.staticioc;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
@@ -43,6 +44,7 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 	private static final Logger logger  = LoggerFactory.getLogger(SpringStaticFactoryGenerator.class);
 	
 	private final static int INIT_BUFFER_SIZE = 4096;
+	private static final String[] EMPTY_STRING_ARRAY = new String[]{};
 		
 	private String commentHeader = "This code has been generated using Static IoC framework (http://code.google.com/p/static-ioc/). DO NOT EDIT MANUALLY HAS CHANGES MAY BE OVERRIDEN";
 		
@@ -109,6 +111,10 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 		SpringConfigParser springConfigParser = new SpringConfigParser();
 		Map<String, Bean> beanClassMap = springConfigParser.load( configurationFiles );
 
+		// Track beans with a declared init-method and destroy-method attribute
+		List<Bean> initRequiredBeans = new LinkedList<Bean>();
+		List<Bean> destroyRequiredBeans = new LinkedList<Bean>();
+		
 		codeGenerator.comment(Level.HEADER, commentHeader );
 
 		codeGenerator.initPackage( generatedPackageName );		
@@ -122,6 +128,16 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 		{
 			// Ignore abstract beans and prototypes
 			if ( isHidden(bean) ){ continue; }
+			
+			if( bean.getInitMethod() != null )
+			{
+				initRequiredBeans.add(bean);
+			}
+			
+			if( bean.getDestroyMethod() != null )
+			{
+				destroyRequiredBeans.add(bean);
+			}
 						
 			codeGenerator.declareBean( bean );
 		}
@@ -186,17 +202,34 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 			res.append("\n");
 		}
 		
+		// Call init-methods
+		if( !initRequiredBeans.isEmpty() )
+		{
+			codeGenerator.comment(Level.METHOD, "Init methods calls" );	
+		}
+		
+		for ( Bean bean : initRequiredBeans)
+		{
+			codeGenerator.invokeMethod(bean, bean.getInitMethod(), EMPTY_STRING_ARRAY);
+		}
+		
 		codeGenerator.closeConstructor( generatedClassName );
 		res.append("\n");
 		res.append("\n");
 		
 		codeGenerator.initDestructor( generatedClassName );
 		
+		// Call destroy-methods
+		for ( Bean bean : initRequiredBeans)
+		{
+			codeGenerator.invokeMethod(bean, bean.getDestroyMethod(), EMPTY_STRING_ARRAY);
+		}
+		
 		//Destructor : free beans in their reverse order of creation
 		for ( final Bean bean: orderedBean.descendingSet() )
 		{
 			// Ignore abstract beans and prototypes that were not instanciated
-			if ( isHidden(bean) ){ continue; }
+			if ( isHidden(bean) ){ continue; }			
 			codeGenerator.deleteBean( bean );
 		}
 		
