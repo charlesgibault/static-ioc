@@ -26,15 +26,18 @@ Please find below some visibility on the planned feature roadmap
   * *Samples* - Cleaned-up GWT samples (removed warnings)
 
 // ---------- To be started
+  * *Core* - Handle dependency with constructor args reference for proper order generation
+
+// Release 0.4
   * *Core* - Add namespace plugin mechanism
   * *Core* - Add namespace plugin for GWT to make bean definition less versbose
   * *Samples* - Use GWT bean plugin to simplify GWT sample
 
-// Release 0.4
+// Release 0.5
   * *Generator* - Add compile time support for PropertyPlaceHolders like mechanism
   * *Generator* - Support Python target
   * *Generator* - Support Objective C and Cpp targets
 
-// Release 0.5+
+// Release 0.6+
   * *Generator* - Add runtime interface to allow for support for PropertyPlaceHolders like mechanism
   * *Samples* -  Add Play N sample project?
