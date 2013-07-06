@@ -34,6 +34,7 @@
       <c:CellTable ui:field="contactsTable" addStyleNames="{style.contactsViewContactsCellTable}"/>
       <g:HorizontalPanel addStyleNames="{style.contactsViewButtonHPanel}">
         <g:Button ui:field="deleteButton"  text='{i18n.removeButton}' />
+        <g:Button ui:field="reportingButton" text='{i18n.reportingButton}'/>
       </g:HorizontalPanel>
     </g:VerticalPanel>
   </g:DecoratorPanel>

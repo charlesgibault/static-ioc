@@ -3,27 +3,28 @@ package org.staticioc.samples.gwt.client.presenter;
 import java.util.List;
 
 import org.staticioc.samples.gwt.client.Messages;
+import org.staticioc.samples.gwt.client.events.ContactChangeEvent;
+import org.staticioc.samples.gwt.client.places.ReportingPlace;
 import org.staticioc.samples.gwt.client.service.ContactsServiceAsync;
 import org.staticioc.samples.gwt.client.view.EditableListView;
 import org.staticioc.samples.gwt.client.view.MessagePopUpView;
 import org.staticioc.samples.gwt.shared.model.Contact;
 
+import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.place.shared.Place;
+import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.HasWidgets;
+import com.google.gwt.user.client.ui.AcceptsOneWidget;
 
-public class ContactsPresenterImpl implements EditableListView.Presenter<Contact>, MessagePopUpView.Presenter {
+public class ContactsPresenterImpl extends AbstractActivity  implements EditableListView.Presenter<Contact>, MessagePopUpView.Presenter {
 
 	private EditableListView<Contact> contactsView;
 	private MessagePopUpView errorView;
 	private ContactsServiceAsync contactsService;
 	private Messages messages;
-
-	@Override
-	public void display(HasWidgets container) {
-		 container.clear();
-		 container.add(contactsView.asWidget());
-		 fetchContacts();
-	}
+	private EventBus eventBus;
+	private PlaceController placeController;
 
 	@Override
 	public void onAddButtonClicked(final Contact contact) {
@@ -37,7 +38,7 @@ public class ContactsPresenterImpl implements EditableListView.Presenter<Contact
 			public void onSuccess(List<Contact> contacts) {
 				contactsView.setModel(contacts);
 				contactsView.resetUserInput();
-				// In a real application, we would probably send an Event there too.
+				eventBus.fireEvent(new ContactChangeEvent( contact, ContactChangeEvent.Action.CREATE) );
 			}
 		});
 	}
@@ -52,7 +53,7 @@ public class ContactsPresenterImpl implements EditableListView.Presenter<Contact
 			@Override
 			public void onSuccess(List<Contact> contacts) {
 				contactsView.setModel(contacts);
-				// In a real application, we would probably send an Event there too.
+				eventBus.fireEvent(new ContactChangeEvent( contact, ContactChangeEvent.Action.DELETE) );
 			}
 		});
 
@@ -73,10 +74,32 @@ public class ContactsPresenterImpl implements EditableListView.Presenter<Contact
 	}
 	
 	@Override
+	public void setState(Place place)
+	{
+		//Nothing to do:  we're stateless
+	}
+	
+	@Override
 	public void onOkButtonClicked() {
 		errorView.hide();
 	}
+
+	@Override
+	public void onReportingButtonClicked() {
+		placeController.goTo(new ReportingPlace("contacts") );
+	}
 	
+	@Override
+	public void display(AcceptsOneWidget container) {
+		container.setWidget( contactsView.asWidget() );
+		fetchContacts();
+	}
+	
+	@Override
+	public void start(AcceptsOneWidget containerWidget, EventBus eventbus) {		
+		display(containerWidget);
+	}
+
 	protected void displayError(String message)
 	{
 		errorView.setModel(message);
@@ -97,5 +120,13 @@ public class ContactsPresenterImpl implements EditableListView.Presenter<Contact
 
 	public void setMessages(Messages messages) {
 		this.messages = messages;
+	}
+
+	public void setEventBus(EventBus eventBus) {
+		this.eventBus = eventBus;
+	}
+
+	public void setPlaceController(PlaceController placeController) {
+		this.placeController = placeController;
 	}
 }

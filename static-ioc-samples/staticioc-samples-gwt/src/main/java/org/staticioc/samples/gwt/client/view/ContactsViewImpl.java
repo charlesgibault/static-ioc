@@ -31,6 +31,7 @@ public class ContactsViewImpl extends Composite implements EditableListView<Cont
 	@UiField(provided = true) CellTable<Contact> contactsTable;
 	@UiField Button addButton;
 	@UiField Button deleteButton;
+	@UiField Button reportingButton;
 
 	private Presenter<Contact> presenter;
 	private Messages messages;
@@ -54,7 +55,13 @@ public class ContactsViewImpl extends Composite implements EditableListView<Cont
 			presenter.onDeleteButtonClicked(selectedItem);//TODO retrieve selected item
 		}
 	}
-
+	
+	@UiHandler("reportingButton")
+	void onReportingButtonClicked(ClickEvent event) {
+		//Navigate to place reporting
+		presenter.onReportingButtonClicked();
+	}
+	
 	@Override
 	public void resetUserInput() {
 		firstNameValue.setValue("");

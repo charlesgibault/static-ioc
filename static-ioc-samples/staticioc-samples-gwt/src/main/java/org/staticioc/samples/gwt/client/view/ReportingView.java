@@ -9,17 +9,14 @@ import java.util.List;
  * @author charles
  * @param <T> Type to display in this view
  */
-public interface EditableListView<T> {
+public interface ReportingView<T> {
 
   public interface Presenter<T> extends org.staticioc.samples.gwt.client.presenter.Presenter {
-    void onAddButtonClicked(T selectedModel);
-    void onDeleteButtonClicked(T selectedModel);
-    void onReportingButtonClicked();
+    void onGoBack();
   }
   
   void setPresenter(Presenter<T> presenter);
   void setModel(List<T> models);
-  void resetUserInput();
 
   Widget asWidget();
 }

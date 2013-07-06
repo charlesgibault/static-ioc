@@ -34,9 +34,36 @@
 	     <constructor-arg value="org.staticioc.samples.gwt.client.service.ContactsService.class"/>
 	</bean>
 	
+	<bean name="eventBus" class="com.google.gwt.event.shared.EventBus" factory-bean="com.google.gwt.core.client.GWT">
+	     <constructor-arg value="com.google.gwt.event.shared.SimpleEventBus.class"/>
+	</bean>
+	
+	<bean name="placeController" class="com.google.gwt.place.shared.PlaceController">
+	     <constructor-arg ref="eventBus"/>
+	</bean>
+	
+	<bean name="activityMapper" class="org.staticioc.samples.gwt.client.places.AppActivityMapper">
+		 <property name="reportingActivity" ref="reportingPresenter"/>
+		 <property name="editionActivity" ref="contactsPresenter"/>
+	</bean>
+	
+	<bean name="activityManager" class="com.google.gwt.activity.shared.ActivityManager">
+	     <constructor-arg ref="activityMapper"/>
+		 <constructor-arg ref="eventBus"/>
+	</bean>
+	
+	<bean name="historyMapper" class="org.staticioc.samples.gwt.client.places.AppPlaceHistoryMapper" factory-bean="com.google.gwt.core.client.GWT">
+	     <constructor-arg value="org.staticioc.samples.gwt.client.places.AppPlaceHistoryMapper.class"/>
+	</bean>
+	
 	<bean name="contactsView" class="org.staticioc.samples.gwt.client.view.ContactsViewImpl" init-method="afterPropertiesSet">
 	    <property name="messages" ref="messages"/>
 	    <property name="presenter" ref="contactsPresenter"/>
+	</bean>
+	
+	<bean name="reportingView" class="org.staticioc.samples.gwt.client.view.ContactsReportingViewImpl" init-method="afterPropertiesSet">
+	    <property name="messages" ref="messages"/>
+	    <property name="presenter" ref="reportingPresenter"/>
 	</bean>
 	
 	<bean name="contactsPresenter" class="org.staticioc.samples.gwt.client.presenter.ContactsPresenterImpl">
@@ -46,5 +73,18 @@
 	        <bean class="org.staticioc.samples.gwt.client.view.MessagePopUpViewImpl" p:presenter-ref="contactsPresenter"/>
 	    </property>
 	    <property name="contactsService" ref="contactsService"/>
+	    <property name="placeController"  ref="placeController"/>
+	    <property name="eventBus" ref="eventBus"/>
+	</bean>
+	
+	<bean name="reportingPresenter" class="org.staticioc.samples.gwt.client.presenter.ContactsReportingPresenterImpl">
+	    <property name="messages" ref="messages"/>
+	    <property name="reportingView" ref="reportingView"/>
+	     <property name="errorView">
+	        <bean class="org.staticioc.samples.gwt.client.view.MessagePopUpViewImpl" p:presenter-ref="reportingPresenter"/>
+	    </property>
+	    <property name="contactsService" ref="contactsService"/>
+	    <property name="placeController"  ref="placeController"/>
+	    <property name="eventBus" ref="eventBus"/>
 	</bean>
 </beans>

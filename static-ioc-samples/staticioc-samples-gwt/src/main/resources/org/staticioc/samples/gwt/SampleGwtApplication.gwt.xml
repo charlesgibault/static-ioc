@@ -15,7 +15,9 @@
   <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
 
   <!-- Other module inherits                                      -->
-
+  <inherits name="com.google.gwt.place.Place" />
+  <inherits name="com.google.gwt.activity.Activity" />
+  
   <!-- Specify the app entry point class.                         -->
   <entry-point class='org.staticioc.samples.gwt.client.SampleGwtApplication' />
 

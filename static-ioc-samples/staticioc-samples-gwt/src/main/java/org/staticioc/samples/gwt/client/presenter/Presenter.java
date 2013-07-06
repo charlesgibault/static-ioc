@@ -1,7 +1,11 @@
 package org.staticioc.samples.gwt.client.presenter;
 
-import com.google.gwt.user.client.ui.HasWidgets;
+import com.google.gwt.activity.shared.Activity;
+import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.ui.AcceptsOneWidget;
 
-public abstract interface Presenter {
-  public abstract void display(final HasWidgets container);
+public interface Presenter extends Activity
+{
+  void display(final AcceptsOneWidget container);
+  void setState(Place place);
 }
