@@ -50,7 +50,7 @@ public class DependencyManagerTest
 		};
 		
 		// No dependency declared for the moment : bean are expected to come out in the same order as they were inserted in the LinkedHashMap
-		LinkedHashSet<String> resultNoDependencies = manager.resolveAllBeans(beans.keySet(), container);
+		LinkedHashSet<String> resultNoDependencies = manager.resolveBeansOrder(beans.keySet(), container);
 		assertEquals("Incorrect bean order when no dependency are present", "[bean1, bean2, bean3, bean4, bean5]", resultNoDependencies.toString() );
 		
 		// Now add dependencies
@@ -66,7 +66,7 @@ public class DependencyManagerTest
 		manager.register(dependency3_12);
 		manager.register(dependency1_4);
 		
-		LinkedHashSet<String> resultWithDependencies = manager.resolveAllBeans(beans.keySet(), container);
+		LinkedHashSet<String> resultWithDependencies = manager.resolveBeansOrder(beans.keySet(), container);
 		assertEquals("Incorrect bean order when dependencies are present", "[bean2, bean4, bean1, bean3, bean5]", resultWithDependencies.toString() );
 	}
 

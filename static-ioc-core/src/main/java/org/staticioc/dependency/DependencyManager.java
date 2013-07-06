@@ -10,6 +10,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.staticioc.model.AcknowledgeableBeanContainer;
 import org.staticioc.model.Bean;
 import org.staticioc.model.BeanContainer;
 
@@ -64,10 +65,11 @@ public class DependencyManager<T extends Dependency>
 	 * @param callback
 	 * @throws XPathExpressionException
 	 */
-	public LinkedHashSet<String> resolveAllBeans(Set<String> beans, BeanContainer container)
+	public LinkedHashSet<String> resolveBeansOrder(Set<String> beans, BeanContainer container)
 	{
 		final Set<String> visitedParents = new HashSet<String>();
 		final LinkedHashSet<String> result = new LinkedHashSet<String>();
+		final AcknowledgeableBeanContainer ackContainer = new AcknowledgeableBeanContainer( container );
 		
 		// First: add all beans that have no dependencies
 		for( String id : container.getBeans().keySet() )
@@ -75,19 +77,21 @@ public class DependencyManager<T extends Dependency>
 			if ( !dependencyMap.keySet().contains( id ) )
 			{
 				result.add(id);
+				ackContainer.acknowledge(id);
 			}
 		}
 
 		// Then add all beans that have dependencies in the proper order
 		for( String parentName :  dependencyMap.keySet() )
 			{
-			resolveBean( parentName, container, visitedParents, new ResolvedDependencyCallback<T> ()
+			resolveBean( parentName, ackContainer, visitedParents, new ResolvedDependencyCallback<T> ()
 				{
 					@Override
 					public void onResolvedDependency(T dependency,
 							BeanContainer container)
 					{
 						result.add(dependency.getId());
+						ackContainer.acknowledge(dependency.getId());
 					}
 						
 				} );
