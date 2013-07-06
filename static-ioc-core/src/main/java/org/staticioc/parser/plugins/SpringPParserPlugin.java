@@ -5,7 +5,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.staticioc.model.Bean;
 import org.staticioc.model.Property;
-import org.staticioc.parser.BeanContainer;
+import org.staticioc.parser.BeanParser;
 import org.staticioc.parser.NodeParserPlugin;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -17,7 +17,7 @@ public class SpringPParserPlugin implements NodeParserPlugin
 {
 	protected static final String BEAN_PROPERTY_PREFIX = "p:";
 	protected static final String BEAN_PROPERTY_REF_SUFFIX = "-ref";
-	protected BeanContainer container;
+	protected BeanParser container;
 
 	
 	@Override
@@ -56,7 +56,7 @@ public class SpringPParserPlugin implements NodeParserPlugin
 	}
 
 	@Override
-	public void setBeanContainer(BeanContainer container)
+	public void setBeanContainer(BeanParser container)
 	{
 		this.container = container;
 	}

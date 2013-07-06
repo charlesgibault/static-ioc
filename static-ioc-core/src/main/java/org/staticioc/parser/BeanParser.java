@@ -7,13 +7,13 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.staticioc.AbstractSpringConfigParser;
+import org.staticioc.dependency.DefinitionDependency;
 import org.staticioc.model.Bean;
-import org.staticioc.model.ParentDependency;
 import org.staticioc.model.Property;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public interface BeanContainer
+public interface BeanParser
 {
 	/**
 	 * Update a collection of properties while registering potential references in the container (for prototype resolution)
@@ -62,7 +62,7 @@ public interface BeanContainer
 	 * Register a bean in the bean map
 	 * @param bean to be registered
 	 */
-	void registerParent( ParentDependency parent );
+	void registerParent( DefinitionDependency parent );
 	
 	/**
 	 * Register a parser's into this parser

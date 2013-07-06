@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.staticioc.model.Bean;
 import org.staticioc.model.Property;
-import org.staticioc.parser.BeanContainer;
+import org.staticioc.parser.BeanParser;
 import org.staticioc.parser.NodeParserPlugin;
 import org.staticioc.parser.ParserConstants;
 import org.staticioc.parser.ParserHelper;
@@ -19,7 +19,7 @@ public class ConstructorArgsPlugin implements NodeParserPlugin, ParserConstants
 {
 	protected static final Logger logger = LoggerFactory.getLogger(ConstructorArgsPlugin.class);
 	
-	protected BeanContainer container;
+	protected BeanParser container;
 	
 	/**
 	 * Parse the XML <bean/> nodes's children for constructor arguments and enrich the Bean object accordingly
@@ -98,7 +98,7 @@ public class ConstructorArgsPlugin implements NodeParserPlugin, ParserConstants
 	}
 
 	@Override
-	public void setBeanContainer(BeanContainer container)
+	public void setBeanContainer(BeanParser container)
 	{
 		this.container = container;
 	}

@@ -38,7 +38,6 @@ package org.staticioc;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
@@ -49,16 +48,19 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.staticioc.dependency.DefinitionDependency;
+import org.staticioc.dependency.DependencyManager;
+import org.staticioc.dependency.ResolvedDependencyCallback;
 import org.staticioc.model.Bean;
-import org.staticioc.model.ParentDependency;
+import org.staticioc.model.BeanContainer;
 import org.staticioc.model.Property;
 import org.staticioc.model.Bean.Scope;
-import org.staticioc.parser.BeanContainer;
+import org.staticioc.parser.BeanParser;
 import org.staticioc.parser.ParserConstants;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-public abstract class AbstractSpringConfigParser implements ParserConstants, BeanContainer {
+public abstract class AbstractSpringConfigParser implements ParserConstants, BeanParser, BeanContainer {
 
 	protected static final Logger logger = LoggerFactory.getLogger(SpringConfigParser.class);
 	
@@ -72,8 +74,7 @@ public abstract class AbstractSpringConfigParser implements ParserConstants, Bea
 	// Map a bean's name (alias) to the actual registerd beans 
 	private final Map<String,Bean> aliases = new HashMap<String,Bean>();
 	
-	// Map a bean
-	private final Map<String, ParentDependency > parentDependencyMap = new ConcurrentHashMap<String, ParentDependency>();
+	private final DependencyManager<DefinitionDependency> parentDependencyManager = new DependencyManager<DefinitionDependency>();
 	
 	// Track prototypes Beans separately 
 	private final Set<String> prototypeBeans = new LinkedHashSet<String>();
@@ -82,16 +83,18 @@ public abstract class AbstractSpringConfigParser implements ParserConstants, Bea
 	private final Map<String,Collection<Property>> propertyReferencesMap = new ConcurrentHashMap<String,Collection<Property>>();
 	
 	/**
-	 * 
-	 * @return
+	 * @return a unique generated Bean id to use for anonymous Beans' declaration
 	 */
 	@Override
 	public String generateAnonymousBeanId() {
 		return ANONYMOUS_BEAN_PREFIX + (++anonymousBeanIdentifier);
 	}
 	
+	/**
+	 * @return a unique generated Bean id to use for prototype Beans' declaration
+	 */
 	protected String generatePrototypeBeanId( String beanName) {
-		return ANONYMOUS_BEAN_PREFIX + beanName + (++anonymousBeanIdentifier);
+		return PROTOTYPE_BEAN_PREFIX + beanName + (++anonymousBeanIdentifier);
 	}
 	
 	/**
@@ -195,13 +198,8 @@ public abstract class AbstractSpringConfigParser implements ParserConstants, Bea
 	 * @param bean to be registered
 	 */
 	@Override
-	public void registerParent( ParentDependency parent ) {	
-		if( logger.isDebugEnabled())
-		{
-			logger.debug( "Adding {}", parent );
-		}
-		
-		parentDependencyMap.put( parent.getId(), parent );
+	public void registerParent( DefinitionDependency parent ) {
+		parentDependencyManager.register(parent);
 	}
 	
 	/**
@@ -213,12 +211,12 @@ public abstract class AbstractSpringConfigParser implements ParserConstants, Bea
 	public void register( final AbstractSpringConfigParser parser) {	
 		if( logger.isDebugEnabled())
 		{
-			logger.debug( "Adding {} parent dependencies", parser.parentDependencyMap );
+			logger.debug( "Adding {} parent dependencies", parser.parentDependencyManager );
 			logger.debug( "Adding {} prototypes definitions", parser.prototypeBeans );
 			logger.debug( "Adding {} Bean reference tracking", parser.propertyReferencesMap );
 		}
 		
-		parentDependencyMap.putAll( parser.parentDependencyMap );
+		parentDependencyManager.registerAll(parser.parentDependencyManager);
 		prototypeBeans.addAll( parser.prototypeBeans );
 		propertyReferencesMap.putAll( parser.propertyReferencesMap );
 	}	
@@ -228,78 +226,42 @@ public abstract class AbstractSpringConfigParser implements ParserConstants, Bea
 	 * @param name
 	 * @return
 	 */
-	protected Bean getBean( final String id)
+	@Override
+	public Bean getBean( final String id)
 	{
 		final Bean bean = beans.get(id);
 		return (bean != null)? bean : aliases.get(id);
 	}
 	
-	protected Map<String, Bean > getBeans()
+	@Override
+	public Map<String, Bean > getBeans()
 	{
 		return beans;
 	}
 	
-	protected void resolveParentDefinition() throws XPathExpressionException
+	protected void resolveParentDefinition()
 	{
-		final Set<String> visitedParents = new HashSet<String>();
-		
-		for( String parentName : parentDependencyMap.keySet() )
+		parentDependencyManager.resolveAllDependencies(this, new ResolvedDependencyCallback<DefinitionDependency> ()
 		{
-			resolveParentBean( parentName, visitedParents );
-		}
-	}
-	
-	/**
-	 * Resolve parent bean dependencies using a depth first search (Cormen et al. / Tarjan)
-	 * 
-	 * @param parentName
-	 * @throws XPathExpressionException 
-	 */
-	protected void resolveParentBean( final String name, final Set<String> visitedBeans ) throws XPathExpressionException
-	{
-		// Grab dependency
-		final ParentDependency dependency = parentDependencyMap.get(name);
-		
-		if( dependency == null )
-		{
-			logger.warn( "Unresolved parent bean {}. Ignoring", name );
-			return;
-		}
-		
-		// Test direct resolution (parent already registered)
-		Bean parentBean = getBean( dependency.getParentId() );
-		
-		if( parentBean == null) // parent cannot be resolved directly -> Do a depth first approach
-		{
-			// Maintain a set of visited parent to avoid infinite loops in cycles.
-			// This works because our depth first approach visits each node only once O(N) complexity.
-			visitedBeans.add( name );
-			
-			if ( !visitedBeans.contains( dependency.getParentId() ))
+			@Override
+			public void onResolvedDependency(DefinitionDependency dependency, BeanContainer container)
 			{
-				resolveParentBean( dependency.getParentId(), visitedBeans );
-				parentBean = getBean( dependency.getParentId() );
+				final String parentBeanId = dependency.getParentId();
+				final Bean parentBean = container.getBean(parentBeanId);
 				
-				if( parentBean == null ) // Parent couldn't be resolved still (due to cycle)
-				{
-					logger.warn( "Unresolved parent bean {}. Ignoring", name );
-					return;
-				}
+				// Perform bean copy and continue
+				final Bean bean = duplicateBean( dependency.getId(), dependency.getAlias(), parentBean, dependency.isAnonymous() );
+				final Node beanNode = dependency.getNode();
+				final NamedNodeMap beanAttributes = beanNode.getAttributes();
+				
+				try {
+					processBeanNode(beanNode, beanAttributes, bean.getId(), bean.getAlias(), dependency.isAnonymous(), bean);
+				} catch (XPathExpressionException e) {
+					logger.error( "Error processing Bean " + bean.getId(), e );
+				}	
 			}
-			else
-			{			
-				logger.warn( "Cycle detected with bean {}", name );
-				return;
-			}
-		}
-		
-		// Perform bean copy and continue
-		final Bean bean = duplicateBean( dependency.getId(), dependency.getAlias(), parentBean, dependency.isAnonymous() );
-		final Node beanNode = dependency.getNode();
-		final NamedNodeMap beanAttributes = beanNode.getAttributes();
-		//TODO remove from parentDependencyMap ?
-		
-		processBeanNode(beanNode, beanAttributes, bean.getId(), bean.getAlias(), dependency.isAnonymous(), bean);			
+				
+		} );
 	}
 	
 	protected void resolveAliasReference()

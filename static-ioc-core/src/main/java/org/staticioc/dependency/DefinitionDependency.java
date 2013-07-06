@@ -16,34 +16,28 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.staticioc.model;
+package org.staticioc.dependency;
 
 import org.w3c.dom.Node;
 
-public class ParentDependency
-{
-	private final String parentId;
-	private final String id;
+public class DefinitionDependency extends Dependency
+{	
 	private final String alias;
 	private final boolean isAnonymous;
 	private final Node node;
 	
-	public ParentDependency(String parentId, String id, String alias,
-			boolean isAnonymous, Node parentNode) {
-		super();
-		this.parentId = parentId;
-		this.id = id;
+	public DefinitionDependency(String parentId, String id, String alias, boolean isAnonymous, Node parentNode)
+	{
+		super(id, parentId);
 		this.alias = alias;
 		this.isAnonymous = isAnonymous;
 		this.node = parentNode;
 	}
 	
 	public String getParentId() {
-		return parentId;
+		return getTargetIds().iterator().next();
 	}
-	public String getId() {
-		return id;
-	}
+	
 	public boolean isAnonymous() {
 		return isAnonymous;
 	}
@@ -55,32 +49,8 @@ public class ParentDependency
 	}
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		return result;
-	}
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ParentDependency other = (ParentDependency) obj;
-		if (id == null) {
-			if (other.id != null)
-				return false;
-		} else if (!id.equals(other.id))
-			return false;
-		return true;
-	}
-
-	@Override
 	public String toString() {
-		return "ParentDependency [parentId=" + parentId + ", id=" + id + ", alias=" + alias
+		return "DefinitionDependency [parentId=" + getParentId() + ", id=" + getId() + ", alias=" + alias
 				+ ", isAnonymous=" + isAnonymous + "]";
 	}
 }

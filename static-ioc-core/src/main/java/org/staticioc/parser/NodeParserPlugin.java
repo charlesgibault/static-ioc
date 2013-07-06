@@ -22,5 +22,5 @@ public interface NodeParserPlugin
 	 * A reference to the bean container
 	 * @param container
 	 */
-	void setBeanContainer(BeanContainer container);
+	void setBeanContainer(BeanParser container);
 }

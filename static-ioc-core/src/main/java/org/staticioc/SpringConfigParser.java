@@ -37,6 +37,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.io.FilenameUtils;
+import org.staticioc.dependency.DefinitionDependency;
 import org.staticioc.model.*;
 import org.staticioc.model.Bean.Scope;
 import org.staticioc.parser.*;
@@ -162,7 +163,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 
 			if( parentBean == null) // parent not known yet
 			{
-				registerParent( new ParentDependency( parentName, id, alias, isAnonymous,  beanNode) );
+				registerParent( new DefinitionDependency( parentName, id, alias, isAnonymous,  beanNode) );
 				return id;
 			}
 			else
@@ -381,15 +382,9 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		}
 
 		// Now resolve every beans
-		try
-		{
-			resolveParentDefinition();
-			resolvePrototypeBeans();
-		}
-		catch( XPathExpressionException e)
-		{
-			logger.error( "Error parsing files" + configurationFiles.toString(), e );
-		}
+		resolveParentDefinition();
+		resolvePrototypeBeans();
+		
 
 		return getBeans();
 	}
