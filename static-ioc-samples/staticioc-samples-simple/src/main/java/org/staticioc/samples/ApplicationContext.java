@@ -29,9 +29,9 @@ public class ApplicationContext
 
 	public void destroyContext()
 	{
-	remoteService = null;
-	customerService = null;
-	coordinator = null;
+		remoteService = null;
+		customerService = null;
+		coordinator = null;
 
 	}
 }
