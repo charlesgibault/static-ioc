@@ -67,17 +67,17 @@ public class SpringStaticFactoryGeneratorTest
 				+ "public class " + className + " {\n"
 				
 				+ "/** * Bean definition */\n"
-				+ "public test.Country country;\n"
 				+ "public test.House number10House;\n"
 				+ "public test.Person personBean;\n"
+				+ "public test.Country country;\n"
 				
 				+ "/** * Constructor of the Factory */\n"
 				+ "public " + className + "() {\n"
 				
 				+ "// Instanciating beans\n"
-				+ "country = new test.Country(42, new java.util.Integer( 7500000 ));\n"
 				+ "number10House = new test.House();\n"
 				+ "personBean = new test.Person();\n"
+				+ "country = new test.Country(42, new java.util.Integer( 7500000 ));\n"
 
 				+ "// Setting up bean number10House\n"
 				+ "number10House.setPerson( personBean );\n"
@@ -92,15 +92,15 @@ public class SpringStaticFactoryGeneratorTest
 				+ "personBean.setCountry( country );\n"
 				
 				+ "// Init methods calls\n"
-				+ "country.initMethod();\n"
 				+ "personBean.afterPropertiesSet();\n"
+				+ "country.initMethod();\n"
 								
 				+"}\n"
 				+ "public void destroyContext() {\n"
 				+ "personBean.onTearDown();\n"
+				+ "country = null;\n"
 				+ "personBean = null;\n"
 				+ "number10House = null;\n"
-				+ "country = null;\n"
 				+ "}\n"
 				+ "}" );
 		
@@ -134,26 +134,26 @@ public class SpringStaticFactoryGeneratorTest
 				+ "public class " + className + " {\n"
 				
 				+ "/** * Bean definition */\n"
-				+ "public test.CustomerService customerService;\n"
 				+ "public test.ProductFactory productFactory;\n"
 				+ "public test.Product product;\n"
 				+ "public test.RpcService rpcService;\n"
+				+ "public test.CustomerService customerService;\n"
 				
 				+ "/** * Constructor of the Factory */\n"
 				+ "public " + className + "() {\n"
 				
 				+ "// Instanciating beans\n"
-				+ "customerService = com.google.gwt.core.client.GWT.create(test.CustomerService.class);\n"
 				+ "productFactory = new test.ProductFactory();\n"
 				+ "product = productFactory.createProduct();\n"
 				+ "rpcService = com.google.gwt.core.client.GWT.create(test.RpcService.class);\n"
+				+ "customerService = com.google.gwt.core.client.GWT.create(test.CustomerService.class);\n"
 								
 				+"}\n"
 				+ "public void destroyContext() {\n"
+				+ "customerService = null;\n"
 				+ "rpcService = null;\n"
 				+ "product = null;\n"
 				+ "productFactory = null;\n"
-				+ "customerService = null;\n"
 				+ "}\n"
 				+ "}");
 		
@@ -161,4 +161,59 @@ public class SpringStaticFactoryGeneratorTest
 		
 		Assert.assertEquals( "Incorrect generated result", expectedResult, normalizeCode( result.toString() ) );
 	}
+	
+	/**
+	 * Constructor arguments dependencies test
+	 * @throws ParserConfigurationException 
+	 * @throws IOException 
+	 * @throws SAXException 
+	 */
+	@Test
+	public void testConstructorArgsDependencyContextDefinition() throws SAXException, IOException, ParserConfigurationException
+	{
+		final CodeGenerator codeGenerator = new JavaCodeGenerator();
+		StringBuilder result = new StringBuilder();
+		codeGenerator.setOutput(result);
+		
+		final String packageName = "org.staticioc.test";
+		final String className = "TestClass";
+
+		String[] contexts = {"src/test/resources/SpringStaticFactoryGeneratorTest-constructorArgsContext.xml"};
+		
+		final String expectedResult = normalizeCode( 
+				"/** This code has been generated using Static IoC framework (http://code.google.com/p/static-ioc/). DO NOT EDIT MANUALLY HAS CHANGES MAY BE OVERRIDEN */\n" +
+				"package " + packageName + ";\n" 
+				+ "@SuppressWarnings(\"all\")\n"
+				+ "public class " + className + " {\n"
+				
+				+ "/** * Bean definition */\n"
+				+ "public test.ProductFactory productFactory;\n"
+				+ "public test.Product product;\n"
+				+ "public test.ProductService productService;\n"
+				+ "public test.ProductService productServiceWrapper;\n"
+				
+				+ "/** * Constructor of the Factory */\n"
+				+ "public " + className + "() {\n"
+				
+				+ "// Instanciating beans\n"
+				+ "productFactory = new test.ProductFactory();\n"
+				+ "product = new test.Product();\n"
+				+ "productService = new test.ProductService(productFactory);\n"
+				+ "productServiceWrapper = new test.ProductService(productService);\n"
+								
+				+"}\n"
+				+ "public void destroyContext() {\n"
+				+ "productServiceWrapper = null;\n"
+				+ "productService = null;\n"
+				+ "product = null;\n"
+				+ "productFactory = null;\n"
+				+ "}\n"
+				+ "}");
+		
+		result = factoryGenerator.generate(codeGenerator, packageName, className, Arrays.asList( contexts ) );
+		
+		Assert.assertEquals( "Incorrect generated result", expectedResult, normalizeCode( result.toString() ) );
+	}
+	
+	
 }

@@ -1,11 +1,14 @@
 package org.staticioc.parser.plugins;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.xml.xpath.XPathExpressionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.staticioc.dependency.RunTimeDependency;
 import org.staticioc.model.Bean;
 import org.staticioc.model.Property;
 import org.staticioc.parser.BeanParser;
@@ -86,6 +89,8 @@ public class ConstructorArgsPlugin implements NodeParserPlugin, ParserConstants
 
 		}
 		
+		final Set<String> beanDependencies = new HashSet<String>();
+		
 		// Now reorder them.
 		for( Property prop : args)
 		{
@@ -93,7 +98,19 @@ public class ConstructorArgsPlugin implements NodeParserPlugin, ParserConstants
 			{
 				logger.debug("Constructor arg : {}", prop.toString());
 				container.addOrReplaceProperty( prop, bean.getConstructorArgs() );
+				
+				if( prop.getRef() != null )
+				{
+					beanDependencies.add( prop.getRef() );
+				}
 			}
+		}
+		
+		if( ! beanDependencies.isEmpty() )
+		{
+			RunTimeDependency dependency = new RunTimeDependency( bean.getId(), beanDependencies);
+			logger.debug( "Adding runtime dependency {}", dependency );
+			container.registerRunTimeDependency( dependency );
 		}
 	}
 

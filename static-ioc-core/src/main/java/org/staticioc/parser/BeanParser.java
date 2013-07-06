@@ -8,6 +8,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.staticioc.AbstractSpringConfigParser;
 import org.staticioc.dependency.DefinitionDependency;
+import org.staticioc.dependency.RunTimeDependency;
 import org.staticioc.model.Bean;
 import org.staticioc.model.Property;
 import org.w3c.dom.Node;
@@ -59,10 +60,16 @@ public interface BeanParser
 	void register(final Map<String, Bean> beans) ;
 	
 	/**
-	 * Register a bean in the bean map
-	 * @param bean to be registered
+	 * Register a bean -> parent dependency
+	 * @param dependency to be registered
 	 */
 	void registerParent( DefinitionDependency parent );
+	
+	/**
+	 * Register a bean -> run dependency
+	 * @param dependency to be registered
+	 */
+	void registerRunTimeDependency(RunTimeDependency dependency);
 	
 	/**
 	 * Register a parser's into this parser

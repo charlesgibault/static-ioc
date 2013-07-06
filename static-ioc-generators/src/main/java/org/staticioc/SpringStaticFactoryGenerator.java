@@ -20,12 +20,10 @@ package org.staticioc;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.NavigableSet;
-import java.util.TreeSet;
-
 import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,6 +108,7 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 		
 		SpringConfigParser springConfigParser = new SpringConfigParser();
 		Map<String, Bean> beanClassMap = springConfigParser.load( configurationFiles );
+		final LinkedList<Bean> orderedBean = springConfigParser.getOrderedBeans();
 
 		// Track beans with a declared init-method and destroy-method attribute
 		List<Bean> initRequiredBeans = new LinkedList<Bean>();
@@ -119,8 +118,6 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 
 		codeGenerator.initPackage( generatedPackageName );		
 		codeGenerator.initClass( generatedClassName );
-		
-		final NavigableSet<Bean> orderedBean = new TreeSet<Bean>( beanClassMap.values() );
 		
 		// declare beans
 		codeGenerator.comment(Level.CLASS, "Bean definition" );
@@ -228,8 +225,11 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 		}
 		
 		//Destructor : free beans in their reverse order of creation
-		for ( final Bean bean: orderedBean.descendingSet() )
-		{
+		Iterator<Bean> itr = orderedBean.descendingIterator();
+		
+		while(itr.hasNext()) {
+			final Bean bean = itr.next();
+		    
 			// Ignore abstract beans and prototypes that were not instanciated
 			if ( isHidden(bean) ){ continue; }			
 			codeGenerator.deleteBean( bean );

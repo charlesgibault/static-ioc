@@ -461,7 +461,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 				logger.debug( "Registered bean {}", beanName);
 			}
 		}
-
+		
 		return getBeans();
 	}
 

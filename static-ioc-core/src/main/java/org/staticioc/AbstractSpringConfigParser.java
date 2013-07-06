@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 import org.staticioc.dependency.DefinitionDependency;
 import org.staticioc.dependency.DependencyManager;
 import org.staticioc.dependency.ResolvedDependencyCallback;
+import org.staticioc.dependency.RunTimeDependency;
 import org.staticioc.model.Bean;
 import org.staticioc.model.BeanContainer;
 import org.staticioc.model.Property;
@@ -75,6 +76,7 @@ public abstract class AbstractSpringConfigParser implements ParserConstants, Bea
 	private final Map<String,Bean> aliases = new HashMap<String,Bean>();
 	
 	private final DependencyManager<DefinitionDependency> parentDependencyManager = new DependencyManager<DefinitionDependency>();
+	private final DependencyManager<RunTimeDependency> runTimeDependencyManager = new DependencyManager<RunTimeDependency>();
 	
 	// Track prototypes Beans separately 
 	private final Set<String> prototypeBeans = new LinkedHashSet<String>();
@@ -194,12 +196,22 @@ public abstract class AbstractSpringConfigParser implements ParserConstants, Bea
 	}
 	
 	/**
-	 * Register a bean in the bean map
-	 * @param bean to be registered
+	 * Register a bean -> parent dependency
+	 * @param dependency to be registered
 	 */
 	@Override
-	public void registerParent( DefinitionDependency parent ) {
-		parentDependencyManager.register(parent);
+	public void registerParent( DefinitionDependency dependency ) {
+		parentDependencyManager.register(dependency);
+	}
+	
+
+	/**
+	 * Register a bean -> parent dependency
+	 * @param dependency to be registered
+	 */
+	@Override
+	public void registerRunTimeDependency( RunTimeDependency dependency ) {
+		runTimeDependencyManager.register(dependency);
 	}
 	
 	/**
@@ -212,12 +224,14 @@ public abstract class AbstractSpringConfigParser implements ParserConstants, Bea
 		if( logger.isDebugEnabled())
 		{
 			logger.debug( "Adding {} parent dependencies", parser.parentDependencyManager );
+			logger.debug( "Adding {} runtime dependencies", parser.runTimeDependencyManager );
 			logger.debug( "Adding {} prototypes definitions", parser.prototypeBeans );
 			logger.debug( "Adding {} Bean reference tracking", parser.propertyReferencesMap );
 		}
 		
 		parentDependencyManager.registerAll(parser.parentDependencyManager);
-		prototypeBeans.addAll( parser.prototypeBeans );
+		runTimeDependencyManager.registerAll(parser.runTimeDependencyManager);
+		prototypeBeans.addAll( parser.prototypeBeans ); //TODO replace this with a dependency manager
 		propertyReferencesMap.putAll( parser.propertyReferencesMap );
 	}	
 	
@@ -262,6 +276,20 @@ public abstract class AbstractSpringConfigParser implements ParserConstants, Bea
 			}
 				
 		} );
+	}
+	
+	public LinkedList<Bean> getOrderedBeans()
+	{
+		LinkedList<Bean> orderedBeans = new LinkedList<Bean>();
+		
+		LinkedHashSet<String> orderedIds = runTimeDependencyManager.resolveBeansOrder(beans.keySet(), this);
+		
+		for ( String id : orderedIds)
+		{
+			orderedBeans.add( getBean(id) );
+		}
+		
+		return orderedBeans;
 	}
 	
 	protected void resolveAliasReference()

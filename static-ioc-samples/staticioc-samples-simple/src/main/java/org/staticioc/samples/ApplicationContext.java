@@ -7,8 +7,8 @@ public class ApplicationContext
 	 * Bean definition
 */	
 	public org.staticioc.samples.coord.ExampleCoordinator coordinator;
-	public org.staticioc.samples.services.impl.CustomerServiceImpl customerService;
 	public org.staticioc.samples.services.impl.RemoteServiceImpl remoteService;
+	public org.staticioc.samples.services.impl.CustomerServiceImpl customerService;
 
 	/**
 	 * Constructor of the Factory
@@ -17,8 +17,8 @@ public class ApplicationContext
 	{
 		// Instanciating beans
 		coordinator = new org.staticioc.samples.coord.ExampleCoordinator();
-		customerService = new org.staticioc.samples.services.impl.CustomerServiceImpl();
 		remoteService = new org.staticioc.samples.services.impl.RemoteServiceImpl();
+		customerService = new org.staticioc.samples.services.impl.CustomerServiceImpl();
 
 		// Setting up bean coordinator
 		coordinator.setRemoteService( remoteService );
@@ -29,8 +29,8 @@ public class ApplicationContext
 
 	public void destroyContext()
 	{
-		remoteService = null;
 		customerService = null;
+		remoteService = null;
 		coordinator = null;
 
 	}

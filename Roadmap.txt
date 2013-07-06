@@ -19,14 +19,16 @@ Please find below some visibility on the planned feature roadmap
   * *Core* - Add plugin chain mechanism to ease extension of supported nodes 
   * *Core* - Add support for init-method/ afterPropertiesSet mechanism for post initing bean
   * *Core* - Add support for destroy-method / Teardown() mechanism
+  * *Core* - Fix prototype bean's naming convention
   * *Generator* - Add support for init-method and destroy-methods 
   * *Generator* - Fixed indentation on destructor
   * *Java Generator* - Changed @SuppressWarnings annotations to a @SuppressWarnings(all)
   * *Samples* - Use init-method to simplify GWT sample
   * *Samples* - Cleaned-up GWT samples (removed warnings)
+ * *Core* - Handle dependency with constructor args reference for proper order generation
 
 // ---------- To be started
-  * *Core* - Handle dependency with constructor args reference for proper order generation
+  * *Core* - Refactor prototype dependency resolution to use new generic dependency resolution mechanism
 
 // Release 0.4
   * *Core* - Add namespace plugin mechanism
