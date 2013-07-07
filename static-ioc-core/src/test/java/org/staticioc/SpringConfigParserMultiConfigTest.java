@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2012 Charles Gibault
+ *  Copyright (C) 2013 Charles Gibault
  *
  *  Static IoC - Compile XML based inversion of control configuration file into a single init class, for many languages.
  *  Project Home : http://code.google.com/p/static-ioc/
@@ -27,7 +27,6 @@ import org.staticioc.model.*;
 
 /**
  * Unit test for SpringConfigParser to test parent and prototype resolution when configuration are loaded together (without import)
- * TODO implement the test 
  */
 public class SpringConfigParserMultiConfigTest extends AbstractSpringParserTest {
 	private final static String[] TEST_CONTEXT = {

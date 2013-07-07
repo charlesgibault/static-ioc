@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-     Copyright (C) 2012 Charles Gibault
+     Copyright (C) 2013 Charles Gibault
 
      Static IoC - Compile XML based inversion of control configuration file into a single init class, for many languages.
      Project Home : http://code.google.com/p/static-ioc/
