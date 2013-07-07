@@ -29,9 +29,13 @@
 	<bean id="subProduct" class="test.SubProduct" parent="product"/>
 	
 	<bean id="rpcService" class="test.RpcService" factory-bean="GWT" factory-method="create">
- 		<constructor-arg value="test.RpcService"/>		
+ 		<constructor-arg value="test.RpcService"/>	
 	</bean>			
 	
-	<bean id="productFactory" class="test.ProductFactory"/>
+	<bean id="productFactory" class="test.ProductFactory">
+ 		<constructor-arg ref="rpcService"/>	
+	</bean>			
+	
+	<bean id="product2" class="test.Product" factory-bean="productFactory" factory-method="createProduct"/>
 
 </beans>

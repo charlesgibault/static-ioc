@@ -133,7 +133,7 @@ public class Bean implements Comparable<Bean>
 	}
 	
 	@Override
-	public int compareTo(Bean bean)
+	public int compareTo(Bean bean) // Alphanumerical sorting using Bean Id
 	{
 		if( StringUtils.equals(id, bean.id) )
 		{
@@ -141,16 +141,6 @@ public class Bean implements Comparable<Bean>
 		}
 		
 		if( id == null)
-		{
-			return -1;
-		}
-		
-		// Check if there's a factoryBean dependency between the 2 beans as this puts a constraint on init order
-		if( (factoryBean != null) && (StringUtils.equals(factoryBean, bean.id) || StringUtils.equals(factoryBean, bean.alias) ) )
-		{
-			return 1;
-		}
-		else if( (bean.factoryBean != null)  && ( StringUtils.equals(bean.factoryBean, id) || StringUtils.equals(bean.factoryBean, alias) ) )
 		{
 			return -1;
 		}

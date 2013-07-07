@@ -136,6 +136,7 @@ public class SpringStaticFactoryGeneratorTest
 				+ "/** * Bean definition */\n"
 				+ "public test.ProductFactory productFactory;\n"
 				+ "public test.Product product;\n"
+				+ "public test.Product product2;\n"
 				+ "public test.RpcService rpcService;\n"
 				+ "public test.CustomerService customerService;\n"
 				
@@ -145,6 +146,7 @@ public class SpringStaticFactoryGeneratorTest
 				+ "// Instanciating beans\n"
 				+ "productFactory = new test.ProductFactory();\n"
 				+ "product = productFactory.createProduct();\n"
+				+ "product2 = productFactory.createProduct();\n"
 				+ "rpcService = com.google.gwt.core.client.GWT.create(test.RpcService.class);\n"
 				+ "customerService = com.google.gwt.core.client.GWT.create(test.CustomerService.class);\n"
 								
@@ -152,6 +154,7 @@ public class SpringStaticFactoryGeneratorTest
 				+ "public void destroyContext() {\n"
 				+ "customerService = null;\n"
 				+ "rpcService = null;\n"
+				+ "product2 = null;\n"
 				+ "product = null;\n"
 				+ "productFactory = null;\n"
 				+ "}\n"

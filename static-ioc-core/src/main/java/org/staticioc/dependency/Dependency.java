@@ -5,11 +5,14 @@ import java.util.Set;
 
 public abstract class Dependency
 {
-	// Source bean having the dependency
+	/// Source bean having the dependency
 	private final String id;
 	
-	// Set of beans whom the bean id depends on
-	private final Set<String> targetIds; 
+	/// Set of beans whom the bean id depends on
+	private final Set<String> targetIds;
+	
+	/// boolean determining whether the Dependency is strict or not
+	private boolean strict=true;
 
 	protected Dependency(String id, String targetId) {
 		this.id = id;
@@ -28,6 +31,14 @@ public abstract class Dependency
 
 	public Set<String> getTargetIds() {
 		return targetIds;
+	}
+
+	public boolean isStrict() {
+		return strict;
+	}
+
+	protected void setStrict(boolean strict) {
+		this.strict = strict;
 	}
 
 	@Override

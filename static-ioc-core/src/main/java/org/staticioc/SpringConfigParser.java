@@ -38,6 +38,8 @@ import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.io.FilenameUtils;
 import org.staticioc.dependency.DefinitionDependency;
+import org.staticioc.dependency.FactoryBeanDependency;
+import org.staticioc.dependency.RunTimeDependency;
 import org.staticioc.model.*;
 import org.staticioc.model.Bean.Scope;
 import org.staticioc.parser.*;
@@ -263,6 +265,12 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 
 		bean.setFactoryBean(factoryBean);
 		bean.setFactoryMethod(factoryMethod);
+
+		if( factoryBean != null)
+		{
+			final RunTimeDependency factoryBeanDependency = new FactoryBeanDependency( id, factoryBean); // Factory-bean can refer to framework classes and thus must be "soft" 
+			registerRunTimeDependency( factoryBeanDependency );
+		}
 		
 		bean.setInitMethod(initMethod);
 		bean.setDestroyMethod(destroyMethod);

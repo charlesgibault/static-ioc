@@ -36,5 +36,7 @@
 	</bean>			
 	
 	<bean id="productFactory" class="test.ProductFactory"/>
+	
+	<bean id="product2" class="test.Product" factory-bean="productFactory" factory-method="createProduct"/>
 
 </beans>

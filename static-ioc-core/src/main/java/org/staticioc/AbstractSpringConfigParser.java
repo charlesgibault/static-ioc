@@ -278,11 +278,15 @@ public abstract class AbstractSpringConfigParser implements ParserConstants, Bea
 		} );
 	}
 	
+	public LinkedHashSet<String> getOrderedBeanIds()
+	{
+		return runTimeDependencyManager.resolveBeansOrder(beans.keySet(), this);
+	}
+	
 	public LinkedList<Bean> getOrderedBeans()
 	{
 		LinkedList<Bean> orderedBeans = new LinkedList<Bean>();
-		
-		LinkedHashSet<String> orderedIds = runTimeDependencyManager.resolveBeansOrder(beans.keySet(), this);
+		LinkedHashSet<String> orderedIds = getOrderedBeanIds();
 		
 		for ( String id : orderedIds)
 		{

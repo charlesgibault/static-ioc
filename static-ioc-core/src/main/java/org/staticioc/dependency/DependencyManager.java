@@ -81,7 +81,7 @@ public class DependencyManager<T extends Dependency>
 			}
 		}
 
-		// Then add all beans that have dependencies in the proper order
+		// Then add all beans that have dependencies in the proper order		
 		for( String parentName :  dependencyMap.keySet() )
 			{
 			resolveBean( parentName, ackContainer, visitedParents, new ResolvedDependencyCallback<T> ()
@@ -106,7 +106,7 @@ public class DependencyManager<T extends Dependency>
 	 * @param parentName
 	 * @throws XPathExpressionException 
 	 */
-	public void resolveBean( final String name, BeanContainer container, final Set<String> visitedBeans, ResolvedDependencyCallback<T> callback )
+	protected void resolveBean( final String name, BeanContainer container, final Set<String> visitedBeans, ResolvedDependencyCallback<T> callback )
 	{
 		// Grab dependency
 		final T dependency = dependencyMap.get(name);
@@ -135,8 +135,12 @@ public class DependencyManager<T extends Dependency>
 
 					if( parentBean == null ) // Dependency couldn't be resolved still (due to cycle)
 					{
-						logger.warn( "Unresolved dependency on bean {}. Ignoring", name );
-						return;
+						// Check if bean exist in the container
+						if( dependency.isStrict() )
+						{
+							logger.warn( "Unresolved dependency on bean {}. Ignoring", name );
+							return;
+						}
 					}
 				}
 				else

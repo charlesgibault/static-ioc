@@ -18,6 +18,8 @@
  */
 package org.staticioc;
 
+import java.util.LinkedHashSet;
+
 import org.junit.Assert;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -44,11 +46,13 @@ public class SpringConfigParserFactoryBeanTest extends AbstractSpringParserTest
 	{
 		// Retrieve personBean and test properties
 		Bean product = loadedBeans.get("product");
+		Bean product2 = loadedBeans.get("product2");
 		Bean subProduct = loadedBeans.get("subProduct");
 		Bean rpcService = loadedBeans.get("rpcService");
 		Bean productFactory = loadedBeans.get("productFactory");
 		
 		Assert.assertNotNull( product );
+		Assert.assertNotNull( product2 );
 		Assert.assertNotNull( subProduct );
 		Assert.assertNotNull( rpcService );
 		Assert.assertNotNull( productFactory );
@@ -61,6 +65,13 @@ public class SpringConfigParserFactoryBeanTest extends AbstractSpringParserTest
 		assertEquals("Factory method not properly set", "createProduct" , product.getFactoryMethod() );		
 		assertTrue("Constructor args found were not expected", product.getConstructorArgs().isEmpty() );
 
+		assertEquals("Bean id not properly set", "product2", product2.getId() );
+		assertEquals("Bean class not properly set", "test.Product", product2.getClassName() );
+		assertEquals("Bean type not properly set", Bean.Type.SIMPLE , product2.getType() );
+		assertEquals("Factory bean not properly set", "productFactory" , product2.getFactoryBean() );
+		assertEquals("Factory method not properly set", "createProduct" , product2.getFactoryMethod() );		
+		assertTrue("Constructor args found were not expected", product2.getConstructorArgs().isEmpty() );
+		
 		assertEquals("Bean id not properly set", "subProduct", subProduct.getId() );
 		assertEquals("Bean class not properly set", "test.SubProduct", subProduct.getClassName() );
 		assertEquals("Bean type not properly set", Bean.Type.SIMPLE , subProduct.getType() );
@@ -80,22 +91,10 @@ public class SpringConfigParserFactoryBeanTest extends AbstractSpringParserTest
 		assertEquals("Bean type not properly set", Bean.Type.SIMPLE , productFactory.getType() );
 		assertNull("Factory bean found were not expected" , productFactory.getFactoryBean() );
 		assertNull("Factory method found were not expected", productFactory.getFactoryMethod() );		
-		assertTrue("Constructor args found were not expected", productFactory.getConstructorArgs().isEmpty() );
-		
+		assertEquals("Constructor args found not found were expected", productFactory.getConstructorArgs().size(), 1 );
+				
 		// Ordering checks
-		assertEquals("Factory Bean expected to be inited before its product", 1, product.compareTo(productFactory) );
-		assertEquals("Factory Bean expected to be inited before its product", -1, productFactory.compareTo(product) );
-		
-		assertEquals("Factory Bean expected to be inited before its product", 1, subProduct.compareTo(productFactory) );
-		assertEquals("Factory Bean expected to be inited before its product", -1, productFactory.compareTo(subProduct) );
-		
-		assertTrue("Alphabetical ordering not respected when no dependency is found", subProduct.compareTo(product) > 0 );
-		assertTrue("Alphabetical ordering not respected when no dependency is found", product.compareTo(subProduct) < 0 );
-			
-		assertTrue("Alphabetical ordering not respected when no dependency is found", product.compareTo(rpcService) < 0 );
-		assertTrue("Alphabetical ordering not respected when no dependency is found", rpcService.compareTo(product) > 0);
-		
-		assertTrue("Alphabetical ordering not respected when no dependency is found", productFactory.compareTo(rpcService) < 0);
-		assertTrue("Alphabetical ordering not respected when no dependency is found", rpcService.compareTo(productFactory) > 0);
+		LinkedHashSet<String> orderedBeans = parser.getOrderedBeanIds();
+		assertEquals("Factory Bean ordering not correct", "[rpcService, productFactory, subProduct, product2, product]", orderedBeans.toString() );
 	}
 }
