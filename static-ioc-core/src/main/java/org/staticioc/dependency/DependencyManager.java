@@ -131,7 +131,7 @@ public class DependencyManager<T extends Dependency>
 		
 		if( dependency == null )
 		{
-			logger.warn( "Unresolved dependency on Bean {}. Ignoring", name );
+			logger.debug( "Unresolved dependency on Bean {}. Ignoring", name );
 			return;
 		}
 		
@@ -156,8 +156,12 @@ public class DependencyManager<T extends Dependency>
 						// Check if bean exist in the container
 						if( dependency.isStrict() )
 						{
-							logger.warn( "Unresolved dependency on bean {}. Ignoring", name );
+							logger.warn( "Unresolved dependency on bean {}. Ignoring bean", name );
 							return;
+						}
+						else
+						{
+							logger.debug( "Ignoring unresolved dependency on bean {}.", name );
 						}
 					}
 				}
