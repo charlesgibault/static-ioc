@@ -25,8 +25,6 @@ import org.staticioc.generator.CodeGenerator;
 import org.staticioc.helper.CodeGeneratorNameHelper;
 import org.staticioc.helper.IoCCompilerHelper;
 
-import org.slf4j.impl.StaticLoggerBinder;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
@@ -93,9 +91,6 @@ public class StaticIocMojo
      */
     public void execute() throws MojoExecutionException, MojoFailureException 
     {
-    	//Have the slf4j and maven logs communicate
-    	StaticLoggerBinder.getSingleton().setMavenLog( getLog() );
-    	
     	if( getLog().isDebugEnabled() )
     	{
     		getLog().debug("Using output Path " + outputPath);

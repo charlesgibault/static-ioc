@@ -66,8 +66,8 @@
     <module>static-ioc-samples</module>
   </modules>
   <properties>
-    <slf4j-version>1.6.6</slf4j-version>
-    <log4j-version>1.2.17</log4j-version>
+    <slf4j-version>1.7.5</slf4j-version>
+    <logback-version>1.0.13</logback-version>
     <commons-lang-version>2.6</commons-lang-version>
     <commons-io-version>2.2</commons-io-version>
     <junit-version>4.10</junit-version>
@@ -135,15 +135,9 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>${slf4j-version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>${log4j-version}</version>
+    	<groupId>ch.qos.logback</groupId>
+    	<artifactId>logback-classic</artifactId>
+	<version>${logback-version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
