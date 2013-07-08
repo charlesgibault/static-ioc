@@ -391,7 +391,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 
 		// Now resolve every beans
 		resolveParentDefinition();
-		resolvePrototypeBeans();
+		resolveReferences();
 		
 
 		return getBeans();
@@ -447,11 +447,10 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 			if( resolveBean)
 			{
 				resolveParentDefinition();
-				resolvePrototypeBeans();
 			}
 
 			// Finally resolve alias references
-			resolveAliasReference();
+			resolveReferences();
 		}
 		catch( XPathExpressionException e)
 		{
