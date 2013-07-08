@@ -1,5 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-
+  <parent>
+    <groupId>org.sonatype.oss</groupId>
+    <artifactId>oss-parent</artifactId>
+    <version>7</version>
+  </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.googlecode.staticioc</groupId>
   <artifactId>staticioc-parent</artifactId>
@@ -20,6 +24,7 @@
     <developer>
       <id>charles.gibault</id>
       <name>Charles Gibault</name>
+      <email>charlesgibault+staticioc@gmail.com</email>
       <roles>
         <role>architect</role>
         <role>developer</role>
@@ -44,8 +49,8 @@
     <url>https://code.google.com/p/static-ioc/issues/list</url>
   </issueManagement>
   <scm>
-    <developerConnection>
-    scm:git:https://code.google.com/p/static-ioc/</developerConnection>
+    <connection>scm:git:https://code.google.com/p/static-ioc/</connection>
+    <developerConnection>scm:git:https://code.google.com/p/static-ioc/</developerConnection>
     <url>https://code.google.com/p/static-ioc/source/browse/</url>
     <tag>HEAD</tag>
   </scm>
@@ -127,6 +132,35 @@
       </plugins>
     </pluginManagement>
   </build>
+  <profiles>
+    <profile>
+      <id>release-sign-artifacts</id>
+      <activation>
+        <property>
+          <name>performRelease</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.4</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+       </plugins>
+      </build>
+    </profile>
+  </profiles>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>
