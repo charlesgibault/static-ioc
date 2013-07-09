@@ -24,7 +24,7 @@ import java.util.Map;
 public class AcknowledgeableBeanContainer implements BeanContainer
 {
 	private final BeanContainer instance;
-	private Map<String, Bean> knownBeans = new HashMap<String, Bean>();
+	private final Map<String, Bean> knownBeans = new HashMap<String, Bean>();
 	
 	public AcknowledgeableBeanContainer( BeanContainer instance )
 	{

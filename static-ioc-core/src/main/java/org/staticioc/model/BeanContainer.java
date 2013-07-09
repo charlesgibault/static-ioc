@@ -24,5 +24,5 @@ public interface BeanContainer
 {
 	Bean getBean( final String id);
 	
-	public Map<String, Bean > getBeans();
+	Map<String, Bean > getBeans();
 }

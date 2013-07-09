@@ -40,7 +40,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.staticioc.dependency.DefinitionDependency;
 import org.staticioc.dependency.FactoryBeanDependency;
 import org.staticioc.dependency.RunTimeDependency;
-import org.staticioc.model.*;
+import org.staticioc.model.Bean;
+import org.staticioc.model.Property;
 import org.staticioc.model.Bean.Scope;
 import org.staticioc.parser.*;
 import org.staticioc.parser.plugins.*;
@@ -419,11 +420,11 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	protected Map<String, Bean> load( String configurationFile, Set<String> loadedContext, boolean resolveBean) throws SAXException, IOException
+	protected Map<String, Bean> load( String entryFile, Set<String> loadedContext, boolean resolveBean) throws SAXException, IOException
 	{
 		// Start by keeping track of loaded file (after normalizing its name)
-		final String fullPath = FilenameUtils.getFullPath( configurationFile ) ; 
-		configurationFile = FilenameUtils.concat( fullPath, FilenameUtils.getName( configurationFile ) );
+		final String fullPath = FilenameUtils.getFullPath( entryFile ) ; 
+		final String configurationFile = FilenameUtils.concat( fullPath, FilenameUtils.getName( entryFile ) );
 		loadedContext.add( configurationFile);
 
 		final Document confFileDom = db.parse( configurationFile );

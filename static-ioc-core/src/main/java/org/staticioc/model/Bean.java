@@ -39,8 +39,8 @@ public class Bean implements Comparable<Bean>
 	private boolean anonymous = false;
 	private boolean isAbstract = false;
 
-	private Collection<Property> properties = new HashSet<Property>();
-	private Set<Property> constructorArgs = new LinkedHashSet<Property>();
+	private final Collection<Property> properties = new HashSet<Property>();
+	private final Set<Property> constructorArgs = new LinkedHashSet<Property>();
 	
 	private String factoryBean=null;
 	private String factoryMethod=null;

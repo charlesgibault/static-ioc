@@ -24,7 +24,7 @@ import java.util.List;
 
 public class CollectionBean extends Bean
 {
-	private List<Property> properties = new LinkedList<Property>();
+	private final List<Property> properties = new LinkedList<Property>();
 
 	public Collection<Property> getProperties() {
 		return properties;
