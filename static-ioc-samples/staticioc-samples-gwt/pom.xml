@@ -37,7 +37,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.10</version>
+      <version>${junit-version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -62,7 +62,7 @@
     <plugins>
       <!-- StaticIoc Maven plugin -->
       <plugin>
-        <groupId>org.staticioc</groupId>
+        <groupId>com.googlecode.static-ioc</groupId>
         <artifactId>staticioc-maven-plugin</artifactId>
         <version>${project.version}</version>
         <executions>
@@ -131,6 +131,17 @@
         <configuration>
           <source>1.6</source>
           <target>1.6</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.15</version>
+        <configuration>
+          <systemPropertyVariables>
+	     <gwt.persistentunitcache>false</gwt.persistentunitcache>
+             <buildDirectory>${project.build.directory}</buildDirectory>
+          </systemPropertyVariables>
         </configuration>
       </plugin>
     </plugins>
