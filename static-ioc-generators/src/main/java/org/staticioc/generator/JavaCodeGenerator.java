@@ -67,7 +67,7 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 			break;
 			
 		case METHOD:
-			getBuilder().append( CLASS_INDENT + "// ").append(comment).append("\n");
+			getBuilder().append( METHOD_INDENT + "// ").append(comment).append("\n");
 			break;			
 		}
 	}
