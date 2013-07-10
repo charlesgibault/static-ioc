@@ -141,6 +141,10 @@ public class IoCCompilerHelperTest
 		result = IoCCompilerHelper.getTargetMapping(":s;");
 		Assert.assertEquals( "More elements than expected", 0, result.keySet().size() );
 		
+		// missing target before :
+		result = IoCCompilerHelper.getTargetMapping("s;");
+		Assert.assertEquals( "More elements than expected", 0, result.keySet().size() );
+		
 		// : as last character
 		result = IoCCompilerHelper.getTargetMapping("test:;target:");
 		Assert.assertEquals( "More elements than expected", 0, result.keySet().size() );

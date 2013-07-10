@@ -18,7 +18,8 @@
  */
 package org.staticioc.generator;
 
-import org.staticioc.model.*;
+import org.staticioc.model.Bean;
+import org.staticioc.model.Property;
 
 /**
  * @author Charles Gibault

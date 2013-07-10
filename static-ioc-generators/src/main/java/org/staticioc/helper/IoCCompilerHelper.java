@@ -107,7 +107,7 @@ public class IoCCompilerHelper
 				continue;
 			}
 			
-			int targetSourceSeparator = trimmedMapping.indexOf( ":" );
+			int targetSourceSeparator = trimmedMapping.indexOf( ':' );
 			
 			if( targetSourceSeparator < 0 )
 			{

@@ -29,12 +29,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
 import org.xml.sax.SAXException;
 
 import org.staticioc.generator.CodeGenerator;
 import org.staticioc.generator.CodeGenerator.Level;
-import org.staticioc.model.*;
+import org.staticioc.model.Bean;
+import org.staticioc.model.Property;
 import org.staticioc.model.Bean.Scope;
 
 public class SpringStaticFactoryGenerator implements IoCCompiler
@@ -42,9 +42,9 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 	private static final Logger logger  = LoggerFactory.getLogger(SpringStaticFactoryGenerator.class);
 	
 	private final static int INIT_BUFFER_SIZE = 4096;
-	private static final String[] EMPTY_STRING_ARRAY = new String[]{};
+	private final static String[] EMPTY_STRING_ARRAY = new String[]{};
 		
-	private String commentHeader = "This code has been generated using Static IoC framework (http://code.google.com/p/static-ioc/). DO NOT EDIT MANUALLY HAS CHANGES MAY BE OVERRIDEN";
+	private final static String COMMENT_HEADER = "This code has been generated using Static IoC framework (http://code.google.com/p/static-ioc/). DO NOT EDIT MANUALLY HAS CHANGES MAY BE OVERRIDEN";
 		
 	private boolean ignoreUnresolvedRefs = true;
 	
@@ -66,14 +66,14 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 	}
 	
 	@Override
-	public void compile( final CodeGenerator generator, String outputPath, final Map< String, List< String >> inputOutputMapping, String fileExtensionOverride ) throws SAXException,
+	public void compile( final CodeGenerator generator, String oPath, final Map< String, List< String >> inputOutputMapping, String fileExtOverride ) throws SAXException,
 	IOException, ParserConfigurationException
 	{
 		// Check if a valid extension override was provided
-		fileExtensionOverride = (fileExtensionOverride == null) ? generator.getDefaultSourceFileExtension() : fileExtensionOverride;
+		final String fileExtensionOverride = (fileExtOverride == null) ? generator.getDefaultSourceFileExtension() : fileExtOverride;
 		
 		// Check if outputPath actually ends with a trailing / or not
-		outputPath = ( outputPath.endsWith(File.separator) ) ? outputPath : outputPath + File.separator;
+		final String outputPath = ( oPath.endsWith(File.separator) ) ? oPath : oPath + File.separator;
 		
 		//Build complete output file path:
 		for( final String targetClass : inputOutputMapping.keySet() )
@@ -96,7 +96,6 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 	/**
 	 * Entry point for the service : generate code matching setup configuration file.
 	 * @return
-	 * @throws XPathExpressionException
 	 * @throws IOException 
 	 * @throws SAXException 
 	 * @throws ParserConfigurationException 
@@ -114,7 +113,7 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 		List<Bean> initRequiredBeans = new LinkedList<Bean>();
 		List<Bean> destroyRequiredBeans = new LinkedList<Bean>();
 		
-		codeGenerator.comment(Level.HEADER, commentHeader );
+		codeGenerator.comment(Level.HEADER, COMMENT_HEADER );
 
 		codeGenerator.initPackage( generatedPackageName );		
 		codeGenerator.initClass( generatedClassName );

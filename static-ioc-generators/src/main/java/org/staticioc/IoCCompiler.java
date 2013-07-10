@@ -36,6 +36,6 @@ import org.xml.sax.SAXException;
  */
 public interface IoCCompiler
 {
-	public void compile( CodeGenerator generator, String outputPath, Map<String, List<String>> inputOutputMapping )  throws SAXException, IOException, ParserConfigurationException;
-	public void compile( CodeGenerator generator, String outputPath, Map<String, List<String>> inputOutputMapping, String fileExtensionOverride )  throws SAXException, IOException, ParserConfigurationException;
+	void compile( CodeGenerator generator, String outputPath, Map<String, List<String>> inputOutputMapping )  throws SAXException, IOException, ParserConfigurationException;
+	void compile( CodeGenerator generator, String outputPath, Map<String, List<String>> inputOutputMapping, String fileExtensionOverride )  throws SAXException, IOException, ParserConfigurationException;
 }

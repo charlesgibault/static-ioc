@@ -34,12 +34,21 @@ public class CodeGeneratorNameHelperTest {
 	}
 	
 	/**
+	 * Check a null target language
+	 */
+	@Test(expected = IllegalArgumentException.class) 
+	public void testNullGeneratorClass()
+	{
+		CodeGeneratorNameHelper.getGeneratorClass(null);
+	}
+		
+	/**
 	 * Check a non existing target language
 	 */
 	@Test(expected = IllegalArgumentException.class) 
 	public void testNonExistingGeneratorClass()
 	{
-		CodeGeneratorNameHelper.getGeneratorClass( "esperanto");
+		CodeGeneratorNameHelper.getGeneratorClass("esperanto");
 	}
 	
 	/**
@@ -48,6 +57,6 @@ public class CodeGeneratorNameHelperTest {
 	@Test(expected = IllegalArgumentException.class) 
 	public void testUnsupportedGeneratorClass()
 	{
-		CodeGeneratorNameHelper.getGeneratorClass( "cpp");
+		CodeGeneratorNameHelper.getGeneratorClass("cpp");
 	}
 }

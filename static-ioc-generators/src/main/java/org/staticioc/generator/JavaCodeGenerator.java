@@ -19,7 +19,8 @@
 package org.staticioc.generator;
 
 import org.apache.commons.lang.WordUtils;
-import org.staticioc.model.*;
+import org.staticioc.model.Bean;
+import org.staticioc.model.Property;
 
 public class JavaCodeGenerator extends AbstractCodeGenerator
 {
@@ -42,15 +43,12 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 				{
 					return "put( " + property.getName() + ", ";
 				}
-				else
-				{
-					return "put( \"" + property.getName() + "\", ";
-				}			
+
+				return "put( \"" + property.getName() + "\", ";			
 				
 			case PROPERTIES:
 				return "setProperty( \"" + property.getName() + "\", ";
 			default:
-					
 				return getSetterName(property) + "( ";
 		}
 	}
@@ -65,12 +63,12 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 			break;
 			
 		case CLASS:
-			getBuilder().append( "\t/**\n\t * ").append(comment).append("\n*/\t\n");
+			getBuilder().append( CLASS_INDENT + "/**\n" + CLASS_INDENT + " * ").append(comment).append("\n*/" + CLASS_INDENT + "\n");
 			break;
 			
 		case METHOD:
-			getBuilder().append( "\t\t// ").append(comment).append("\n");
-			break;
+			getBuilder().append( CLASS_INDENT + "// ").append(comment).append("\n");
+			break;			
 		}
 	}
 		
@@ -90,13 +88,13 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 	@Override
 	public void initConstructor( String className )
 	{
-		getBuilder().append("\tpublic ").append(className).append("()\n\t{\n" );	
+		getBuilder().append(CLASS_INDENT + "public ").append(className).append("()\n" + CLASS_INDENT + "{\n" );	
 	}
 	
 	@Override
 	public void closeConstructor(String className)
 	{		
-		getBuilder().append( "\n\t}" );
+		getBuilder().append( "\n" + CLASS_INDENT + "}" );
 	}
 	
 	@Override
@@ -104,11 +102,11 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 	{
 		if ( bean.isAnonymous() )
 		{
-			getBuilder().append("\tprivate ");
+			getBuilder().append(CLASS_INDENT + "private ");
 		}
 		else
 		{
-			getBuilder().append("\tpublic ");
+			getBuilder().append(CLASS_INDENT + "public ");
 		}
 			
 		getBuilder().append( getBeanClass( bean ) ).append(" ").append( bean.getId() ).append( ";\n" );
@@ -134,7 +132,7 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 	@Override
 	public void instantiateBean( Bean bean )
 	{
-		getBuilder().append("\t\t").append( bean.getId() ).append( " = new " ).append( getBeanClass( bean ) ).append("(");
+		getBuilder().append(METHOD_INDENT).append( bean.getId() ).append( " = new " ).append( getBeanClass( bean ) ).append("(");
 		appendConstructorArgs(bean);
 		getBuilder().append(");\n");
 	}
@@ -142,7 +140,7 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 	@Override
 	public void instantiateBeanWithFactory( Bean bean )
 	{
-		getBuilder().append("\t\t").append( bean.getId() ).append( " = " ).append( bean.getFactoryBean() ).append(".").append(getFactoryMethod(bean)).append("(");		
+		getBuilder().append(METHOD_INDENT).append( bean.getId() ).append( " = " ).append( bean.getFactoryBean() ).append(".").append(getFactoryMethod(bean)).append("(");		
 		appendConstructorArgs(bean);
 		getBuilder().append(");\n");
 	}
@@ -150,7 +148,7 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 	@Override
 	public void declareProperty( Bean bean, final Property property )
 	{
-		getBuilder().append( "\t\t").append( bean.getId() ).append("." ).append( getAssignMethod( bean, property ) );
+		getBuilder().append( METHOD_INDENT).append( bean.getId() ).append("." ).append( getAssignMethod( bean, property ) );
 		appendPropertyValue( property );
 		getBuilder().append( " );\n" );	
 	}
@@ -185,18 +183,18 @@ public class JavaCodeGenerator extends AbstractCodeGenerator
 	@Override
 	public void initDestructor( String className )
 	{
-		getBuilder().append("\tpublic void destroyContext()\n\t{\n" );
+		getBuilder().append(CLASS_INDENT + "public void destroyContext()\n" + CLASS_INDENT + "{\n" );
 	}
 	
 	@Override
 	public void closeDestructor( String className )
 	{
-		getBuilder().append( "\n\t}" );	
+		getBuilder().append( "\n" + CLASS_INDENT + "}" );	
 	}
 
 	@Override
 	public void deleteBean( Bean bean )
 	{
-		getBuilder().append( "\t\t" ).append( bean.getId() ).append(" = null;\n");
+		getBuilder().append( METHOD_INDENT ).append( bean.getId() ).append(" = null;\n");
 	}
 }

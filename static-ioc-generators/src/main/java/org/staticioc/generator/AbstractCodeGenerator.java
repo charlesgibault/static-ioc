@@ -23,6 +23,9 @@ import org.staticioc.model.Property;
 
 public abstract class AbstractCodeGenerator implements CodeGenerator
 {
+	protected final static String METHOD_INDENT = "\t\t";
+	protected final static String CLASS_INDENT = "\t";
+	
 	private StringBuilder builder;
 	
 	public final StringBuilder getBuilder() {
