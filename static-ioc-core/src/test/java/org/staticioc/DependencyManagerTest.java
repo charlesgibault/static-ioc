@@ -33,8 +33,6 @@ import org.staticioc.model.BeanContainer;
 
 public class DependencyManagerTest
 {
-	
-	
 	@Test
 	public void testRunTimeDependencyResolution()
 	{
