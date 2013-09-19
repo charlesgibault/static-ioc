@@ -104,6 +104,7 @@
           <runTarget>SampleGwtApplication.html</runTarget>
           <hostedWebapp>${webappDirectory}</hostedWebapp>
           <i18nMessagesBundle>org.staticioc.samples.gwt.client.Messages</i18nMessagesBundle>
+          <mode>htmlunit</mode> 
         </configuration>
       </plugin>
 
