@@ -38,7 +38,12 @@ public class SpringConfigParserCollectionTest extends AbstractSpringParserTest
 			
 	public SpringConfigParserCollectionTest() throws Exception 
 	{
-		super( TEST_CONTEXT );
+		this( TEST_CONTEXT );
+	}
+	
+	protected SpringConfigParserCollectionTest(String context) throws Exception 
+	{
+		super( context );
 		collectBean = loadedBeans.get("collectBean");
 		
 		Assert.assertNotNull( "collectBean not found", collectBean);

@@ -37,6 +37,11 @@ public class SpringConfigParserSimpleBeanTest extends AbstractSpringParserTest
 		super( TEST_CONTEXT );
 	}
 	
+	protected SpringConfigParserSimpleBeanTest(String context) throws Exception 
+	{
+		super( context );
+	}
+	
 	/**
 	 * Simple Bean loading validation : personBean
 	 * 

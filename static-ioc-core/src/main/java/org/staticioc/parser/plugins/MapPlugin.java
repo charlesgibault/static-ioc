@@ -23,19 +23,15 @@ import javax.xml.xpath.XPathExpressionException;
 import org.staticioc.model.Bean;
 import org.staticioc.model.CollectionBean;
 import org.staticioc.model.Property;
-import org.staticioc.parser.BeanParser;
-import org.staticioc.parser.NodeSupportPlugin;
-import org.staticioc.parser.ParserConstants;
 import org.staticioc.parser.ParserHelper;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class MapPlugin implements NodeSupportPlugin, ParserConstants
+public class MapPlugin extends AbstractNodeSupportPlugin
 {
-	protected BeanParser container;
-
-	public String getSupportedNode()
+	@Override
+	public String getUnprefixedSupportedNode()
 	{
 		return MAP;
 	}
@@ -66,9 +62,8 @@ public class MapPlugin implements NodeSupportPlugin, ParserConstants
 		for (int e = 0 ; e < entries.getLength() ; ++e )
 		{
 			final Node entry = entries.item( e );
-			final String entryNodeName = entry.getNodeName();
-			
-			if( !entryNodeName.equals( ENTRY ) ) // ignore non <entry> nodes
+						
+			if( ! ParserHelper.match( ENTRY, entry.getNodeName(), prefix) ) // ignore non <entry> nodes
 			{
 				continue;
 			}
@@ -176,11 +171,5 @@ public class MapPlugin implements NodeSupportPlugin, ParserConstants
 				container.addOrReplaceProperty(prop, collecBean.getProperties() );
 			}
 		}
-	}
-
-	@Override
-	public void setBeanContainer(BeanParser container)
-	{
-		this.container = container;
 	}
 }

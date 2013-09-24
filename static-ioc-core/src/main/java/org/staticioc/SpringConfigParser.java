@@ -44,7 +44,7 @@ import org.staticioc.model.Bean;
 import org.staticioc.model.Property;
 import org.staticioc.model.Bean.Scope;
 import org.staticioc.parser.*;
-import org.staticioc.parser.plugins.*;
+import org.staticioc.parser.namespace.*;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -59,10 +59,14 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 
 	private final XPathExpression xBeans;
 	private final XPathExpression xImports;
+	private final XPathExpression xBeanRoot;
 
-	//TODO put that into a PluginChain
+	// Plugin chains
 	private final Collection<NodeParserPlugin> nodeParserPlugins = new LinkedList<NodeParserPlugin>();
-	private final Map<String, NodeSupportPlugin> nodesSupportPlugins = new ConcurrentHashMap<String, NodeSupportPlugin>();	
+	private final Map<String, NodeSupportPlugin> nodesSupportPlugins = new ConcurrentHashMap<String, NodeSupportPlugin>();
+	
+	// Prefix for the Spring beans namespace
+	private String prefix = "";
 
 	public SpringConfigParser() throws ParserConfigurationException
 	{
@@ -88,45 +92,54 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 
 			final XPath xPathImports  = xPathFactory.newXPath();
 			xImports = xPathImports.compile(XPATH_IMPORT);
+
+			final XPath xPathBeanRoot  = xPathFactory.newXPath();
+			xBeanRoot = xPathBeanRoot.compile(XPATH_BEANS_NODE);
 		}
 		catch( XPathExpressionException e )
 		{
 			throw new ParserConfigurationException( "Error compiling XPaths :" + e.getMessage() );
 		}
-
-		// Load plugins
-		NodeParserPlugin springPPluging = new SpringPParserPlugin();
-		NodeParserPlugin constructorArgsPlugin = new ConstructorArgsPlugin();
-		NodeParserPlugin beanPropertiesPlugin = new BeanPropertiesParserPlugin();
-
-		springPPluging.setBeanContainer(this);
-		constructorArgsPlugin.setBeanContainer(this);
-		beanPropertiesPlugin.setBeanContainer(this);
-
-		nodeParserPlugins.add( springPPluging );
-		nodeParserPlugins.add( constructorArgsPlugin );
-		nodeParserPlugins.add( beanPropertiesPlugin );
-
-
-		NodeSupportPlugin listPlugin = new ListPlugin();
-		NodeSupportPlugin setPlugin = new SetPlugin();
-		NodeSupportPlugin mapPlugin = new MapPlugin();
-		NodeSupportPlugin propertiesPlugin = new PropertiesPlugin();
-
-		listPlugin.setBeanContainer(this);
-		setPlugin.setBeanContainer(this);
-		mapPlugin.setBeanContainer(this);
-		propertiesPlugin.setBeanContainer(this);
-
-		nodesSupportPlugins.put(listPlugin.getSupportedNode(), listPlugin);
-		nodesSupportPlugins.put(setPlugin.getSupportedNode(), setPlugin);
-		nodesSupportPlugins.put(mapPlugin.getSupportedNode(), mapPlugin);
-		nodesSupportPlugins.put(propertiesPlugin.getSupportedNode(), propertiesPlugin);
 	}
 
 	@Override
 	public XPathFactory getXPathFactory() {
 		return xPathFactory;
+	}
+
+	protected Map<String, String> extractNamespacePrefix( final Document confFileDom ) throws XPathExpressionException
+	{
+		final Map<String, String> namespacePrefix = new ConcurrentHashMap<String, String> ();
+
+		final NodeList beansRoot = (NodeList) xBeanRoot.evaluate(confFileDom, XPathConstants.NODESET);
+
+		for( int i = 0 ; i < beansRoot.getLength() ; ++i)
+		{
+			Node beansNode = beansRoot.item(i);
+			NamedNodeMap attributes = beansNode.getAttributes();
+
+			for( int a = 0 ; a < attributes.getLength(); ++a )
+			{
+				final Node attribute = attributes.item(a);
+				final String attributeValue = attribute.getNodeName();
+
+				if( attributeValue != null && attributeValue.startsWith(XML_NAMESPACE_DEF) ) // its a namespace declaration
+				{
+					final String schemaUrl = attribute.getNodeValue();					
+					String prefix  = "";
+					
+					if( attributeValue.contains(":") ) // prefix
+					{
+						prefix = attributeValue.split(":")[1];
+					}
+					
+					logger.debug( "schemaUrl {} has prefix {} ", schemaUrl, prefix );
+					namespacePrefix.put(schemaUrl, prefix);
+				}
+			}
+		}
+		
+		return namespacePrefix;
 	}
 
 	protected String createBean( final Node beanNode ) throws XPathExpressionException
@@ -231,7 +244,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		// Handle init/destroy methods here:
 		String initMethod=(bean != null)? bean.getInitMethod() : null;
 		String destroyMethod=(bean != null)? bean.getDestroyMethod() : null;
-		
+
 		final Node initMethodBeanNode = beanAttributes.getNamedItem(INIT_METHOD);
 		final Node destroyMethodNode = beanAttributes.getNamedItem(DESTROY_METHOD);
 		if ( initMethodBeanNode != null )
@@ -242,7 +255,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		{
 			destroyMethod = destroyMethodNode.getNodeValue();
 		}
-		
+
 		// Class is mandatory for non abstract beans
 		if( className == null && !abstractBean)
 		{
@@ -272,7 +285,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 			final RunTimeDependency factoryBeanDependency = new FactoryBeanDependency( id, factoryBean); // Factory-bean can refer to framework classes and thus must be "soft" 
 			registerRunTimeDependency( factoryBeanDependency );
 		}
-		
+
 		bean.setInitMethod(initMethod);
 		bean.setDestroyMethod(destroyMethod);
 
@@ -322,13 +335,13 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 			throws XPathExpressionException
 			{
 		final String spNodeName = node.getNodeName();
-
+		
 		if( nodesSupportPlugins.containsKey( spNodeName) )
 		{
 			NodeSupportPlugin plugin = nodesSupportPlugins.get(spNodeName);
 			return plugin.handleNode(node, propName);
 		}
-		else if ( spNodeName.equals( REF ) || spNodeName.equals( IDREF ) ) // Look at children named ref / idref
+		else if ( ParserHelper.match( REF, spNodeName, prefix) || ParserHelper.match( IDREF, spNodeName, prefix) ) // Look at children named ref / idref
 		{
 			final NamedNodeMap spNodeAttributes = node.getAttributes();
 			final Node refNode = spNodeAttributes.getNamedItem(BEAN);
@@ -342,7 +355,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 				return ParserHelper.getRef( propName, ParserHelper.extractFirstChildValue(node) );
 			}
 		}
-		else if ( spNodeName.equals( VALUE ) ) // Look at children named value
+		else if ( ParserHelper.match( VALUE, spNodeName, prefix) ) // Look at children named value
 		{						
 			final Property res =  ParserHelper.getVal( propName, ParserHelper.extractFirstChildValue(node) ); 
 
@@ -356,7 +369,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 
 			return res;
 		}
-		else if  ( spNodeName.equals( BEAN ) ) // anonymous bean
+		else if  ( ParserHelper.match( BEAN, spNodeName, prefix) ) // anonymous bean
 		{
 			// recursively create bean
 			final String subBeanName = createBean( node );
@@ -366,7 +379,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 				return ParserHelper.getRef( propName, subBeanName );
 			}
 		}
-		else if  ( spNodeName.equals( NULL ) ) // null value
+		else if  ( ParserHelper.match( NULL, spNodeName, prefix) ) // null value
 		{
 			return new Property( propName, null, null );
 		}
@@ -393,7 +406,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		// Now resolve every beans
 		resolveParentDefinition();
 		resolveReferences();
-		
+
 
 		return getBeans();
 	}
@@ -431,10 +444,62 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 
 		try
 		{
+			logger.debug( "Starting loading of {}", configurationFile);
+			
+			// Extract namespaces and load matching namespace plugins
+			Map<String, String> namespaces = extractNamespacePrefix(confFileDom);
+		
+			
+			// TODO make loading flexible enough to have a namespace plugin mechanism here
+			SpringBeansNameSpaceParser springBeansParser = new SpringBeansNameSpaceParser();
+			springBeansParser.setBeanContainer(this);
+
+			SpringPNameSpaceParser springPNameSpaceParser = new SpringPNameSpaceParser();
+			springPNameSpaceParser.setBeanContainer(this);
+
+			if( namespaces.containsKey( springBeansParser.getNameSpaceUri() ) )
+			{
+				prefix = namespaces.get( springBeansParser.getNameSpaceUri() );
+				springBeansParser.setPrefix( prefix );
+				
+				logger.debug("Namespace {}. Adding {} node parser plugins", springBeansParser.getNameSpaceUri(), springBeansParser.getNodeParserPlugins().size() );
+				
+				nodeParserPlugins.addAll( springBeansParser.getNodeParserPlugins() );
+				
+				for( NodeSupportPlugin plugin : springBeansParser.getNodeSupportPlugins() )
+				{
+					final String supportedNode = plugin.getSupportedNode();
+					logger.debug("Namespace {}. Adding node support plugin for {} nodes", springBeansParser.getNameSpaceUri(), supportedNode );
+					
+					nodesSupportPlugins.put(supportedNode, plugin);
+				}
+			}
+			else
+			{
+				logger.warn( "Main beans namespace ({}) is not included in {}", springBeansParser.getNameSpaceUri(), configurationFile );
+			}
+			
+			if( namespaces.containsKey( springPNameSpaceParser.getNameSpaceUri() ) )
+			{
+				springPNameSpaceParser.setPrefix( namespaces.get( springPNameSpaceParser.getNameSpaceUri() ) );
+
+				logger.debug("Namespace {}. Adding {} node parser plugins", springPNameSpaceParser.getNameSpaceUri(), springPNameSpaceParser.getNodeParserPlugins().size() );
+				
+				nodeParserPlugins.addAll( springPNameSpaceParser.getNodeParserPlugins() );
+
+				for( NodeSupportPlugin plugin : springPNameSpaceParser.getNodeSupportPlugins() )
+				{
+					final String supportedNode = plugin.getSupportedNode();
+					logger.debug("Namespace {}. Adding node support plugin for {} nodes", springBeansParser.getNameSpaceUri(), supportedNode );
+					
+					nodesSupportPlugins.put(supportedNode, plugin);
+				}
+			}
+		
+		
 			final NodeList importsRef = (NodeList) xImports.evaluate(confFileDom, XPathConstants.NODESET);
 			final NodeList beansRef = (NodeList) xBeans.evaluate(confFileDom, XPathConstants.NODESET);
-			// TODO plug special namespace plugins here
-
+			
 			// Start by recursively resolve all imports
 			resolveImports(importsRef, loadedContext, fullPath);
 
@@ -469,7 +534,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 				logger.debug( "Registered bean {}", beanName);
 			}
 		}
-		
+
 		return getBeans();
 	}
 
@@ -504,6 +569,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 				if ( !loadedContext.contains( importedFileName ) )
 				{
 					SpringConfigParser subParser = new SpringConfigParser();
+					logger.debug( "Importing {}", importedFileName);
 					Map<String,Bean> importedBeans = subParser.load( importedFileName, loadedContext, false );
 
 					register( importedBeans );
@@ -513,9 +579,6 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		}
 	}
 
-	//TODO add more control on target class : inheritance, lifecycle
+	//TODO split file loading part, Spring beans parser and bean container?
 	//TODO add (partial) support for PropertyPlaceHolders
-	//TODO add support for init-method and a init() method
-	//TODO add support for depends-on (in init-method)
-	//TODO add support for destroy-method and a teardDown() method ?	
 }

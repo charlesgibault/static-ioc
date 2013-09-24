@@ -26,9 +26,6 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.staticioc.model.Bean;
 import org.staticioc.model.Property;
-import org.staticioc.parser.BeanParser;
-import org.staticioc.parser.NodeParserPlugin;
-import org.staticioc.parser.ParserConstants;
 import org.staticioc.parser.ParserHelper;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -37,9 +34,8 @@ import org.w3c.dom.NodeList;
 /**
  * Handle property element
  */
-public class BeanPropertiesParserPlugin implements NodeParserPlugin, ParserConstants
+public class BeanPropertiesParserPlugin extends AbstractNodeParserPlugin
 {
-	protected BeanParser container;
 	private XPathExpression xProps;
 
 	@Override
@@ -91,11 +87,5 @@ public class BeanPropertiesParserPlugin implements NodeParserPlugin, ParserConst
 			}
 		}
 		return xProps;
-	}
-
-	@Override
-	public void setBeanContainer(BeanParser container)
-	{
-		this.container = container;
 	}
 }

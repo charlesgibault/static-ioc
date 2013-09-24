@@ -30,7 +30,13 @@ public interface NodeSupportPlugin
 	 * @return name of the supported type
 	 */
 	String getSupportedNode();
-	
+
+	/**
+	 * Declare the prefix for this namespace in the current document
+	 * @param prefix
+	 */
+	void setPrefix(String prefix);
+
 	/**
 	 * Process a special node type and encapsulate the result as a Property
 	 * @param node Node to process
@@ -39,7 +45,7 @@ public interface NodeSupportPlugin
 	 * @throws XPathExpressionException
 	 */
 	Property handleNode( final Node node, final String name ) throws XPathExpressionException;
-	
+
 	/**
 	 * A reference to the bean container
 	 * @param container

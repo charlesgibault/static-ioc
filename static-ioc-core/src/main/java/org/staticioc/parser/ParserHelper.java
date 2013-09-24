@@ -113,16 +113,18 @@ public class ParserHelper implements ParserConstants
 	 * @param name
 	 * @return
 	 */
-	public  static Collection<Node> extractNodesByName(final NodeList nodes, final String name) {
+	public  static Collection<Node> extractNodesByName(final NodeList nodes, final String name, final String namespacePrefix) {
 		Collection<Node> result = new LinkedList<Node>();
-
+		
 		if(nodes != null && name != null )
-		{	
+		{
+			final String fullName = prefixedName(namespacePrefix, name);
+			
 			for( int n = 0 ; n<nodes.getLength() ; ++n )
 			{
 				final Node node = nodes.item( n );
 
-				if ( name.equals(node.getNodeName()) )
+				if ( fullName.equals(node.getNodeName()) )
 				{
 					result.add( node );
 				}
@@ -130,5 +132,29 @@ public class ParserHelper implements ParserConstants
 		}
 
 		return result;
+	}
+	
+	/**
+	 * Build full name of an element given the prefix of its namespace
+	 * @param prefix of the namespace the element belongs to
+	 * @param name of the element
+	 * @return exact name of the element as it is expected in present document
+	*/
+	public static String prefixedName(String prefix, String name) //TODO cache
+	{
+		if ( "".equals(prefix) || prefix == null )
+		{
+			return name;
+		}
+		
+		StringBuilder sb = new StringBuilder(prefix);
+		sb.append( ':');
+		sb.append(name);
+		return sb.toString();
+	} 
+	
+	public static boolean match( String expectedName, String nodeName, String prefix) //TODO cache
+	{
+		return prefixedName(prefix, expectedName).equals(nodeName);
 	}
 }

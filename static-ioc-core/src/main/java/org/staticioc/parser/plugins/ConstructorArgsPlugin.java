@@ -30,13 +30,11 @@ import org.staticioc.dependency.RunTimeDependency;
 import org.staticioc.model.Bean;
 import org.staticioc.model.Property;
 import org.staticioc.parser.BeanParser;
-import org.staticioc.parser.NodeParserPlugin;
-import org.staticioc.parser.ParserConstants;
 import org.staticioc.parser.ParserHelper;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-public class ConstructorArgsPlugin implements NodeParserPlugin, ParserConstants
+public class ConstructorArgsPlugin extends AbstractNodeParserPlugin
 {
 	protected static final Logger logger = LoggerFactory.getLogger(ConstructorArgsPlugin.class);
 	
@@ -51,7 +49,7 @@ public class ConstructorArgsPlugin implements NodeParserPlugin, ParserConstants
 	@Override
 	public void handleNode( final Bean bean, final Node beanNode ) throws XPathExpressionException
 	{
-		final Collection<Node> constArgNodes = ParserHelper.extractNodesByName(beanNode.getChildNodes(), CONSTRUCTOR_ARGS);
+		final Collection<Node> constArgNodes = ParserHelper.extractNodesByName(beanNode.getChildNodes(), CONSTRUCTOR_ARGS, prefix);
 		
 		final Property[] args = new Property[ constArgNodes.size() ];
 		

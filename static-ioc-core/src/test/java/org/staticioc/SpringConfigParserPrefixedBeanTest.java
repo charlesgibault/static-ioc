@@ -16,35 +16,17 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.staticioc.parser;
-
-import javax.xml.xpath.XPathExpressionException;
-
-import org.staticioc.model.Bean;
-import org.w3c.dom.Node;
+package org.staticioc;
 
 /**
- * Interface for plugins that parse special attributes on a Bean node
- * @author charles
+ * Unit test for SpringConfigParser
  */
-public interface NodeParserPlugin
+public class SpringConfigParserPrefixedBeanTest extends SpringConfigParserSimpleBeanTest
 {
-	/**
-	 * Handle a specific node to enrich the passed bean
-	 * @param bean Bean to enrich
-	 * @param node full Node to parse
-	 */
-	void handleNode( final Bean bean, final Node node ) throws XPathExpressionException;
-	
-	/**
-	 * A reference to the bean container
-	 * @param container
-	 */
-	void setBeanContainer(BeanParser container);
+	private final static String TEST_CONTEXT = "src/test/resources/SpringConfigParserTest-PrefixedBean.xml";
 
-	/**
-	 * Declare the prefix for this namespace in the current document
-	 * @param prefix
-	 */
-	void setPrefix(String prefix);
+	public SpringConfigParserPrefixedBeanTest() throws Exception 
+	{
+		super( TEST_CONTEXT );
+	}
 }

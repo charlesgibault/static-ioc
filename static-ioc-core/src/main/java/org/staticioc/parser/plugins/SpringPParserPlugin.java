@@ -23,20 +23,24 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.staticioc.model.Bean;
 import org.staticioc.model.Property;
-import org.staticioc.parser.BeanParser;
-import org.staticioc.parser.NodeParserPlugin;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 /**
  * Handle property written using Spring p: syntactic sugar 
  */
-public class SpringPParserPlugin implements NodeParserPlugin
+public class SpringPParserPlugin extends AbstractNodeParserPlugin
 {
-	protected static final String BEAN_PROPERTY_PREFIX = "p:";
+	protected static final String DEFAULT_BEAN_PROPERTY_PREFIX = "p:";
 	protected static final String BEAN_PROPERTY_REF_SUFFIX = "-ref";
-	protected BeanParser container;
-
+	
+	protected String beanPropertyPrefix;
+	
+	public SpringPParserPlugin()
+	{
+		prefix="p";
+		beanPropertyPrefix=DEFAULT_BEAN_PROPERTY_PREFIX;
+	}
 	
 	@Override
 	public void handleNode(Bean bean, Node node) throws XPathExpressionException
@@ -50,9 +54,9 @@ public class SpringPParserPlugin implements NodeParserPlugin
 		for ( int a=0 ; a < beanAttributes.getLength() ; ++a )
 		{
 			Node beanAttr = beanAttributes.item( a ); 
-			if ( beanAttr.getNodeName().startsWith( BEAN_PROPERTY_PREFIX ) )
+			if ( beanAttr.getNodeName().startsWith( beanPropertyPrefix ) )
 			{
-				String propertyName = beanAttr.getNodeName().substring( BEAN_PROPERTY_PREFIX.length() );
+				String propertyName = beanAttr.getNodeName().substring( beanPropertyPrefix.length() );
 				String ref = null;
 				String value = null;
 
@@ -74,8 +78,8 @@ public class SpringPParserPlugin implements NodeParserPlugin
 	}
 
 	@Override
-	public void setBeanContainer(BeanParser container)
-	{
-		this.container = container;
+	public void setPrefix(String prefix) {
+		super.setPrefix(prefix);
+		beanPropertyPrefix = prefix + ":";		
 	}
 }
