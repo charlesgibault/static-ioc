@@ -94,7 +94,7 @@ public class SpringConfigParserFactoryBeanTest extends AbstractSpringParserTest
 		assertEquals("Constructor args found not found were expected", productFactory.getConstructorArgs().size(), 1 );
 				
 		// Ordering checks
-		LinkedHashSet<String> orderedBeans = parser.getOrderedBeanIds();
+		LinkedHashSet<String> orderedBeans = parser.getBeanContainer().getOrderedBeanIds();
 		assertEquals("Factory Bean ordering not correct", "[rpcService, productFactory, subProduct, product2, product]", orderedBeans.toString() );
 	}
 }

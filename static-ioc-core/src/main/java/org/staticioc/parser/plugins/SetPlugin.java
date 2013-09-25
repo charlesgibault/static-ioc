@@ -38,12 +38,12 @@ public class SetPlugin extends AbstractNodeSupportPlugin
 	public Property handleNode( final Node node, final String propName ) throws XPathExpressionException
 	{
 		// create an anonymous bean of appropriate collection type
-		final String beanId = container.generateAnonymousBeanId();
+		final String beanId = beanParser.getBeanContainer().generateAnonymousBeanId();
 		final Bean collecBean = new CollectionBean( beanId, Bean.Type.SET.toString(), Bean.Type.SET );
-		container.handleNodes( collecBean, "add", node.getChildNodes() ); // recursively set it's property
+		beanParser.handleNodes( collecBean, "add", node.getChildNodes() ); // recursively set it's property
 
 		// register Bean in Map
-		container.register( collecBean  );
+		beanParser.getBeanContainer().register( collecBean  );
 
 		// Wire this bean as a reference
 		return ParserHelper.getRef( propName, beanId );

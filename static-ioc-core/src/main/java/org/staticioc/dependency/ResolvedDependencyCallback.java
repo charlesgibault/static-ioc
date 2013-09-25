@@ -18,9 +18,9 @@
  */
 package org.staticioc.dependency;
 
-import org.staticioc.model.BeanContainer;
+import org.staticioc.container.SimpleBeanContainer;
 
 public interface ResolvedDependencyCallback<T extends Dependency>
 {
-	void onResolvedDependency( T dependency, BeanContainer container );
+	void onResolvedDependency( T dependency, SimpleBeanContainer container );
 }

@@ -40,12 +40,12 @@ public class MapPlugin extends AbstractNodeSupportPlugin
 	public Property handleNode( final Node node, final String propName ) throws XPathExpressionException
 	{
 		// create an anonymous bean of appropriate collection type
-		final String beanId = container.generateAnonymousBeanId();
+		final String beanId = beanParser.getBeanContainer().generateAnonymousBeanId();
 		final Bean collecBean = new CollectionBean( beanId, Bean.Type.MAP.toString(), Bean.Type.MAP );
 		handleMap( collecBean, node.getChildNodes() );
 
 		// register Bean in Map
-		container.register( collecBean  );
+		beanParser.getBeanContainer().register( collecBean  );
 
 		// Wire this bean as a reference
 		return ParserHelper.getRef( propName, beanId );
@@ -100,7 +100,7 @@ public class MapPlugin extends AbstractNodeSupportPlugin
 							final Node kcNode = keyDef.getChildNodes().item( kc );
 							final String keyPropName = collecBean.getId() + "_key";
 							
-							Property keyRefAsProp = container.handleNode( kcNode, keyPropName );
+							Property keyRefAsProp = beanParser.handleNode( kcNode, keyPropName );
 							if (keyRefAsProp != null)
 							{
 								if( keyRefAsProp.getValue() != null )
@@ -145,7 +145,7 @@ public class MapPlugin extends AbstractNodeSupportPlugin
 						final Node vNode = entry.getChildNodes().item( v );
 						final String valuePropName = collecBean.getId() + "_value";
 						
-						Property keyValueAsProp = container.handleNode( vNode, valuePropName );
+						Property keyValueAsProp = beanParser.handleNode( vNode, valuePropName );
 						if (keyValueAsProp != null)
 						{
 							if( keyValueAsProp.getValue() != null )
@@ -168,7 +168,7 @@ public class MapPlugin extends AbstractNodeSupportPlugin
 				Property prop  = new Property( keyValue, value, refValue);
 				prop.setKeyRef( isKeyRef );
 			
-				container.addOrReplaceProperty(prop, collecBean.getProperties() );
+				beanParser.addOrReplaceProperty(prop, collecBean.getProperties() );
 			}
 		}
 	}

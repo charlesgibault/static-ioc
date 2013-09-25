@@ -28,9 +28,10 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.staticioc.model.AcknowledgeableBeanContainer;
+import org.staticioc.container.AcknowledgeableBeanContainer;
+import org.staticioc.container.BeanContainer;
+import org.staticioc.container.SimpleBeanContainer;
 import org.staticioc.model.Bean;
-import org.staticioc.model.BeanContainer;
 
 public class DependencyManager<T extends Dependency>
 {
@@ -83,7 +84,7 @@ public class DependencyManager<T extends Dependency>
 	 * @param callback
 	 * @throws XPathExpressionException
 	 */
-	public LinkedHashSet<String> resolveBeansOrder(Set<String> beans, BeanContainer container)
+	public LinkedHashSet<String> resolveBeansOrder(Set<String> beans, SimpleBeanContainer container)
 	{
 		final Set<String> visitedParents = new HashSet<String>();
 		final LinkedHashSet<String> result = new LinkedHashSet<String>();
@@ -106,7 +107,7 @@ public class DependencyManager<T extends Dependency>
 				{
 					@Override
 					public void onResolvedDependency(T dependency,
-							BeanContainer container)
+							SimpleBeanContainer container)
 					{
 						result.add(dependency.getId());
 						ackContainer.acknowledge(dependency.getId());
@@ -124,7 +125,7 @@ public class DependencyManager<T extends Dependency>
 	 * @param parentName
 	 * @throws XPathExpressionException 
 	 */
-	protected void resolveBean( final String name, BeanContainer container, final Set<String> visitedBeans, ResolvedDependencyCallback<T> callback )
+	protected void resolveBean( final String name, SimpleBeanContainer container, final Set<String> visitedBeans, ResolvedDependencyCallback<T> callback )
 	{
 		// Grab dependency
 		final T dependency = dependencyMap.get(name);

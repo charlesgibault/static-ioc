@@ -16,17 +16,19 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.staticioc.model;
+package org.staticioc.container;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class AcknowledgeableBeanContainer implements BeanContainer
+import org.staticioc.model.Bean;
+
+public class AcknowledgeableBeanContainer implements SimpleBeanContainer
 {
-	private final BeanContainer instance;
+	private final SimpleBeanContainer instance;
 	private final Map<String, Bean> knownBeans = new HashMap<String, Bean>();
 	
-	public AcknowledgeableBeanContainer( BeanContainer instance )
+	public AcknowledgeableBeanContainer( SimpleBeanContainer instance )
 	{
 		this.instance = instance;
 	}
@@ -43,10 +45,6 @@ public class AcknowledgeableBeanContainer implements BeanContainer
 	@Override
 	public Map<String, Bean> getBeans() {
 		return knownBeans;
-	}
-
-	public BeanContainer getInstance() {
-		return instance;
 	}
 	
 	public void acknowledge(String id)

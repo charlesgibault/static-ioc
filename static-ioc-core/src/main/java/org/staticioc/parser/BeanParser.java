@@ -19,14 +19,11 @@
 package org.staticioc.parser;
 
 import java.util.Collection;
-import java.util.Map;
 
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.staticioc.AbstractSpringConfigParser;
-import org.staticioc.dependency.DefinitionDependency;
-import org.staticioc.dependency.RunTimeDependency;
+import org.staticioc.container.BeanContainer;
 import org.staticioc.model.Bean;
 import org.staticioc.model.Property;
 import org.w3c.dom.Node;
@@ -60,41 +57,9 @@ public interface BeanParser
 	Property handleNode( final Node subNode, final String propName ) throws XPathExpressionException;
 	
 	/**
-	 * 
-	 * @return a GUID for an anonymous bean
+	 * @return the BeanContainer associated with the current BeanParser
 	 */
-	String generateAnonymousBeanId();
-	
-	/**
-	 * Register a set of beans in the bean map
-	 * @param beans
-	 */
-	void register(final Bean bean);
-
-	/**
-	 * Register a set of beans in the bean map
-	 * @param beans
-	 */
-	void register(final Map<String, Bean> beans) ;
-	
-	/**
-	 * Register a bean -> parent dependency
-	 * @param dependency to be registered
-	 */
-	void registerParent( DefinitionDependency parent );
-	
-	/**
-	 * Register a bean -> run dependency
-	 * @param dependency to be registered
-	 */
-	void registerRunTimeDependency(RunTimeDependency dependency);
-	
-	/**
-	 * Register a parser's into this parser
-	 * Merge parent dependencies, prototypeBeans and propertyReferencesMap
-	 * @param bean to be registered
-	 */
-	void register( final AbstractSpringConfigParser parser);
+	BeanContainer getBeanContainer();
 	
 	/**
 	 * @return an XPathFactory for node analysis

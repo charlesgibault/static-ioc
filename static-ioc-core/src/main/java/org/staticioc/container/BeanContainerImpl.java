@@ -16,7 +16,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.staticioc;
+package org.staticioc.container;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -36,20 +36,15 @@ import org.staticioc.dependency.DependencyManager;
 import org.staticioc.dependency.ResolvedDependencyCallback;
 import org.staticioc.dependency.RunTimeDependency;
 import org.staticioc.model.Bean;
-import org.staticioc.model.BeanContainer;
 import org.staticioc.model.Property;
 import org.staticioc.model.Bean.Scope;
-import org.staticioc.parser.BeanParser;
-import org.staticioc.parser.ParserConstants;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-public abstract class AbstractSpringConfigParser implements ParserConstants, BeanParser, BeanContainer {
-
-	protected static final Logger logger = LoggerFactory.getLogger(SpringConfigParser.class);
+public class BeanContainerImpl implements ExtendedBeanContainer
+{
+	protected static final Logger logger = LoggerFactory.getLogger(BeanContainerImpl.class);
 	
-	public static final String ANONYMOUS_BEAN_PREFIX = "bean_";
-	public static final String PROTOTYPE_BEAN_PREFIX = "prototyped_";
 	private static int anonymousBeanIdentifier = 0;
 
 	// Map a bean's id to the actual instanciated beans 
@@ -57,7 +52,7 @@ public abstract class AbstractSpringConfigParser implements ParserConstants, Bea
 	
 	// Map a bean's name (alias) to the actual registerd beans 
 	private final Map<String,Bean> aliases = new HashMap<String,Bean>();
-	
+
 	private final DependencyManager<DefinitionDependency> parentDependencyManager = new DependencyManager<DefinitionDependency>();
 	private final DependencyManager<RunTimeDependency> runTimeDependencyManager = new DependencyManager<RunTimeDependency>();
 	
@@ -82,6 +77,7 @@ public abstract class AbstractSpringConfigParser implements ParserConstants, Bea
 		return PROTOTYPE_BEAN_PREFIX + beanName + (++anonymousBeanIdentifier);
 	}
 	
+
 	/**
 	 * Add or replace a Property in a bean's property set
 	 * Also updates a the Map of Property with a bean ref.
@@ -101,7 +97,8 @@ public abstract class AbstractSpringConfigParser implements ParserConstants, Bea
 		registerPropertyReference( prop);
 	}
 	
-	protected Bean duplicateBean( final String id, final String alias, final Bean parent, final boolean isAnonymous)
+	@Override
+	public Bean duplicateBean( final String id, final String alias, final Bean parent, final boolean isAnonymous)
 	{
 		final Bean duplicatedBean = new Bean( id, parent, isAnonymous );
 		duplicatedBean.setAlias(alias);
@@ -195,19 +192,22 @@ public abstract class AbstractSpringConfigParser implements ParserConstants, Bea
 	 * @param bean to be registered
 	 */
 	@Override
-	public void register( final AbstractSpringConfigParser parser) {	
+	public void register( final ExtendedBeanContainer container)
+	{
 		if( logger.isDebugEnabled())
 		{
-			logger.debug( "Adding {} parent dependencies", parser.parentDependencyManager );
-			logger.debug( "Adding {} runtime dependencies", parser.runTimeDependencyManager );
-			logger.debug( "Adding {} prototypes definitions", parser.prototypeBeans );
-			logger.debug( "Adding {} Bean reference tracking", parser.propertyReferences );
+			logger.debug( "Adding {} parent dependencies", container.getParentDependencyManager() );
+			logger.debug( "Adding {} runtime dependencies", container.getRunTimeDependencyManager() );
+			logger.debug( "Adding {} prototypes definitions", container.getPrototypeBeans() );
+			logger.debug( "Adding {} Bean reference tracking", container.getPropertyReferences() );
+			logger.debug( "Adding {} Bean alias dictionary", container.getAliases() );
 		}
-		
-		parentDependencyManager.registerAll(parser.parentDependencyManager);
-		runTimeDependencyManager.registerAll(parser.runTimeDependencyManager);
-		prototypeBeans.addAll( parser.prototypeBeans );
-		propertyReferences.addAll( parser.propertyReferences );
+
+		parentDependencyManager.registerAll(container.getParentDependencyManager());
+		runTimeDependencyManager.registerAll(container.getRunTimeDependencyManager());
+		prototypeBeans.addAll( container.getPrototypeBeans() );
+		propertyReferences.addAll( container.getPropertyReferences() );
+		aliases.putAll( container.getAliases() );
 	}	
 	
 	/**
@@ -227,13 +227,18 @@ public abstract class AbstractSpringConfigParser implements ParserConstants, Bea
 	{
 		return beans;
 	}
-	
-	protected void resolveParentDefinition()
+
+	/**
+	 * Resolve all parent definitions
+	 * @param callback to use to process a Bean
+	 */
+	@Override
+	public void resolveParentDefinition(final ResolvedBeanCallback callback)
 	{
 		parentDependencyManager.resolveAllDependencies(this, new ResolvedDependencyCallback<DefinitionDependency> ()
 		{
 			@Override
-			public void onResolvedDependency(DefinitionDependency dependency, BeanContainer container)
+			public void onResolvedDependency(DefinitionDependency dependency, SimpleBeanContainer container)
 			{
 				final String parentBeanId = dependency.getParentId();
 				final Bean parentBean = container.getBean(parentBeanId);
@@ -244,20 +249,22 @@ public abstract class AbstractSpringConfigParser implements ParserConstants, Bea
 				final NamedNodeMap beanAttributes = beanNode.getAttributes();
 				
 				try {
-					processBeanNode(beanNode, beanAttributes, bean.getId(), bean.getAlias(), dependency.isAnonymous(), bean);
+					callback.resolve( bean, beanNode, beanAttributes, dependency.isAnonymous() );
 				} catch (XPathExpressionException e) {
 					logger.error( "Error processing Bean " + bean.getId(), e );
-				}	
+				}
 			}
 				
 		} );
 	}
 	
+	@Override
 	public LinkedHashSet<String> getOrderedBeanIds()
 	{
 		return runTimeDependencyManager.resolveBeansOrder(beans.keySet(), this);
 	}
 	
+	@Override
 	public LinkedList<Bean> getOrderedBeans()
 	{
 		LinkedList<Bean> orderedBeans = new LinkedList<Bean>();
@@ -271,7 +278,8 @@ public abstract class AbstractSpringConfigParser implements ParserConstants, Bea
 		return orderedBeans;
 	}
 	
-	protected void resolveReferences()
+	@Override
+	public void resolveReferences()
 	{
 		logger.debug( "Resolving alias for {} beans", beans.size() );
 
@@ -311,6 +319,34 @@ public abstract class AbstractSpringConfigParser implements ParserConstants, Bea
 			register( prototypedInstance );
 		}
 	}
+	
+	@Override
+	public
+	DependencyManager<DefinitionDependency> getParentDependencyManager() {
+		return parentDependencyManager;
+	}
 
-	abstract protected String processBeanNode(final Node beanNode, final NamedNodeMap beanAttributes, final String id, final String alias, boolean isAnonymous, Bean bean) throws XPathExpressionException;
+	@Override
+	public
+	DependencyManager<RunTimeDependency> getRunTimeDependencyManager() {
+		return runTimeDependencyManager;
+	}
+
+	@Override
+	public
+	Set<String> getPrototypeBeans() {
+		return prototypeBeans;
+	}
+
+	@Override
+	public
+	List<Property> getPropertyReferences() {
+		return propertyReferences;
+	}
+
+	@Override
+	public
+	Map<String, Bean> getAliases() {
+		return aliases;
+	}
 }

@@ -37,6 +37,12 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.staticioc.container.BeanContainer;
+import org.staticioc.container.ExtendedBeanContainer;
+import org.staticioc.container.BeanContainerImpl;
+import org.staticioc.container.ResolvedBeanCallback;
 import org.staticioc.dependency.DefinitionDependency;
 import org.staticioc.dependency.FactoryBeanDependency;
 import org.staticioc.dependency.RunTimeDependency;
@@ -51,8 +57,10 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class SpringConfigParser extends AbstractSpringConfigParser
+public class SpringConfigParser implements ParserConstants, BeanParser
 {
+	protected static final Logger logger = LoggerFactory.getLogger(SpringConfigParser.class);
+	
 	private final DocumentBuilderFactory dbf;
 	private final DocumentBuilder db;
 	private final XPathFactory xPathFactory; 
@@ -64,6 +72,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 	// Plugin chains
 	private final Collection<NodeParserPlugin> nodeParserPlugins = new LinkedList<NodeParserPlugin>();
 	private final Map<String, NodeSupportPlugin> nodesSupportPlugins = new ConcurrentHashMap<String, NodeSupportPlugin>();
+	private final ExtendedBeanContainer beanContainer;
 	
 	// Prefix for the Spring beans namespace
 	private String prefix = "";
@@ -84,6 +93,8 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		db = dbf.newDocumentBuilder();
 
 		xPathFactory = XPathFactory.newInstance();
+		
+		beanContainer = new BeanContainerImpl();
 
 		try
 		{
@@ -161,7 +172,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		boolean isAnonymous = false;
 		if( id == null )
 		{
-			id = generateAnonymousBeanId(); 
+			id = beanContainer.generateAnonymousBeanId(); 
 			isAnonymous = true;
 		}
 
@@ -175,28 +186,27 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 			final String parentName = parentNode.getNodeValue();
 
 			// Test direct resolution (parent already registered)
-			final Bean parentBean = getBean( parentName );
+			final Bean parentBean = beanContainer.getBean( parentName );
 
 			if( parentBean == null) // parent not known yet
 			{
-				registerParent( new DefinitionDependency( parentName, id, alias, isAnonymous,  beanNode) );
+				beanContainer.registerParent( new DefinitionDependency( parentName, id, alias, isAnonymous,  beanNode) );
 				return id;
 			}
 			else
 			{
 				// Perform bean copy and continues
-				bean = duplicateBean( id, alias, parentBean, isAnonymous );
+				bean = beanContainer.duplicateBean( id, alias, parentBean, isAnonymous );
 			}
 		}
 
 		// Perform actual node content processing
 		return processBeanNode(beanNode, beanAttributes, id, alias, isAnonymous, bean);
 	}
-
+	
 	/**
 	 * Process a <bean/> node's content.
 	 */
-	@Override
 	protected String processBeanNode(final Node beanNode, final NamedNodeMap beanAttributes, final String id, final String alias, boolean isAnonymous, Bean bean) throws XPathExpressionException
 	{
 		String className = (bean != null)? bean.getClassName() : null;
@@ -283,7 +293,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		if( factoryBean != null)
 		{
 			final RunTimeDependency factoryBeanDependency = new FactoryBeanDependency( id, factoryBean); // Factory-bean can refer to framework classes and thus must be "soft" 
-			registerRunTimeDependency( factoryBeanDependency );
+			beanContainer.registerRunTimeDependency( factoryBeanDependency );
 		}
 
 		bean.setInitMethod(initMethod);
@@ -296,7 +306,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 		}
 
 		// register Bean in Map
-		register( bean );
+		beanContainer.register( bean );
 
 		return id;
 	}
@@ -318,7 +328,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 			Property prop = handleNode(  spNode, propName );
 			if (prop != null )
 			{
-				addOrReplaceProperty(prop, bean.getProperties() );
+				beanContainer.addOrReplaceProperty(prop, bean.getProperties() );
 			}
 		}
 	}
@@ -405,10 +415,10 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 
 		// Now resolve every beans
 		resolveParentDefinition();
-		resolveReferences();
+		beanContainer.resolveReferences();
 
 
-		return getBeans();
+		return beanContainer.getBeans();
 	}
 
 
@@ -516,7 +526,7 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 			}
 
 			// Finally resolve alias references
-			resolveReferences();
+			beanContainer.resolveReferences();
 		}
 		catch( XPathExpressionException e)
 		{
@@ -529,13 +539,13 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 
 		if( logger.isDebugEnabled() )
 		{
-			for( String beanName : getBeans().keySet() )
+			for( String beanName : beanContainer.getBeans().keySet() )
 			{
 				logger.debug( "Registered bean {}", beanName);
 			}
 		}
 
-		return getBeans();
+		return beanContainer.getBeans();
 	}
 
 	/**
@@ -572,13 +582,34 @@ public class SpringConfigParser extends AbstractSpringConfigParser
 					logger.debug( "Importing {}", importedFileName);
 					Map<String,Bean> importedBeans = subParser.load( importedFileName, loadedContext, false );
 
-					register( importedBeans );
-					register( subParser ); // handle parents (in case of cross file parent/child relationship), prototype listing and reference tracking
+					beanContainer.register( importedBeans );
+					beanContainer.register( subParser.beanContainer ); // handle parents (in case of cross file parent/child relationship), prototype listing and reference tracking
 				}
 			}
 		}
 	}
+	
+	protected void resolveParentDefinition()
+	{
+		beanContainer.resolveParentDefinition(
+				new ResolvedBeanCallback()
+				{
+					public String resolve(Bean bean, Node beanNode, NamedNodeMap beanAttributes, boolean isAnonymous ) throws XPathExpressionException
+					{
+						return processBeanNode(beanNode, beanAttributes, bean.getId(), bean.getAlias(), isAnonymous, bean);
+					}
+				} );
+	}
 
-	//TODO split file loading part, Spring beans parser and bean container?
+	@Override
+	public void addOrReplaceProperty(final Property prop, final Collection<Property> set) {
+		beanContainer.addOrReplaceProperty( prop, set);
+	}
+
+	@Override
+	public BeanContainer getBeanContainer() {
+		return beanContainer;
+	}
+
 	//TODO add (partial) support for PropertyPlaceHolders
 }

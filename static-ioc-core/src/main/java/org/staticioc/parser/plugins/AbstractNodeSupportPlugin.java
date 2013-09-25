@@ -7,13 +7,13 @@ import org.staticioc.parser.ParserHelper;
 
 public abstract class AbstractNodeSupportPlugin implements ParserConstants,  NodeSupportPlugin
 {
-	protected BeanParser container;
+	protected BeanParser beanParser;
 	protected String prefix = "";
 	
 	@Override
 	public void setBeanContainer(BeanParser container)
 	{
-		this.container = container;
+		this.beanParser = container;
 	}
 
 	@Override

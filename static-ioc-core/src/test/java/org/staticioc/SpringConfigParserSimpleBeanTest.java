@@ -23,6 +23,8 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import java.util.Map;
+
+import org.staticioc.container.BeanContainer;
 import org.staticioc.model.*;
 
 /**
@@ -112,7 +114,7 @@ public class SpringConfigParserSimpleBeanTest extends AbstractSpringParserTest
 		
 		for( String name : loadedBeans.keySet() )
 		{
-			if( name.startsWith( SpringConfigParser.ANONYMOUS_BEAN_PREFIX) )
+			if( name.startsWith( BeanContainer.ANONYMOUS_BEAN_PREFIX) )
 			{
 				anonymousBeanFound = true;
 				final Bean bean = loadedBeans.get(name); // Our test set only contains one

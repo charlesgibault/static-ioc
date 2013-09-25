@@ -107,7 +107,7 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 		
 		SpringConfigParser springConfigParser = new SpringConfigParser();
 		Map<String, Bean> beanClassMap = springConfigParser.load( configurationFiles );
-		final LinkedList<Bean> orderedBean = springConfigParser.getOrderedBeans();
+		final LinkedList<Bean> orderedBean = springConfigParser.getBeanContainer().getOrderedBeans();
 
 		// Track beans with a declared init-method and destroy-method attribute
 		List<Bean> initRequiredBeans = new LinkedList<Bean>();

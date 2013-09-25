@@ -26,10 +26,10 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 
 import org.junit.Test;
+import org.staticioc.container.SimpleBeanContainer;
 import org.staticioc.dependency.DependencyManager;
 import org.staticioc.dependency.RunTimeDependency;
 import org.staticioc.model.Bean;
-import org.staticioc.model.BeanContainer;
 
 public class DependencyManagerTest
 {
@@ -51,7 +51,7 @@ public class DependencyManagerTest
 		beans.put(bean4.getId(), bean4);
 		beans.put(bean5.getId(), bean5);
 		
-		BeanContainer container = new BeanContainer()
+		SimpleBeanContainer container = new SimpleBeanContainer()
 		{
 			@Override
 			public Bean getBean(String id) {

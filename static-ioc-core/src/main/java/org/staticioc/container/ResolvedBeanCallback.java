@@ -16,13 +16,27 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.staticioc.model;
+package org.staticioc.container;
 
-import java.util.Map;
+import javax.xml.xpath.XPathExpressionException;
 
-public interface BeanContainer
+import org.staticioc.model.Bean;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+
+/**
+ * Callback interface used during Bean dependency resolution
+ */
+public interface ResolvedBeanCallback
 {
-	Bean getBean( final String id);
-	
-	Map<String, Bean > getBeans();
+	/**
+	 * Callback method when a new Bean is resolved
+	 * @param bean newly resolved Bean
+	 * @param beanNode XML node matching this new Bean
+	 * @param beanAttributes Map of the Bean's attributes 
+	 * @param isAnonymous whether the bean is anonymous or not
+	 * @return the id of the Bean after resolution
+	 * @throws XPathExpressionException
+	 */
+	String resolve(Bean bean, Node beanNode, NamedNodeMap beanAttributes, boolean isAnonymous ) throws XPathExpressionException;
 }

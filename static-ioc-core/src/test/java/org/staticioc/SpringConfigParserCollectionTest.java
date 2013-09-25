@@ -25,6 +25,8 @@ import static org.junit.Assert.*;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+
+import org.staticioc.container.BeanContainer;
 import org.staticioc.model.*;
 
 /**
@@ -160,11 +162,11 @@ public class SpringConfigParserCollectionTest extends AbstractSpringParserTest
 		
 		prop = mappedProps.get("Key 5");
 		Assert.assertNotNull("Reference shouldn't be null", prop.getRef() );
-		Assert.assertTrue( "Reference should be anonymous", prop.getRef().startsWith( SpringConfigParser.ANONYMOUS_BEAN_PREFIX) );
+		Assert.assertTrue( "Reference should be anonymous", prop.getRef().startsWith( BeanContainer.ANONYMOUS_BEAN_PREFIX) );
 		
 		prop = mappedProps.get("Key 6");
 		Assert.assertNotNull("Reference shouldn't be null", prop.getRef() );
-		Assert.assertTrue( "Reference should be anonymous", prop.getRef().startsWith( SpringConfigParser.ANONYMOUS_BEAN_PREFIX) );
+		Assert.assertTrue( "Reference should be anonymous", prop.getRef().startsWith( BeanContainer.ANONYMOUS_BEAN_PREFIX) );
 			
 		checkProperty(mappedProps, "Key 7", 		"2", 	null );
 		//checkProperty(mappedProps, "bean_?", 		"woah", 	null ); //keyref = true

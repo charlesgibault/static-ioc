@@ -38,7 +38,7 @@ public class ConstructorArgsPlugin extends AbstractNodeParserPlugin
 {
 	protected static final Logger logger = LoggerFactory.getLogger(ConstructorArgsPlugin.class);
 	
-	protected BeanParser container;
+	protected BeanParser beanParser;
 	
 	/**
 	 * Parse the XML <bean/> nodes's children for constructor arguments and enrich the Bean object accordingly
@@ -80,7 +80,7 @@ public class ConstructorArgsPlugin extends AbstractNodeParserPlugin
 						continue;
 					}
 				
-					argumentProp = container.handleNode( argumentNode, argumentPropName );
+					argumentProp = beanParser.handleNode( argumentNode, argumentPropName );
 				}
 				
 				if (argumentProp != null)
@@ -113,7 +113,7 @@ public class ConstructorArgsPlugin extends AbstractNodeParserPlugin
 			if( prop != null)
 			{
 				logger.debug("Constructor arg : {}", prop.toString());
-				container.addOrReplaceProperty( prop, bean.getConstructorArgs() );
+				beanParser.addOrReplaceProperty( prop, bean.getConstructorArgs() );
 				
 				if( prop.getRef() != null )
 				{
@@ -126,13 +126,13 @@ public class ConstructorArgsPlugin extends AbstractNodeParserPlugin
 		{
 			RunTimeDependency dependency = new RunTimeDependency( bean.getId(), beanDependencies);
 			logger.debug( "Adding runtime dependency {}", dependency );
-			container.registerRunTimeDependency( dependency );
+			beanParser.getBeanContainer().registerRunTimeDependency( dependency );
 		}
 	}
 
 	@Override
 	public void setBeanContainer(BeanParser container)
 	{
-		this.container = container;
+		this.beanParser = container;
 	}
 }
