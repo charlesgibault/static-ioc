@@ -462,10 +462,10 @@ public class SpringConfigParser implements ParserConstants, BeanParser
 			
 			// TODO make loading flexible enough to have a namespace plugin mechanism here
 			SpringBeansNameSpaceParser springBeansParser = new SpringBeansNameSpaceParser();
-			springBeansParser.setBeanContainer(this);
+			springBeansParser.setBeanParser(this);
 
 			SpringPNameSpaceParser springPNameSpaceParser = new SpringPNameSpaceParser();
-			springPNameSpaceParser.setBeanContainer(this);
+			springPNameSpaceParser.setBeanParser(this);
 
 			if( namespaces.containsKey( springBeansParser.getNameSpaceUri() ) )
 			{

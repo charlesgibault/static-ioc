@@ -9,6 +9,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.junit.Test;
+import org.staticioc.SpringConfigParser;
 import org.w3c.dom.Document;
 
 public class NamespaceSupportTest {

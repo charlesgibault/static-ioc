@@ -37,10 +37,10 @@ public interface NodeParserPlugin
 	void handleNode( final Bean bean, final Node node ) throws XPathExpressionException;
 	
 	/**
-	 * A reference to the bean container
-	 * @param container
+	 * A reference to the bean parser context
+	 * @param parser
 	 */
-	void setBeanContainer(BeanParser container);
+	void setBeanParser(BeanParser parser);
 
 	/**
 	 * Declare the prefix for this namespace in the current document

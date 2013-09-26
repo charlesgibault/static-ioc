@@ -21,6 +21,7 @@ package org.staticioc.parser;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import org.apache.commons.lang.StringUtils;
 import org.staticioc.model.Property;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -140,21 +141,38 @@ public class ParserHelper implements ParserConstants
 	 * @param name of the element
 	 * @return exact name of the element as it is expected in present document
 	*/
-	public static String prefixedName(String prefix, String name) //TODO cache
+	public static String prefixedName(String prefix, String name)
 	{
-		if ( "".equals(prefix) || prefix == null )
+		if ( StringUtils.isEmpty(prefix) )
 		{
 			return name;
 		}
 		
 		StringBuilder sb = new StringBuilder(prefix);
-		sb.append( ':');
+		sb.append( XML_NAMESPACE_DELIMITER );
 		sb.append(name);
 		return sb.toString();
 	} 
 	
-	public static boolean match( String expectedName, String nodeName, String prefix) //TODO cache
+	public static boolean match( String expectedName, String nodeName, String prefix)
 	{
-		return prefixedName(prefix, expectedName).equals(nodeName);
+		if ( expectedName == null)
+		{
+			return StringUtils.isEmpty(prefix) && nodeName == null;
+		}
+		
+		if ( StringUtils.isEmpty(prefix) )
+		{
+			return expectedName.equals(nodeName);
+		}
+		
+		if( nodeName == null || nodeName.length() != expectedName.length() + prefix.length() +1 )
+		{
+			return false;
+		}
+		
+		return nodeName.startsWith(prefix)
+			&& nodeName.endsWith(expectedName)
+			&& nodeName.charAt( prefix.length() ) == XML_NAMESPACE_DELIMITER;
 	}
 }

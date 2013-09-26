@@ -63,11 +63,11 @@ public class BeanPropertiesParserPlugin extends AbstractNodeParserPlugin
 
 				if ( prop != null ) // Simple property : value or reference
 				{
-					container.addOrReplaceProperty(prop, bean.getProperties() );
+					beanParser.addOrReplaceProperty(prop, bean.getProperties() );
 				}
 				else
 				{
-					container.handleNodes( bean, propName, node.getChildNodes());				
+					beanParser.handleNodes( bean, propName, node.getChildNodes());				
 				}
 			}
 		}
@@ -81,7 +81,7 @@ public class BeanPropertiesParserPlugin extends AbstractNodeParserPlugin
 			{
 				if( xProps == null)
 				{
-					final XPath xPathProperties  = container.getXPathFactory().newXPath();
+					final XPath xPathProperties  = beanParser.getXPathFactory().newXPath();
 					xProps = xPathProperties.compile(XPATH_PROPERTY);
 				}
 			}

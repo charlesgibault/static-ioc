@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 import org.staticioc.dependency.RunTimeDependency;
 import org.staticioc.model.Bean;
 import org.staticioc.model.Property;
-import org.staticioc.parser.BeanParser;
 import org.staticioc.parser.ParserHelper;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -37,8 +36,6 @@ import org.w3c.dom.Node;
 public class ConstructorArgsPlugin extends AbstractNodeParserPlugin
 {
 	protected static final Logger logger = LoggerFactory.getLogger(ConstructorArgsPlugin.class);
-	
-	protected BeanParser beanParser;
 	
 	/**
 	 * Parse the XML <bean/> nodes's children for constructor arguments and enrich the Bean object accordingly
@@ -128,11 +125,5 @@ public class ConstructorArgsPlugin extends AbstractNodeParserPlugin
 			logger.debug( "Adding runtime dependency {}", dependency );
 			beanParser.getBeanContainer().registerRunTimeDependency( dependency );
 		}
-	}
-
-	@Override
-	public void setBeanContainer(BeanParser container)
-	{
-		this.beanParser = container;
 	}
 }

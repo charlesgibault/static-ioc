@@ -11,9 +11,9 @@ public abstract class AbstractNodeSupportPlugin implements ParserConstants,  Nod
 	protected String prefix = "";
 	
 	@Override
-	public void setBeanContainer(BeanParser container)
+	public void setBeanContainer(BeanParser beanParser)
 	{
-		this.beanParser = container;
+		this.beanParser = beanParser;
 	}
 
 	@Override

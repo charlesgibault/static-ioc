@@ -31,7 +31,6 @@ import org.w3c.dom.Node;
  */
 public class SpringPParserPlugin extends AbstractNodeParserPlugin
 {
-	protected static final String DEFAULT_BEAN_PROPERTY_PREFIX = "p:";
 	protected static final String BEAN_PROPERTY_REF_SUFFIX = "-ref";
 	
 	protected String beanPropertyPrefix;
@@ -39,7 +38,7 @@ public class SpringPParserPlugin extends AbstractNodeParserPlugin
 	public SpringPParserPlugin()
 	{
 		prefix="p";
-		beanPropertyPrefix=DEFAULT_BEAN_PROPERTY_PREFIX;
+		setPrefix(prefix);
 	}
 	
 	@Override
@@ -72,7 +71,7 @@ public class SpringPParserPlugin extends AbstractNodeParserPlugin
 				}
 
 				Property prop = new Property( propertyName, value, ref );
-				container.addOrReplaceProperty(prop, bean.getProperties() );
+				beanParser.addOrReplaceProperty(prop, bean.getProperties() );
 			}
 		}
 	}
@@ -80,6 +79,6 @@ public class SpringPParserPlugin extends AbstractNodeParserPlugin
 	@Override
 	public void setPrefix(String prefix) {
 		super.setPrefix(prefix);
-		beanPropertyPrefix = prefix + ":";		
+		beanPropertyPrefix = prefix + XML_NAMESPACE_DELIMITER;		
 	}
 }

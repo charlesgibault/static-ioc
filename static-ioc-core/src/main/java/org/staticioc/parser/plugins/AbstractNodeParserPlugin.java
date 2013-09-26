@@ -6,13 +6,13 @@ import org.staticioc.parser.ParserConstants;
 
 public abstract class AbstractNodeParserPlugin implements ParserConstants,  NodeParserPlugin
 {
-	protected BeanParser container;
+	protected BeanParser beanParser;
 	protected String prefix = "";
 	
 	@Override
-	public void setBeanContainer(BeanParser container)
+	public void setBeanParser(BeanParser parser)
 	{
-		this.container = container;
+		this.beanParser = parser;
 	}
 
 	@Override

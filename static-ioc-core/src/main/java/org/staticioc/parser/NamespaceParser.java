@@ -23,7 +23,7 @@ public interface NamespaceParser
 	 * A reference to the bean container
 	 * @param container
 	 */
-	void setBeanContainer(BeanParser container);
+	void setBeanParser(BeanParser container);
 	
 	/**
 	 * Declare the prefix for this namespace in the current document

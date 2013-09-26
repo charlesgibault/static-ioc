@@ -25,15 +25,15 @@ public abstract class AbstractNameSpaceParser implements NamespaceParser
 	}
 
 	@Override
-	public void setBeanContainer(BeanParser container) {
+	public void setBeanParser(BeanParser beanParser) {
 		for( NodeParserPlugin plugin : nodeParserPlugins)
 		{
-			plugin.setBeanContainer(container);
+			plugin.setBeanParser(beanParser);
 		}
 		
 		for( NodeSupportPlugin plugin : nodeSupportPlugins)
 		{
-			plugin.setBeanContainer(container);
+			plugin.setBeanContainer(beanParser);
 		}
 
 	}
