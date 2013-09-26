@@ -48,34 +48,61 @@ public class Bean implements Comparable<Bean>
 	private String initMethod=null;
 	private String destroyMethod=null;
 	
+	/**
+	 * Construct an empty Bean with a null id/classname.
+	 * This attributes will need to be configured using setters before the object can be properly used
+	 */
 	public Bean(){}
+	
+	/**
+	 * Construct a bean with a given id and classname
+	 * @param id
+	 * @param className
+	 */
 	public Bean( String id, String className)
 	{
 		this.id = id;
 		this.className = className;
 	}
 	
+	/**
+	 * Construct a bean with a given id, classname and anonymous values
+	 * @param id
+	 * @param className
+	 * @param anonymous
+	 */
 	public Bean( String id, String className, boolean anonymous)
 	{
-		this.id = id;
-		this.className = className;
+		this(id, className);
 		this.anonymous = anonymous;
 	}
 	
 	/**
+	 * Construct a bean that is to be created by a factoryBean
+	 * @param id
+	 * @param className
+	 * @param factoryBean
+	 * @param factoryMethod
+	 */
+	public Bean( String id, String className, String factoryBean, String factoryMethod)
+	{
+		this(id, className);
+		this.factoryBean = factoryBean;
+		this.factoryMethod = factoryMethod;
+	}
+	
+	/**
 	 * Kind of copy constructor to construct a bean from a parent
-	 * @param name
+	 * @param id
 	 * @param parent
 	 * @param anonymous
 	 */
 	public Bean( String id, Bean parent, boolean anonymous)
 	{
-		this.id = id;
-		this.className = parent.className;
+		this(id, parent.className, parent.factoryBean, parent.factoryMethod);
+		
 		this.type = parent.type;
 		this.scope = parent.scope;
-		this.factoryBean=parent.factoryBean;
-		this.factoryMethod=parent.factoryMethod;
 		this.initMethod=parent.initMethod;
 		this.destroyMethod=parent.destroyMethod;
 		
@@ -90,21 +117,6 @@ public class Bean implements Comparable<Bean>
 		{
 			this.constructorArgs.add( prop.clone() );
 		}
-	}
-	
-	/**
-	 * Construct a bean that is to be created by a factoryBean
-	 * @param id
-	 * @param className
-	 * @param factoryBean
-	 * @param factoryMethod
-	 */
-	public Bean( String id, String className, String factoryBean, String factoryMethod)
-	{
-		this.id = id;
-		this.className = className;
-		this.factoryBean = factoryBean;
-		this.factoryMethod = factoryMethod;
 	}
 	
 	@Override

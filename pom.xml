@@ -186,6 +186,11 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.9.1</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-project-info-reports-plugin</artifactId>
         <version>2.4</version>
         <!--  <reportSets>
@@ -205,20 +210,11 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
-        <version>2.7.1</version>
+        <version>3.0.1</version>
         <configuration>
-          <rulesets>
-            <ruleset>/rulesets/basic.xml</ruleset>
-            <ruleset>/rulesets/favorites.xml</ruleset>
-            <ruleset>/rulesets/coupling.xml</ruleset>
-            <ruleset>/rulesets/design.xml</ruleset>
-            <ruleset>/rulesets/typeresolution.xml</ruleset>
-            <ruleset>/rulesets/strings.xml</ruleset>
-            <!-- <ruleset>/rulesets/naming.xml</ruleset> <ruleset>/rulesets/optimizations.xml</ruleset> -->
-          </rulesets>
           <sourceEncoding>utf-8</sourceEncoding>
           <minimumTokens>100</minimumTokens>
-          <targetJdk>1.5</targetJdk>
+          <targetJdk>1.6</targetJdk>
         </configuration>
       </plugin>
     </plugins>

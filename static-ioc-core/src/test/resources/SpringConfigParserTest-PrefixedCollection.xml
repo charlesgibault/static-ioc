@@ -82,9 +82,9 @@
 				</bean:entry>
 				
 				<bean:entry>
-					<key>
+					<bean:key>
 						<bean:value>Key 6</bean:value>
-					</key>
+					</bean:key>
 					<bean:bean class="test.Person">
 						<bean:property name="name" value="yourself" />
 						<bean:property name="address" value="address" />
@@ -93,13 +93,13 @@
 				</bean:entry>
 				<bean:entry key="Key 7"><bean:value>2</bean:value></bean:entry>
 				<bean:entry>
-					<key>
+					<bean:key>
 						<bean:bean class="test.Person">
 							<bean:property name="name" value="myself" />
 							<bean:property name="address" value="address2" />
 							<bean:property name="age" value="32" />
 						</bean:bean>
-					</key>
+					</bean:key>
 					<bean:value>woah</bean:value>
 				</bean:entry>
 				<bean:entry key="Key 9"><bean:null/></bean:entry>

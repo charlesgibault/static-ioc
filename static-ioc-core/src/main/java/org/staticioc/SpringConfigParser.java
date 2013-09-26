@@ -118,41 +118,6 @@ public class SpringConfigParser implements ParserConstants, BeanParser
 		return xPathFactory;
 	}
 
-	protected Map<String, String> extractNamespacePrefix( final Document confFileDom ) throws XPathExpressionException
-	{
-		final Map<String, String> namespacePrefix = new ConcurrentHashMap<String, String> ();
-
-		final NodeList beansRoot = (NodeList) xBeanRoot.evaluate(confFileDom, XPathConstants.NODESET);
-
-		for( int i = 0 ; i < beansRoot.getLength() ; ++i)
-		{
-			Node beansNode = beansRoot.item(i);
-			NamedNodeMap attributes = beansNode.getAttributes();
-
-			for( int a = 0 ; a < attributes.getLength(); ++a )
-			{
-				final Node attribute = attributes.item(a);
-				final String attributeValue = attribute.getNodeName();
-
-				if( attributeValue != null && attributeValue.startsWith(XML_NAMESPACE_DEF) ) // its a namespace declaration
-				{
-					final String schemaUrl = attribute.getNodeValue();					
-					String prefix  = "";
-					
-					if( attributeValue.contains(":") ) // prefix
-					{
-						prefix = attributeValue.split(":")[1];
-					}
-					
-					logger.debug( "schemaUrl {} has prefix {} ", schemaUrl, prefix );
-					namespacePrefix.put(schemaUrl, prefix);
-				}
-			}
-		}
-		
-		return namespacePrefix;
-	}
-
 	protected String createBean( final Node beanNode ) throws XPathExpressionException
 	{
 		if (beanNode == null) // if Bean doesn't exist, there's nothing to do
@@ -399,7 +364,7 @@ public class SpringConfigParser implements ParserConstants, BeanParser
 	/**
 	 * Load a set of configuration files
 	 * @param configurationFiles
-	 * @return
+	 * @return a Map<Bean's Id, Bean>  containing all loaded Beans, fully resolved
 	 * @throws SAXException
 	 * @throws IOException
 	 */
@@ -425,7 +390,7 @@ public class SpringConfigParser implements ParserConstants, BeanParser
 	/**
 	 * Load a single configuration file
 	 * @param configurationFile
-	 * @return
+	 * @return a Map<Bean's Id, Bean>  containing all loaded Beans, fully resolved
 	 * @throws SAXException
 	 * @throws IOException
 	 */
@@ -435,15 +400,15 @@ public class SpringConfigParser implements ParserConstants, BeanParser
 	}
 
 	/**
-	 * 
-	 * @param configurationFile
+	 * Load a single configuration file with or without resolving Beans 
+	 * @param entryFile to load
 	 * @param loadedContext Set to track all loaded context to avoid infinite looping should configuration files be incorrects
 	 * @param resolveBean
-	 * @return
+	 * @return a Map<Bean's Id, Bean>  containing all loaded Beans, resolved or not depending on resolveBean parameter value
 	 * @throws SAXException
 	 * @throws IOException
 	 */
-	protected Map<String, Bean> load( String entryFile, Set<String> loadedContext, boolean resolveBean) throws SAXException, IOException
+	private Map<String, Bean> load( String entryFile, Set<String> loadedContext, boolean resolveBean) throws SAXException, IOException
 	{
 		// Start by keeping track of loaded file (after normalizing its name)
 		final String fullPath = FilenameUtils.getFullPath( entryFile ) ; 
@@ -457,8 +422,9 @@ public class SpringConfigParser implements ParserConstants, BeanParser
 			logger.debug( "Starting loading of {}", configurationFile);
 			
 			// Extract namespaces and load matching namespace plugins
-			Map<String, String> namespaces = extractNamespacePrefix(confFileDom);
-		
+			final NodeList beansRoot = (NodeList) xBeanRoot.evaluate(confFileDom, XPathConstants.NODESET);
+			Map<String, String> namespaces = ParserHelper.extractNamespacePrefix(beansRoot);
+			logger.debug( "XML namespaces prefix mapping ", namespaces);
 			
 			// TODO make loading flexible enough to have a namespace plugin mechanism here
 			SpringBeansNameSpaceParser springBeansParser = new SpringBeansNameSpaceParser();

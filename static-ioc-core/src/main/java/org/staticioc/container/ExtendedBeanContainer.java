@@ -13,9 +13,9 @@ import org.staticioc.model.Property;
 public interface ExtendedBeanContainer extends BeanContainer {
 	
 	/**
-	 * Register a parser's into this parser
-	 * Merge parent dependencies, prototypeBeans and propertyReferencesMap
-	 * @param bean to be registered
+	 * Register another ExtendedBeanContainer's content into this ExtendedBeanContainer
+	 * Merge parent and runtime dependencies, prototypeBeans, aliases and propertyReferences
+	 * @param container whose content is to be register in the current container
 	 */
 	void register( ExtendedBeanContainer container);
 	
@@ -27,6 +27,7 @@ public interface ExtendedBeanContainer extends BeanContainer {
 	/**
 	 * Resolve all parents dependencies and fill in their definition.
 	 * A ResolvedBeanCallback will be called after each parent Bean resolution
+	 * 
 	 * @param callback to call after each parent Bean resolution
 	 */
 	void resolveParentDefinition(ResolvedBeanCallback callback);

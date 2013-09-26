@@ -91,7 +91,7 @@ public class MapPlugin extends AbstractNodeSupportPlugin
 				}
 				else
 				{
-					final Node keyDef = ParserHelper.extractFirstNodeByName( entry.getChildNodes(), KEY);
+					final Node keyDef = ParserHelper.extractFirstNodeByName( entry.getChildNodes(), KEY, prefix);
 					
 					if(keyDef != null)
 					{

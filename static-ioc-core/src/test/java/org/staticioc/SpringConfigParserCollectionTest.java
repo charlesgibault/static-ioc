@@ -169,7 +169,6 @@ public class SpringConfigParserCollectionTest extends AbstractSpringParserTest
 		Assert.assertTrue( "Reference should be anonymous", prop.getRef().startsWith( BeanContainer.ANONYMOUS_BEAN_PREFIX) );
 			
 		checkProperty(mappedProps, "Key 7", 		"2", 	null );
-		//checkProperty(mappedProps, "bean_?", 		"woah", 	null ); //keyref = true
 		checkProperty(mappedProps, "Key 9", 		null, 	null );
     }
 }

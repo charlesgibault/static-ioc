@@ -187,9 +187,9 @@ public class BeanContainerImpl implements ExtendedBeanContainer
 	}
 	
 	/**
-	 * Register a parser's into this parser
-	 * Merge parent and runtime dependencies, prototypeBeans and propertyReferences
-	 * @param bean to be registered
+	 * Register another ExtendedBeanContainer's content into this ExtendedBeanContainer
+	 * Merge parent and runtime dependencies, prototypeBeans, aliases and propertyReferences
+	 * @param container whose content is to be register in the current container
 	 */
 	@Override
 	public void register( final ExtendedBeanContainer container)
@@ -211,9 +211,9 @@ public class BeanContainerImpl implements ExtendedBeanContainer
 	}	
 	
 	/**
-	 * Resolve a bean by Name
-	 * @param name
-	 * @return
+	 * Resolve a bean by name, id or alias
+	 * @param id of the Bean to retrieve
+	 * @return the matching Bean, if found, null otherwise
 	 */
 	@Override
 	public Bean getBean( final String id)
@@ -222,6 +222,11 @@ public class BeanContainerImpl implements ExtendedBeanContainer
 		return (bean != null)? bean : aliases.get(id);
 	}
 	
+	/**
+	 * Retrieve all resolved Beans in the container
+	 * 
+	 * @return a Map<id, Bean> containing all resolved Beans in this container
+	 */
 	@Override
 	public Map<String, Bean > getBeans()
 	{

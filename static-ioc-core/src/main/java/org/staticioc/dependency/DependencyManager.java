@@ -23,9 +23,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.xml.xpath.XPathExpressionException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.staticioc.container.AcknowledgeableBeanContainer;
@@ -81,8 +78,6 @@ public class DependencyManager<T extends Dependency>
 	 * Provide an ordered Set of Strings so that each Bean's id is listed after all its dependencies' id
 	 * @param beans
 	 * @param container
-	 * @param callback
-	 * @throws XPathExpressionException
 	 */
 	public LinkedHashSet<String> resolveBeansOrder(Set<String> beans, SimpleBeanContainer container)
 	{
@@ -121,9 +116,10 @@ public class DependencyManager<T extends Dependency>
 	
 	/**
 	 * Resolve dependencies using a depth first search (Cormen et al. / Tarjan)
-	 * 
-	 * @param parentName
-	 * @throws XPathExpressionException 
+	 * @param name of the build to resolve
+	 * @param container of Beans to use
+	 * @param visitedBeans Set of already visited Beans in the container
+	 * @param callback to use when resolving a dependency
 	 */
 	protected void resolveBean( final String name, SimpleBeanContainer container, final Set<String> visitedBeans, ResolvedDependencyCallback<T> callback )
 	{

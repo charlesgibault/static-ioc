@@ -30,15 +30,12 @@ public class CollectionBean extends Bean
 		return properties;
 	}
 
-	public CollectionBean( Type type) {
-		super();
-		setType( type );
-		setAnonymous(true);
+	public CollectionBean( Type type) {	
+		this( null, null, true, type);
 	}
 	
 	public CollectionBean(String name, String className, Type type) {
-		super(name, className, true);
-		setType( type );
+		this(name, className, true, type);
 	}
 
 	public CollectionBean(String name, String className, boolean anonymous, Type type) {

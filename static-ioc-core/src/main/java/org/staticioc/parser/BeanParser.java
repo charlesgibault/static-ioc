@@ -48,10 +48,10 @@ public interface BeanParser
 	void handleNodes( final Bean bean, final String propName, final NodeList propChilds) throws XPathExpressionException;
 
 	/**
-	 * Handle a <property> sub-node
-	 * @param spNode
-	 * @param propName
-	 * @return
+	 * Handle a sub-node and encapsulate result as a property
+	 * @param subNode to parse
+	 * @param propName name of the resulting Property
+	 * @return the matching Property referring the sub-node content
 	 * @throws XPathExpressionException
 	 */
 	Property handleNode( final Node subNode, final String propName ) throws XPathExpressionException;

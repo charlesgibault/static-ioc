@@ -24,9 +24,7 @@ public class Property implements Cloneable
 	
 	public Property( final String name, final String value, final String ref)
 	{
-		this.name = name;
-		this.value = value;
-		this.ref = ref;
+		this(name, value, ref, null);
 	}
 	
 	public Property( final String name, final String value, final String ref, final String type )

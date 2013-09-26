@@ -20,8 +20,12 @@ package org.staticioc.parser;
 
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.staticioc.model.Property;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -34,16 +38,36 @@ import org.w3c.dom.NodeList;
  */
 public class ParserHelper implements ParserConstants
 {
+	protected static final Logger logger = LoggerFactory.getLogger(ParserHelper.class);
+
+	/**
+	 * Builds a value property
+	 * @param propertyName name of the Property to build
+	 * @param value of the Property to build
+	 * @return the built Property if value is not null, null otherwise
+	 */
 	public static Property getVal(String propertyName, String value) {
 		if ( value == null) { return null; }
 		return new Property( propertyName, value, null );
 	}
 
+	/**
+	 * Builds a ref property
+	 * @param propertyName name of the Property to build
+	 * @param ref of the Property to build
+	 * @return the built Property if ref is not null, null otherwise
+	 */
 	public  static Property getRef(String propertyName, String ref) {
 		if ( ref == null) { return null; }
 		return new Property( propertyName, null, ref );
 	}
 
+	/**
+	 * Handle value, ref and idref attribute of an XML node and builds the corresponding property
+	 * @param propName name of the Property to build
+	 * @param node to analyze
+	 * @return the built Property, if value, ref or idref is found, null otherwise
+	 */
 	public static Property handleValueRefAttributes(final String propName, final Node node)
 	{
 		Property prop=null;
@@ -76,7 +100,7 @@ public class ParserHelper implements ParserConstants
 	/**
 	 * Extract text value for nodes like <value>text</value>
 	 * @param node
-	 * @return
+	 * @return the content of the first subnode of a node, expressed as a String, or null otherwise
 	 */
 	public  static String extractFirstChildValue(final Node node) {
 		final Node valueSubNode = node.getFirstChild();
@@ -89,16 +113,16 @@ public class ParserHelper implements ParserConstants
 	 * Go through a node list a extract the first matching node given its name
 	 * @param nodes
 	 * @param name
-	 * @return
+	 * @return the first matching node given in the NodeList, or null if not matching Node is found
 	 */
-	public static Node extractFirstNodeByName(final NodeList nodes, final String name) {
+	public static Node extractFirstNodeByName(final NodeList nodes, final String name, final String namespacePrefix) {
 		if(nodes != null && name != null )
 		{	
 			for( int n = 0 ; n<nodes.getLength() ; ++n )
 			{
 				final Node node = nodes.item( n );
 
-				if ( name.equals(node.getNodeName()) )
+				if ( match(name, node.getNodeName(), namespacePrefix) )
 				{
 					return node;
 				}
@@ -112,20 +136,18 @@ public class ParserHelper implements ParserConstants
 	 * Go through a node list a extract the first matching node given its name
 	 * @param nodes
 	 * @param name
-	 * @return
+	 * @return the first matching node given in the NodeList, or null if not matching Node is found
 	 */
 	public  static Collection<Node> extractNodesByName(final NodeList nodes, final String name, final String namespacePrefix) {
 		Collection<Node> result = new LinkedList<Node>();
 		
 		if(nodes != null && name != null )
-		{
-			final String fullName = prefixedName(namespacePrefix, name);
-			
+		{	
 			for( int n = 0 ; n<nodes.getLength() ; ++n )
 			{
 				final Node node = nodes.item( n );
 
-				if ( fullName.equals(node.getNodeName()) )
+				if ( match(name, node.getNodeName(), namespacePrefix) )
 				{
 					result.add( node );
 				}
@@ -133,6 +155,44 @@ public class ParserHelper implements ParserConstants
 		}
 
 		return result;
+	}
+	
+	/**
+	 * Parse a NodeList for XML namespace declaration attributes and build a mapping associating each namespace with its prefix
+	 * 
+	 * @param nodes to analyze
+	 * @return a Map<namespace URL, namespace prefix> for each namespace definition attached to any nodes in the passed NodeList
+	 */
+	public static Map<String, String> extractNamespacePrefix( final NodeList nodes )
+	{
+		final Map<String, String> namespacePrefix = new ConcurrentHashMap<String, String> ();
+
+		for( int i = 0 ; i < nodes.getLength() ; ++i)
+		{
+			Node node = nodes.item(i);
+			NamedNodeMap attributes = node.getAttributes();
+
+			for( int a = 0 ; a < attributes.getLength(); ++a )
+			{
+				final Node attribute = attributes.item(a);
+				final String attributeValue = attribute.getNodeName();
+
+				if( attributeValue != null && attributeValue.startsWith(XML_NAMESPACE_DEF) ) // its a namespace declaration
+				{
+					final String schemaUrl = attribute.getNodeValue();					
+					String prefix  = "";
+					
+					if( attributeValue.contains(":") ) // prefix
+					{
+						prefix = attributeValue.split(":")[1];
+					}
+					
+					namespacePrefix.put(schemaUrl, prefix);
+				}
+			}
+		}
+		
+		return namespacePrefix;
 	}
 	
 	/**
@@ -154,6 +214,14 @@ public class ParserHelper implements ParserConstants
 		return sb.toString();
 	} 
 	
+	/**
+	 * Check whether a node has the expected name after prefix resolution
+	 * 
+	 * @param expectedName unprefixed expected name 
+	 * @param nodeName full name of the element to compare
+	 * @param prefix of the namespace the expected element belongs to
+	 * @return true if nodeName is equals to expectedName after prefix resolution
+	 */
 	public static boolean match( String expectedName, String nodeName, String prefix)
 	{
 		if ( expectedName == null)

@@ -33,12 +33,12 @@ public interface BeanContainer extends SimpleBeanContainer
 	/**
 	 * Prefix used for declaring all anonymous Beans
 	 */
-	public static final String ANONYMOUS_BEAN_PREFIX = "bean_";
+	final String ANONYMOUS_BEAN_PREFIX = "bean_";
 	
 	/**
 	 * Prefix used for declaring all instances of prototype Beans
 	 */
-	public static final String PROTOTYPE_BEAN_PREFIX = "prototyped_";
+	final String PROTOTYPE_BEAN_PREFIX = "prototyped_";
 	
 	/**
 	 * Duplicate a Bean's definition, changing id, alias and anonymous status on the fly
@@ -57,13 +57,13 @@ public interface BeanContainer extends SimpleBeanContainer
 	String generateAnonymousBeanId();
 	
 	/**
-	 * Register a set of beans in the bean map
-	 * @param beans
+	 * Register a Bean in the container
+	 * @param bean
 	 */
 	void register(final Bean bean);
 
 	/**
-	 * Register a set of beans in the bean map
+	 * Register a set of Beans in the container
 	 * @param beans
 	 */
 	void register(final Map<String, Bean> beans) ;
@@ -72,7 +72,7 @@ public interface BeanContainer extends SimpleBeanContainer
 	 * Register a bean -> parent dependency
 	 * @param dependency to be registered
 	 */
-	void registerParent( DefinitionDependency parent );
+	void registerParent( DefinitionDependency dependency );
 	
 	/**
 	 * Register a bean -> run dependency
