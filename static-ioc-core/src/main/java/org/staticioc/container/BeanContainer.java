@@ -33,12 +33,12 @@ public interface BeanContainer extends SimpleBeanContainer
 	/**
 	 * Prefix used for declaring all anonymous Beans
 	 */
-	final String ANONYMOUS_BEAN_PREFIX = "bean_";
+	String ANONYMOUS_BEAN_PREFIX = "bean_";
 	
 	/**
 	 * Prefix used for declaring all instances of prototype Beans
 	 */
-	final String PROTOTYPE_BEAN_PREFIX = "prototyped_";
+	String PROTOTYPE_BEAN_PREFIX = "prototyped_";
 	
 	/**
 	 * Duplicate a Bean's definition, changing id, alias and anonymous status on the fly

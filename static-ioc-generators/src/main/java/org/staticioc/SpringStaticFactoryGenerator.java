@@ -51,7 +51,7 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 	/**
 	 * Ignore abstract beans and prototypes
 	 * @param bean
-	 * @return
+	 * @return true if the Bean is hidden (and thus should not be instanciated)
 	 */
 	protected boolean isHidden( final Bean bean )
 	{
@@ -73,7 +73,7 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 		final String fileExtensionOverride = (fileExtOverride == null) ? generator.getDefaultSourceFileExtension() : fileExtOverride;
 		
 		// Check if outputPath actually ends with a trailing / or not
-		final String outputPath = ( oPath.endsWith(File.separator) ) ? oPath : oPath + File.separator;
+		final String outputPath = oPath.endsWith(File.separator) ? oPath : oPath + File.separator;
 		
 		//Build complete output file path:
 		for( final String targetClass : inputOutputMapping.keySet() )
@@ -94,13 +94,18 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 	}
 
 	/**
-	 * Entry point for the service : generate code matching setup configuration file.
-	 * @return
-	 * @throws IOException 
-	 * @throws SAXException 
-	 * @throws ParserConfigurationException 
+	 * Load one or multiple context configuration file and generate a BeanFactory class that instanciates the declared Beans
+	 * 
+	 * @param codeGenerator CodeGenerator object to use to generate the target BeanFactory source code
+	 * @param generatedPackageName the name of the target package (if any) to use for the BeanFactory 
+	 * @param generatedClassName the name of the target generated class (and file) name for the BeanFactory
+	 * @param configurationFiles List of Configuration files (Spring contexts) to load
+	 * @return The BeanFactory content as StringBuilder object
+	 * @throws SAXException
+	 * @throws IOException
+	 * @throws ParserConfigurationException
 	 */
-	public StringBuilder generate(final CodeGenerator codeGenerator, final String generatedPackageName, final String generatedClassName, final List<String> configurationFiles )  throws SAXException, IOException, ParserConfigurationException
+	protected StringBuilder generate(final CodeGenerator codeGenerator, final String generatedPackageName, final String generatedClassName, final List<String> configurationFiles )  throws SAXException, IOException, ParserConfigurationException
 	{
 		final StringBuilder res = new StringBuilder( INIT_BUFFER_SIZE );
 		codeGenerator.setOutput( res );

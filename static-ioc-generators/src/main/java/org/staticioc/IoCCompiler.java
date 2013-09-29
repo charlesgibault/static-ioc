@@ -32,10 +32,33 @@ import org.xml.sax.SAXException;
 
 /**
  * @author Charles Gibault
- * @date 11 sept. 2012
  */
 public interface IoCCompiler
 {
+	/**
+	 * Load a Set of context configuration files and generate a BeanFactory class that instanciates the declared Beans for each input/output mapping
+	 * using the default file extension provided by the chosen CodeGenerator
+	 * 
+	 * @param generator  CodeGenerator object to use to generate the target BeanFactory source code
+	 * @param outputPath were the BeanFactory classes will be written 
+	 * @param inputOutputMapping Map< Target BeanFactory class name, List of configuration files to load>
+	 * @throws SAXException
+	 * @throws IOException
+	 * @throws ParserConfigurationException
+	 */
 	void compile( CodeGenerator generator, String outputPath, Map<String, List<String>> inputOutputMapping )  throws SAXException, IOException, ParserConfigurationException;
+	
+	/**
+	 * Load a Set of context configuration files and generate a BeanFactory class that instanciates the declared Beans for each input/output mapping
+	 * using the provided file extension.
+	 * 
+	 * @param generator  CodeGenerator object to use to generate the target BeanFactory source code
+	 * @param outputPath were the BeanFactory classes will be written 
+	 * @param inputOutputMapping Map< Target BeanFactory class name, List of configuration files to load>
+	 * @param fileExtensionOverride file extension to use for generated classes
+	 * @throws SAXException
+	 * @throws IOException
+	 * @throws ParserConfigurationException
+	 */
 	void compile( CodeGenerator generator, String outputPath, Map<String, List<String>> inputOutputMapping, String fileExtensionOverride )  throws SAXException, IOException, ParserConfigurationException;
 }

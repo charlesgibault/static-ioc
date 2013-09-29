@@ -67,14 +67,14 @@ public class BeanContainerImpl implements ExtendedBeanContainer
 	 */
 	@Override
 	public String generateAnonymousBeanId() {
-		return ANONYMOUS_BEAN_PREFIX + (++anonymousBeanIdentifier);
+		return ANONYMOUS_BEAN_PREFIX + ++anonymousBeanIdentifier;
 	}
 	
 	/**
 	 * @return a unique generated Bean id to use for prototype Beans' declaration
 	 */
 	protected String generatePrototypeBeanId( String beanName) {
-		return PROTOTYPE_BEAN_PREFIX + beanName + (++anonymousBeanIdentifier);
+		return PROTOTYPE_BEAN_PREFIX + beanName + ++anonymousBeanIdentifier;
 	}
 	
 

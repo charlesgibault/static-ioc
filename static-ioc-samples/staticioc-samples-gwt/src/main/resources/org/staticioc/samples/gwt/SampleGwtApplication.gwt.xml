@@ -35,6 +35,7 @@
   <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/>     -->
 
   <!-- Other module inherits                                      -->
+  <inherits name="javax.validation.Validation"/>
   <inherits name="com.google.gwt.place.Place" />
   <inherits name="com.google.gwt.activity.Activity" />
   

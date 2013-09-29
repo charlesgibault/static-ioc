@@ -23,7 +23,6 @@ import org.staticioc.model.Property;
 
 /**
  * @author Charles Gibault
- * @date 6 sept. 2012
  */
 public interface CodeGenerator
 {

@@ -32,7 +32,6 @@ import org.staticioc.generator.JavaCodeGenerator;
 
 /**
  * @author Charles Gibault
- * @date 12 sept. 2012
  */
 public class IoCCompilerHelperTest
 {

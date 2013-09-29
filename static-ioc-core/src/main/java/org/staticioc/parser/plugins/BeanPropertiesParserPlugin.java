@@ -24,8 +24,11 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.staticioc.model.Bean;
 import org.staticioc.model.Property;
+import org.staticioc.parser.BeanParser;
 import org.staticioc.parser.ParserHelper;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -36,14 +39,14 @@ import org.w3c.dom.NodeList;
  */
 public class BeanPropertiesParserPlugin extends AbstractNodeParserPlugin
 {
+	protected static final Logger logger = LoggerFactory.getLogger(BeanPropertiesParserPlugin.class);
 	private XPathExpression xProps;
-
+	
 	@Override
 	public void handleNode(Bean bean, Node node) throws XPathExpressionException
 	{
-		final NodeList propsRef = (NodeList) getXProps().evaluate(node, XPathConstants.NODESET);
+		final NodeList propsRef = (NodeList) xProps.evaluate(node, XPathConstants.NODESET);
 		handleBeanProperties(bean, propsRef);
-
 	}
 
 	protected void handleBeanProperties( final Bean bean, final NodeList propsRef)
@@ -73,19 +76,20 @@ public class BeanPropertiesParserPlugin extends AbstractNodeParserPlugin
 		}
 	}
 	
-	private XPathExpression getXProps() throws XPathExpressionException
+	
+	@Override
+	public void setBeanParser(BeanParser parser)
 	{
-		if( xProps == null)
+		super.setBeanParser(parser);
+	
+		try
 		{
-			synchronized(this)
-			{
-				if( xProps == null)
-				{
-					final XPath xPathProperties  = beanParser.getXPathFactory().newXPath();
-					xProps = xPathProperties.compile(XPATH_PROPERTY);
-				}
-			}
+			final XPath xPathProperties  = beanParser.getXPathFactory().newXPath();
+			xProps = xPathProperties.compile(XPATH_PROPERTY);
 		}
-		return xProps;
+		catch(XPathExpressionException e)
+		{
+			logger.error( "Couldn't compile Xpath {}", XPATH_PROPERTY, e);
+		}
 	}
 }

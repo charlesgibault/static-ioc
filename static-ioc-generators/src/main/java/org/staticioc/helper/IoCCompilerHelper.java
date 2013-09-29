@@ -33,7 +33,6 @@ import org.staticioc.generator.CodeGenerator;
 
 /**
  * @author Charles Gibault
- * @date 12 sept. 2012
  */
 public class IoCCompilerHelper
 {

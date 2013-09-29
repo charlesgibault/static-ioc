@@ -78,7 +78,7 @@ public class ParserHelper implements ParserConstants
 
 		final Node refNode = propAttributes.getNamedItem(REF);
 		final Node idRefNode = propAttributes.getNamedItem(IDREF);
-		final String ref = (refNode != null ) ? refNode.getNodeValue() : ((idRefNode != null ) ? idRefNode.getNodeValue() : null);
+		final String ref = refNode != null ? refNode.getNodeValue() : (idRefNode != null ? idRefNode.getNodeValue() : null);
 
 		if ( value != null || ref != null ) // Simple property : value or reference
 		{
