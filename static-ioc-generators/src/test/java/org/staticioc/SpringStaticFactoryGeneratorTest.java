@@ -85,6 +85,7 @@ public class SpringStaticFactoryGeneratorTest
 				+ "number10House.setP( personBean );\n"
 
 				+ "// Setting up bean personBean\n"
+				+ "personBean.setNullProp( null );\n"
 				+ "personBean.setUsername( \"root\" );\n"
 				+ "personBean.setName( \"personName\" );\n"
 				+ "personBean.setBirthCountry( country );\n"

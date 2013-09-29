@@ -41,6 +41,9 @@
   		</bean:property>
 		<bean:property name="age" value="28"/>
 		<bean:property name="reference" ref="number10House" />
+		<bean:property name="nullProp">
+		    <bean:null/>
+		</bean:property>
 	</bean:bean>
 
 	 <!-- class without id  -->

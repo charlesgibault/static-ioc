@@ -38,6 +38,9 @@
 			<idref bean="country"/>
   		</property>
 		<property name="age" value="28"/>
+		<property name="nullProp">
+		    <null/>
+		</property>
 	</bean>
 
 	<!-- class with id and p notation " -->
