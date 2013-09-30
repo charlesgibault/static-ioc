@@ -16,22 +16,23 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.staticioc.parser.plugins;
+package org.staticioc.parser.namespace.spring.beans;
 
 import javax.xml.xpath.XPathExpressionException;
 
 import org.staticioc.model.Bean;
 import org.staticioc.model.CollectionBean;
 import org.staticioc.model.Property;
+import org.staticioc.parser.AbstractNodeSupportPlugin;
 import org.staticioc.parser.ParserHelper;
 import org.w3c.dom.Node;
 
-public class ListPlugin extends AbstractNodeSupportPlugin
+public class SetPlugin extends AbstractNodeSupportPlugin 
 {
 	@Override
 	public String getUnprefixedSupportedNode()
 	{
-		return LIST;
+		return SET;
 	}
 
 	@Override
@@ -39,7 +40,7 @@ public class ListPlugin extends AbstractNodeSupportPlugin
 	{
 		// create an anonymous bean of appropriate collection type
 		final String beanId = beanParser.getBeanContainer().generateAnonymousBeanId();
-		final Bean collecBean = new CollectionBean( beanId, Bean.Type.LIST.toString(), Bean.Type.LIST );
+		final Bean collecBean = new CollectionBean( beanId, Bean.Type.SET.toString(), Bean.Type.SET );
 		beanParser.handleNodes( collecBean, "add", node.getChildNodes() ); // recursively set it's property
 
 		// register Bean in Map

@@ -81,13 +81,12 @@ public interface BeanContainer extends SimpleBeanContainer
 	void registerRunTimeDependency(RunTimeDependency dependency);
 
 	/**
-	 * Add or replace a Property in a bean's property set
-	 * Also updates a the Map of Property with a bean reference.
+	 * Update a collection of properties while registering potential references in the container (for prototype resolution)
 	 * 
-	 * @param prop
-	 * @param set
+	 * @param prop the Property to add
+	 * @param properties Collection of existing properties
 	 */
-	void addOrReplaceProperty(Property prop, Collection<Property> set);
+	void addOrReplaceProperty(Property prop, Collection<Property> properties);
 	
 	/**
 	 * Resolve beans dependencies to order them so that for each Bean, all its dependencies are ordered before it

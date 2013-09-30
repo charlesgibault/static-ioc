@@ -26,11 +26,8 @@ public interface ExtendedBeanContainer extends BeanContainer {
 
 	/**
 	 * Resolve all parents dependencies and fill in their definition.
-	 * A ResolvedBeanCallback will be called after each parent Bean resolution
-	 * 
-	 * @param callback to call after each parent Bean resolution
 	 */
-	void resolveParentDefinition(ResolvedBeanCallback callback);
+	void resolveParentDefinition();
 	
 	/**
 	 * @return the Bean definition dependencies manager

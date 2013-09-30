@@ -1,7 +1,7 @@
-package org.staticioc.parser.namespace;
+package org.staticioc.parser.namespace.spring.p;
 
+import org.staticioc.parser.AbstractNameSpaceParser;
 import org.staticioc.parser.NodeParserPlugin;
-import org.staticioc.parser.plugins.SpringPParserPlugin;
 
 public class SpringPNameSpaceParser extends AbstractNameSpaceParser
 {	

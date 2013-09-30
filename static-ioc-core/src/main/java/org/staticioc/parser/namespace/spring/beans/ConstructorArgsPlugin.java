@@ -16,7 +16,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.staticioc.parser.plugins;
+package org.staticioc.parser.namespace.spring.beans;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.staticioc.dependency.RunTimeDependency;
 import org.staticioc.model.Bean;
 import org.staticioc.model.Property;
+import org.staticioc.parser.AbstractNodeParserPlugin;
 import org.staticioc.parser.ParserHelper;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -110,7 +111,7 @@ public class ConstructorArgsPlugin extends AbstractNodeParserPlugin
 			if( prop != null)
 			{
 				logger.debug("Constructor arg : {}", prop.toString());
-				beanParser.addOrReplaceProperty( prop, bean.getConstructorArgs() );
+				beanParser.getBeanContainer().addOrReplaceProperty( prop, bean.getConstructorArgs() );
 				
 				if( prop.getRef() != null )
 				{

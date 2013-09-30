@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.staticioc.dependency.DefinitionDependency;
 import org.staticioc.dependency.DependencyManager;
+import org.staticioc.dependency.ResolvedBeanCallback;
 import org.staticioc.dependency.ResolvedDependencyCallback;
 import org.staticioc.dependency.RunTimeDependency;
 import org.staticioc.model.Bean;
@@ -235,12 +236,12 @@ public class BeanContainerImpl implements ExtendedBeanContainer
 
 	/**
 	 * Resolve all parent definitions
-	 * @param callback to use to process a Bean
 	 */
 	@Override
-	public void resolveParentDefinition(final ResolvedBeanCallback callback)
+	public void resolveParentDefinition()
 	{
-		parentDependencyManager.resolveAllDependencies(this, new ResolvedDependencyCallback<DefinitionDependency> ()
+		final BeanContainer beanContainer = this;
+		parentDependencyManager.resolveAllDependencies(beanContainer, new ResolvedDependencyCallback<DefinitionDependency> ()
 		{
 			@Override
 			public void onResolvedDependency(DefinitionDependency dependency, SimpleBeanContainer container)
@@ -252,11 +253,15 @@ public class BeanContainerImpl implements ExtendedBeanContainer
 				final Bean bean = duplicateBean( dependency.getId(), dependency.getAlias(), parentBean, dependency.isAnonymous() );
 				final Node beanNode = dependency.getNode();
 				final NamedNodeMap beanAttributes = beanNode.getAttributes();
+				final ResolvedBeanCallback callback = dependency.getResolvedBeanCallback();
 				
-				try {
-					callback.resolve( bean, beanNode, beanAttributes, dependency.isAnonymous() );
-				} catch (XPathExpressionException e) {
-					logger.error( "Error processing Bean " + bean.getId(), e );
+				if ( callback != null)
+				{
+					try {
+						callback.onResolve( bean, beanNode, beanAttributes, dependency.isAnonymous(), beanContainer );
+					} catch (XPathExpressionException e) {
+						logger.error( "Error processing Bean " + bean.getId(), e );
+					}
 				}
 			}
 				

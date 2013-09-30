@@ -25,13 +25,15 @@ public class DefinitionDependency extends Dependency
 	private final String alias;
 	private final boolean isAnonymous;
 	private final Node node;
+	private ResolvedBeanCallback resolvedBeanCallback;
 	
-	public DefinitionDependency(String parentId, String id, String alias, boolean isAnonymous, Node parentNode)
+	public DefinitionDependency(String parentId, String id, String alias, boolean isAnonymous, Node parentNode, ResolvedBeanCallback callback)
 	{
 		super(id, parentId);
 		this.alias = alias;
 		this.isAnonymous = isAnonymous;
 		this.node = parentNode;
+		this.resolvedBeanCallback = callback;
 	}
 	
 	public String getParentId() {
@@ -48,9 +50,13 @@ public class DefinitionDependency extends Dependency
 		return alias;
 	}
 
+	public ResolvedBeanCallback getResolvedBeanCallback() {
+		return resolvedBeanCallback;
+	}
+
 	@Override
 	public String toString() {
 		return "DefinitionDependency [parentId=" + getParentId() + ", id=" + getId() + ", alias=" + alias
-				+ ", isAnonymous=" + isAnonymous + "]";
+				+ ", isAnonymous=" + isAnonymous + ", hasCallback=" +  (resolvedBeanCallback!= null) + "]";
 	}
 }

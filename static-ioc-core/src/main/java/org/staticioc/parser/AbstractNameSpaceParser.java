@@ -1,12 +1,8 @@
-package org.staticioc.parser.namespace;
+package org.staticioc.parser;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import org.staticioc.parser.BeanParser;
-import org.staticioc.parser.NamespaceParser;
-import org.staticioc.parser.NodeParserPlugin;
-import org.staticioc.parser.NodeSupportPlugin;
 
 public abstract class AbstractNameSpaceParser implements NamespaceParser
 {

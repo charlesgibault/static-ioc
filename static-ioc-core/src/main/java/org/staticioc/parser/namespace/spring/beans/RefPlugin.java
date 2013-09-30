@@ -16,36 +16,36 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.staticioc.parser.plugins;
+package org.staticioc.parser.namespace.spring.beans;
 
 import javax.xml.xpath.XPathExpressionException;
-
-import org.staticioc.model.Bean;
-import org.staticioc.model.CollectionBean;
 import org.staticioc.model.Property;
+import org.staticioc.parser.AbstractNodeSupportPlugin;
 import org.staticioc.parser.ParserHelper;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-public class SetPlugin extends AbstractNodeSupportPlugin 
+public class RefPlugin extends AbstractNodeSupportPlugin
 {
 	@Override
 	public String getUnprefixedSupportedNode()
 	{
-		return SET;
+		return REF;
 	}
 
 	@Override
 	public Property handleNode( final Node node, final String propName ) throws XPathExpressionException
 	{
-		// create an anonymous bean of appropriate collection type
-		final String beanId = beanParser.getBeanContainer().generateAnonymousBeanId();
-		final Bean collecBean = new CollectionBean( beanId, Bean.Type.SET.toString(), Bean.Type.SET );
-		beanParser.handleNodes( collecBean, "add", node.getChildNodes() ); // recursively set it's property
+		final NamedNodeMap spNodeAttributes = node.getAttributes();
+		final Node refNode = spNodeAttributes.getNamedItem(BEAN);
 
-		// register Bean in Map
-		beanParser.getBeanContainer().register( collecBean  );
-
-		// Wire this bean as a reference
-		return ParserHelper.getRef( propName, beanId );
+		if( refNode != null) // handle <ref bean="">
+		{
+			return ParserHelper.getRef( propName, refNode.getNodeValue() );
+		} 
+		else //Handle <ref>value</ref>
+		{
+			return ParserHelper.getRef( propName, ParserHelper.extractFirstChildValue(node) );
+		}
 	}
 }

@@ -30,14 +30,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public interface BeanParser
-{
-	/**
-	 * Update a collection of properties while registering potential references in the container (for prototype resolution)
-	 * @param prop the Property to add
-	 * @param properties Collection of existing properties
-	 */
-	void addOrReplaceProperty(final Property prop, final Collection<Property> properties);
-		
+{		
 	/**
 	 * Handle a bean's sub property
 	 * @param bean the current bean
@@ -60,6 +53,13 @@ public interface BeanParser
 	 * @return the BeanContainer associated with the current BeanParser
 	 */
 	BeanContainer getBeanContainer();
+	
+	/**
+	 * the list of all NodeSupportPlugins that have been registered by various NamespaceParser to match the XML namespaces defined in the document
+	 * 
+	 * @return the list of all active NodeSupportPlugins
+	 */
+	Collection<NodeParserPlugin> getNodeParserPlugins();
 	
 	/**
 	 * @return an XPathFactory for node analysis

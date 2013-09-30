@@ -42,21 +42,18 @@ import org.slf4j.LoggerFactory;
 import org.staticioc.container.BeanContainer;
 import org.staticioc.container.ExtendedBeanContainer;
 import org.staticioc.container.BeanContainerImpl;
-import org.staticioc.container.ResolvedBeanCallback;
-import org.staticioc.dependency.DefinitionDependency;
-import org.staticioc.dependency.FactoryBeanDependency;
-import org.staticioc.dependency.RunTimeDependency;
 import org.staticioc.model.Bean;
 import org.staticioc.model.Property;
-import org.staticioc.model.Bean.Scope;
 import org.staticioc.parser.*;
-import org.staticioc.parser.namespace.*;
+import org.staticioc.parser.namespace.spring.beans.SpringBeansNameSpaceParser;
+import org.staticioc.parser.namespace.spring.p.SpringPNameSpaceParser;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+//TODO add (partial) support for PropertyPlaceHolders
 public class SpringConfigParser implements ParserConstants, BeanParser
 {
 	protected static final Logger logger = LoggerFactory.getLogger(SpringConfigParser.class);
@@ -118,164 +115,16 @@ public class SpringConfigParser implements ParserConstants, BeanParser
 		return xPathFactory;
 	}
 
-	protected String createBean( final Node beanNode ) throws XPathExpressionException
+	/**
+	 * Handle a list of node 
+	 * @param nodes List of nodes to process
+	 * @throws XPathExpressionException
+	 */
+	protected void handleNodes( final NodeList nodes) throws XPathExpressionException
 	{
-		if (beanNode == null) // if Bean doesn't exist, there's nothing to do
-		{
-			return null;
-		}
-
-		final NamedNodeMap beanAttributes = beanNode.getAttributes();
-
-		// use Id if defined, name otherwise (if defined), auto-generated bean name otherwise.
-		final Node idNode = beanAttributes.getNamedItem(ID);
-		final Node bNameNode = beanAttributes.getNamedItem(NAME);
-
-		String id = (idNode != null )? idNode.getNodeValue() : (bNameNode != null )? bNameNode.getNodeValue() : null;
-		final String alias = ( idNode != null  && bNameNode != null)? bNameNode.getNodeValue(): null;
-
-		boolean isAnonymous = false;
-		if( id == null )
-		{
-			id = beanContainer.generateAnonymousBeanId(); 
-			isAnonymous = true;
-		}
-
-		// Check if this node has a parent
-		final Node parentNode = beanAttributes.getNamedItem(PARENT);
-
-		Bean bean = null;
-
-		if (parentNode != null )
-		{
-			final String parentName = parentNode.getNodeValue();
-
-			// Test direct resolution (parent already registered)
-			final Bean parentBean = beanContainer.getBean( parentName );
-
-			if( parentBean == null) // parent not known yet
-			{
-				beanContainer.registerParent( new DefinitionDependency( parentName, id, alias, isAnonymous,  beanNode) );
-				return id;
-			}
-			else
-			{
-				// Perform bean copy and continues
-				bean = beanContainer.duplicateBean( id, alias, parentBean, isAnonymous );
-			}
-		}
-
-		// Perform actual node content processing
-		return processBeanNode(beanNode, beanAttributes, id, alias, isAnonymous, bean);
+		handleNodes( null, "", nodes);
 	}
 	
-	/**
-	 * Process a <bean/> node's content.
-	 */
-	protected String processBeanNode(final Node beanNode, final NamedNodeMap beanAttributes, final String id, final String alias, boolean isAnonymous, Bean bean) throws XPathExpressionException
-	{
-		String className = (bean != null)? bean.getClassName() : null;
-		boolean abstractBean = false;
-
-		final Node classNode = beanAttributes.getNamedItem(CLASS);
-		if ( classNode != null )
-		{
-			className = classNode.getNodeValue();
-		}
-
-		final Node abstractNode = beanAttributes.getNamedItem( ABSTRACT );
-		if( abstractNode != null )
-		{
-			abstractBean = Boolean.valueOf( abstractNode.getNodeValue() );
-		}
-
-		final Node scopeNode = beanAttributes.getNamedItem(SCOPE);
-		final Node singletonNode = beanAttributes.getNamedItem(SINGLETON);
-
-		Scope scope = Scope.SINGLETON;
-		if( scopeNode != null && PROTOTYPE.equalsIgnoreCase( scopeNode.getNodeValue() ) 
-				|| singletonNode != null && !Boolean.valueOf( singletonNode.getNodeValue() ) )
-		{
-			scope = Scope.PROTOTYPE;
-		}
-
-		logger.debug( "id {} scope {} ", id, scope );
-
-		//Handle Factory Bean/Method here
-		String factoryBean=(bean != null)? bean.getFactoryBean() : null;
-		String factoryMethod=(bean != null)? bean.getFactoryMethod() : null;
-
-		final Node factoryBeanNode = beanAttributes.getNamedItem(FACTORY_BEAN);
-		final Node factoryMethodNode = beanAttributes.getNamedItem(FACTORY_METHOD);
-		if ( factoryBeanNode != null )
-		{
-			factoryBean = factoryBeanNode.getNodeValue();
-		}
-		if ( factoryMethodNode != null )
-		{
-			factoryMethod = factoryMethodNode.getNodeValue();
-		}
-
-		// Handle init/destroy methods here:
-		String initMethod=(bean != null)? bean.getInitMethod() : null;
-		String destroyMethod=(bean != null)? bean.getDestroyMethod() : null;
-
-		final Node initMethodBeanNode = beanAttributes.getNamedItem(INIT_METHOD);
-		final Node destroyMethodNode = beanAttributes.getNamedItem(DESTROY_METHOD);
-		if ( initMethodBeanNode != null )
-		{
-			initMethod = initMethodBeanNode.getNodeValue();
-		}
-		if ( destroyMethodNode != null )
-		{
-			destroyMethod = destroyMethodNode.getNodeValue();
-		}
-
-		// Class is mandatory for non abstract beans
-		if( className == null && !abstractBean)
-		{
-			logger.warn( "No class defined for bean {}. Skipping", id );
-			return null;
-		}
-
-		if( bean == null )
-		{
-			bean = new Bean(id, className, isAnonymous );
-			bean.setAlias(alias);
-		}
-		else
-		{
-			bean.setClassName(className); // possible override of the parent's class
-			bean.setAlias(alias);
-		}
-
-		bean.setAbstract( abstractBean );
-		bean.setScope( scope );
-
-		bean.setFactoryBean(factoryBean);
-		bean.setFactoryMethod(factoryMethod);
-
-		if( factoryBean != null)
-		{
-			final RunTimeDependency factoryBeanDependency = new FactoryBeanDependency( id, factoryBean); // Factory-bean can refer to framework classes and thus must be "soft" 
-			beanContainer.registerRunTimeDependency( factoryBeanDependency );
-		}
-
-		bean.setInitMethod(initMethod);
-		bean.setDestroyMethod(destroyMethod);
-
-		// Specific attributes plugin
-		for( NodeParserPlugin plugin: nodeParserPlugins )
-		{
-			plugin.handleNode(bean, beanNode);
-		}
-
-		// register Bean in Map
-		beanContainer.register( bean );
-
-		return id;
-	}
-
 	/**
 	 * Handle all bean's properties nodes
 	 * @param bean : reference to the bean owning this attributes
@@ -291,7 +140,7 @@ public class SpringConfigParser implements ParserConstants, BeanParser
 			final Node spNode = nodes.item( sp );
 
 			Property prop = handleNode(  spNode, propName );
-			if (prop != null )
+			if (prop != null && bean != null)
 			{
 				beanContainer.addOrReplaceProperty(prop, bean.getProperties() );
 			}
@@ -306,57 +155,12 @@ public class SpringConfigParser implements ParserConstants, BeanParser
 	 * @throws XPathExpressionException
 	 */
 	@Override
-	public Property handleNode( final Node node, final String propName )
-			throws XPathExpressionException
-			{
-		final String spNodeName = node.getNodeName();
-		
-		if( nodesSupportPlugins.containsKey( spNodeName) )
+	public Property handleNode( final Node node, final String propName ) throws XPathExpressionException
+	{		
+		if( nodesSupportPlugins.containsKey( node.getNodeName()) )
 		{
-			NodeSupportPlugin plugin = nodesSupportPlugins.get(spNodeName);
+			NodeSupportPlugin plugin = nodesSupportPlugins.get(node.getNodeName());
 			return plugin.handleNode(node, propName);
-		}
-		else if ( ParserHelper.match( REF, spNodeName, prefix) || ParserHelper.match( IDREF, spNodeName, prefix) ) // Look at children named ref / idref
-		{
-			final NamedNodeMap spNodeAttributes = node.getAttributes();
-			final Node refNode = spNodeAttributes.getNamedItem(BEAN);
-
-			if( refNode != null) // handle <ref bean="">
-			{
-				return ParserHelper.getRef( propName, refNode.getNodeValue() );
-			} 
-			else //Handle <ref>value</ref>
-			{
-				return ParserHelper.getRef( propName, ParserHelper.extractFirstChildValue(node) );
-			}
-		}
-		else if ( ParserHelper.match( VALUE, spNodeName, prefix) ) // Look at children named value
-		{						
-			final Property res =  ParserHelper.getVal( propName, ParserHelper.extractFirstChildValue(node) ); 
-
-			// Handle type specified as an attribute
-			final NamedNodeMap spNodeAttributes = node.getAttributes();
-			final Node typeNode = spNodeAttributes.getNamedItem(TYPE);
-			if( typeNode != null)
-			{
-				res.setType( typeNode.getNodeValue() );
-			}
-
-			return res;
-		}
-		else if  ( ParserHelper.match( BEAN, spNodeName, prefix) ) // anonymous bean
-		{
-			// recursively create bean
-			final String subBeanName = createBean( node );
-
-			if (subBeanName != null) // Wire this bean as a reference
-			{
-				return ParserHelper.getRef( propName, subBeanName );
-			}
-		}
-		else if  ( ParserHelper.match( NULL, spNodeName, prefix) ) // null value
-		{
-			return new Property( propName, null, null );
 		}
 		return null;
 	}
@@ -379,9 +183,8 @@ public class SpringConfigParser implements ParserConstants, BeanParser
 		}
 
 		// Now resolve every beans
-		resolveParentDefinition();
+		beanContainer.resolveParentDefinition();
 		beanContainer.resolveReferences();
-
 
 		return beanContainer.getBeans();
 	}
@@ -480,15 +283,12 @@ public class SpringConfigParser implements ParserConstants, BeanParser
 			resolveImports(importsRef, loadedContext, fullPath);
 
 			// the parse bean definition 
-			for( int i = 0 ; i< beansRef.getLength() ; ++i )
-			{
-				createBean( beansRef.item( i ) );
-			}
+			handleNodes( beansRef);
 
 			// resolve parent definition that couldn't be resolved in the first pass.
 			if( resolveBean)
 			{
-				resolveParentDefinition();
+				beanContainer.resolveParentDefinition();
 			}
 
 			// Finally resolve alias references
@@ -555,27 +355,14 @@ public class SpringConfigParser implements ParserConstants, BeanParser
 		}
 	}
 	
-	protected void resolveParentDefinition()
-	{
-		beanContainer.resolveParentDefinition(
-				new ResolvedBeanCallback()
-				{
-					public String resolve(Bean bean, Node beanNode, NamedNodeMap beanAttributes, boolean isAnonymous ) throws XPathExpressionException
-					{
-						return processBeanNode(beanNode, beanAttributes, bean.getId(), bean.getAlias(), isAnonymous, bean);
-					}
-				} );
-	}
-
-	@Override
-	public void addOrReplaceProperty(final Property prop, final Collection<Property> set) {
-		beanContainer.addOrReplaceProperty( prop, set);
-	}
-
 	@Override
 	public BeanContainer getBeanContainer() {
 		return beanContainer;
 	}
 
-	//TODO add (partial) support for PropertyPlaceHolders
+	@Override
+	public Collection<NodeParserPlugin> getNodeParserPlugins() {
+		return nodeParserPlugins;
+	}
+
 }

@@ -1,13 +1,8 @@
-package org.staticioc.parser.namespace;
+package org.staticioc.parser.namespace.spring.beans;
 
+import org.staticioc.parser.AbstractNameSpaceParser;
 import org.staticioc.parser.NodeParserPlugin;
 import org.staticioc.parser.NodeSupportPlugin;
-import org.staticioc.parser.plugins.BeanPropertiesParserPlugin;
-import org.staticioc.parser.plugins.ConstructorArgsPlugin;
-import org.staticioc.parser.plugins.ListPlugin;
-import org.staticioc.parser.plugins.MapPlugin;
-import org.staticioc.parser.plugins.PropertiesPlugin;
-import org.staticioc.parser.plugins.SetPlugin;;
 
 public class SpringBeansNameSpaceParser extends AbstractNameSpaceParser
 {	
@@ -19,16 +14,26 @@ public class SpringBeansNameSpaceParser extends AbstractNameSpaceParser
 		nodeParserPlugins.add( constructorArgsPlugin );
 		nodeParserPlugins.add( beanPropertiesPlugin );
 
-
 		NodeSupportPlugin listPlugin = new ListPlugin();
 		NodeSupportPlugin setPlugin = new SetPlugin();
 		NodeSupportPlugin mapPlugin = new MapPlugin();
 		NodeSupportPlugin propertiesPlugin = new PropertiesPlugin();
-
+		NodeSupportPlugin beanPlugin = new BeanPlugin();
+		NodeSupportPlugin refPlugin = new RefPlugin();
+		NodeSupportPlugin idrefPlugin = new IdRefPlugin();
+		NodeSupportPlugin valuePlugin = new ValuePlugin();
+		NodeSupportPlugin nullPlugin = new NullPlugin();
+		
+		nodeSupportPlugins.add( beanPlugin );
 		nodeSupportPlugins.add( listPlugin );
 		nodeSupportPlugins.add( setPlugin );
 		nodeSupportPlugins.add( mapPlugin );
 		nodeSupportPlugins.add( propertiesPlugin );
+		nodeSupportPlugins.add( refPlugin );
+		nodeSupportPlugins.add( idrefPlugin );
+		nodeSupportPlugins.add( valuePlugin );
+		nodeSupportPlugins.add( nullPlugin );
+		
 	}
 
 	@Override

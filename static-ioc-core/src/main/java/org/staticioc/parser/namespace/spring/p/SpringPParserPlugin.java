@@ -16,13 +16,14 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.staticioc.parser.plugins;
+package org.staticioc.parser.namespace.spring.p;
 
 
 import javax.xml.xpath.XPathExpressionException;
 
 import org.staticioc.model.Bean;
 import org.staticioc.model.Property;
+import org.staticioc.parser.AbstractNodeParserPlugin;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -71,7 +72,7 @@ public class SpringPParserPlugin extends AbstractNodeParserPlugin
 				}
 
 				Property prop = new Property( propertyName, value, ref );
-				beanParser.addOrReplaceProperty(prop, bean.getProperties() );
+				beanParser.getBeanContainer().addOrReplaceProperty(prop, bean.getProperties() );
 			}
 		}
 	}

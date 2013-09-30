@@ -1,8 +1,5 @@
-package org.staticioc.parser.plugins;
+package org.staticioc.parser;
 
-import org.staticioc.parser.BeanParser;
-import org.staticioc.parser.NodeParserPlugin;
-import org.staticioc.parser.ParserConstants;
 
 public abstract class AbstractNodeParserPlugin implements ParserConstants,  NodeParserPlugin
 {

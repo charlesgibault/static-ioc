@@ -25,11 +25,16 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
+import javax.xml.xpath.XPathExpressionException;
+
 import org.junit.Test;
+import org.staticioc.container.BeanContainer;
 import org.staticioc.container.SimpleBeanContainer;
 import org.staticioc.dependency.DependencyManager;
 import org.staticioc.dependency.RunTimeDependency;
 import org.staticioc.model.Bean;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
 
 public class DependencyManagerTest
 {
@@ -86,4 +91,32 @@ public class DependencyManagerTest
 		assertEquals("Incorrect bean order when dependencies are present", "[bean2, bean4, bean1, bean3, bean5]", resultWithDependencies.toString() );
 	}
 
+	@Test
+	public void testDependencyCollision()
+	{
+		DefinitionDependency simpleDependency = new DefinitionDependency("bean5", "bean1", "alias", false, null, null);
+		DefinitionDependency simpleDuplicatedDependency = new DefinitionDependency("bean5", "bean1", "alias", false, null, null);
+		
+		assertEquals("Hashcode incompatible with equals", simpleDependency.hashCode(), simpleDuplicatedDependency.hashCode() );
+		assertTrue( "Should be equal", simpleDependency.equals(simpleDuplicatedDependency));
+		assertTrue( "Equals relationship not reflexive", simpleDuplicatedDependency.equals(simpleDependency));
+		
+		DefinitionDependency anotherDependency = new DefinitionDependency("bean3", "bean1", "alias", true, null, null);
+		DefinitionDependency anotherSimpleDuplicatedDependency = new DefinitionDependency("bean3", "bean1", "alias2", false, null,
+				new ResolvedBeanCallback() {
+			@Override
+			public String onResolve(Bean bean, Node beanNode,
+					NamedNodeMap beanAttributes, boolean isAnonymous,
+					BeanContainer container) throws XPathExpressionException {
+				return null;
+			} });
+		
+		assertEquals("Hashcode incompatible with equals", anotherDependency.hashCode(), anotherSimpleDuplicatedDependency.hashCode() );
+		assertTrue( "Should be equal", anotherDependency.equals(anotherSimpleDuplicatedDependency));
+		assertTrue( "Equals relationship not reflexive", anotherSimpleDuplicatedDependency.equals(anotherDependency));
+		
+		assertFalse("Hashcode incompatible with equals", anotherDependency.hashCode() == simpleDependency.hashCode() );
+		assertFalse("Should be different", anotherDependency.equals(simpleDependency));
+		assertFalse("Should be different", simpleDependency.equals(anotherDependency));
+	}
 }

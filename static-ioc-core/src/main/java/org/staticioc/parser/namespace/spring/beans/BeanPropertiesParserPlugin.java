@@ -16,7 +16,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package org.staticioc.parser.plugins;
+package org.staticioc.parser.namespace.spring.beans;
 
 
 import javax.xml.xpath.XPath;
@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.staticioc.model.Bean;
 import org.staticioc.model.Property;
+import org.staticioc.parser.AbstractNodeParserPlugin;
 import org.staticioc.parser.BeanParser;
 import org.staticioc.parser.ParserHelper;
 import org.w3c.dom.NamedNodeMap;
@@ -66,7 +67,7 @@ public class BeanPropertiesParserPlugin extends AbstractNodeParserPlugin
 
 				if ( prop != null ) // Simple property : value or reference
 				{
-					beanParser.addOrReplaceProperty(prop, bean.getProperties() );
+					beanParser.getBeanContainer().addOrReplaceProperty(prop, bean.getProperties() );
 				}
 				else
 				{
