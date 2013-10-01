@@ -74,6 +74,10 @@ public class BeanPropertiesParserPlugin extends AbstractNodeParserPlugin
 					beanParser.handleNodes( bean, propName, node.getChildNodes());				
 				}
 			}
+			else
+			{
+				logger.warn("Ignoring unamed property for Bean {} : {}", bean, node);
+			}
 		}
 	}
 	
