@@ -44,6 +44,11 @@
 		<property name="nullProp">
 		    <null/>
 		</property>
+		<property name="innerBean">
+		    <bean class="test.innerBean">
+		        <property name="innerBeanOnly" value="Embedded property"/>
+		    </bean>
+		</property>
 	</bean>
 
 	 <!-- class without id  -->

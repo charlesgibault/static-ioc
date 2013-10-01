@@ -75,6 +75,40 @@ public class SpringConfigParserSimpleBeanTest extends AbstractSpringParserTest
 		checkProperty(properties, "age", 		"28", 			null );
 		checkProperty(properties, "reference", 	null, 			"number10House" );
 		checkProperty(properties, "nullProp", 	null, 			null );
+
+		assertNull("Property from innerBean shouldn not be seen here", properties.get("innerBeanOnly"));
+	}
+	
+	/**
+	 * Specific check innerBean declaration
+	 */
+	@Test
+	public void testInnerBeanLoading()
+	{
+		// Retrieve personBean and test properties
+		Bean bean = loadedBeans.get("personBean");
+
+		Assert.assertNotNull( bean );
+		// Property checks
+		final Map<String, Property> properties = mapProperties( bean.getProperties() );
+				
+		Property innerBeanRefProp = properties.get("innerBean");
+		assertNotNull("InnerBean property missing ", innerBeanRefProp); 
+		assertNotNull("InnerBean property is not a reference ", innerBeanRefProp.getRef() ); 
+		
+		Bean innerBean = loadedBeans.get(  innerBeanRefProp.getRef() );
+		assertNotNull("InnerBean not found", innerBean);
+		assertEquals("Bean class not properly set", "test.innerBean", innerBean.getClassName() );
+		assertTrue("Inner Bean should be anonymous", innerBean.isAnonymous() );
+		
+		// Inner bean should have a prototype scope
+		//assertEquals("Inner Bean scope should be prototype", Bean.Scope.PROTOTYPE, bean.getScope() );
+		
+		// Property checks
+		final Map<String, Property> innerProperties = mapProperties( innerBean.getProperties() );
+		checkProperty(innerProperties, "innerBeanOnly", "Embedded property", 	null );
+		
+		assertNull("Property from outer Bean shouldn not be seen here", innerProperties.get("age"));
 	}
 	
 	/**
@@ -117,12 +151,18 @@ public class SpringConfigParserSimpleBeanTest extends AbstractSpringParserTest
 		{
 			if( name.startsWith( BeanContainer.ANONYMOUS_BEAN_PREFIX) )
 			{
+				final Bean bean = loadedBeans.get(name);
+
+				// Our test set only contains one that has class "test.AnonymousPerson"
+				if( ! "test.AnonymousPerson".equals( bean.getClassName()) )
+				{
+					continue;
+				}
+
 				anonymousBeanFound = true;
-				final Bean bean = loadedBeans.get(name); // Our test set only contains one
-				
+
 				// Bean definition checks
 				assertTrue("Named bean not declared as anonymous" , bean.isAnonymous() );
-				assertEquals("Bean class not properly set", "test.AnonymousPerson", bean.getClassName() );
 				assertEquals("Bean type not properly set", Bean.Type.SIMPLE , bean.getType() );
 				assertFalse("Real bean wrongly considered as abstract" , bean.isAbstract() );
 				assertTrue("Constructor args found were not expected", bean.getConstructorArgs().isEmpty() );
