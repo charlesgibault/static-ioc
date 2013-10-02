@@ -93,6 +93,11 @@ public class IoCCompilerHelper
 		//Parse targetMapping definition and build associated map
 		Map< String,List<String> > targetMapping= new HashMap< String,List<String> >();
 		
+		if( targetMappingAsText == null)
+		{
+			return targetMapping;
+		}
+		
 		//Expected format "package.name.target1:source1,source2;target2:source1,..."
 		String[] targetMappings = targetMappingAsText.split( ";" );
 		

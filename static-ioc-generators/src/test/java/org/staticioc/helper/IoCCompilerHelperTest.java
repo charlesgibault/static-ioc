@@ -119,13 +119,17 @@ public class IoCCompilerHelperTest
 	}
 
 	/**
-	 * Try to load a malformatted mapping expression
+	 * Try to load a malformatted mapping expressions
 	 */
 	@Test
 	public void testGetTargetMappingMalFormatted()
 	{
+		// Null parameter :
+		Map<String, List<String>> result = IoCCompilerHelper.getTargetMapping(null);
+		Assert.assertEquals( "More elements than expected", 0, result.keySet().size() );
+		
 		// Empty mapping :
-		Map<String, List<String>> result = IoCCompilerHelper.getTargetMapping("");
+		result = IoCCompilerHelper.getTargetMapping("");
 		Assert.assertEquals( "More elements than expected", 0, result.keySet().size() );
 		
 		// missing source after :
