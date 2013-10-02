@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -71,6 +72,8 @@ public class SpringConfigParser implements ParserConstants, BeanParser
 	private final Map<String, NodeSupportPlugin> nodesSupportPlugins = new ConcurrentHashMap<String, NodeSupportPlugin>();
 	private final ExtendedBeanContainer beanContainer;
 	
+	private final List<NamespaceParser> namespaceParsers; 
+	
 	// Prefix for the Spring beans namespace
 	private String prefix = "";
 
@@ -93,6 +96,10 @@ public class SpringConfigParser implements ParserConstants, BeanParser
 		
 		beanContainer = new BeanContainerImpl();
 
+		namespaceParsers = new LinkedList<NamespaceParser>();
+		addNamespaceParser(  new SpringBeansNameSpaceParser() );
+		addNamespaceParser(  new SpringPNameSpaceParser() );
+		
 		try
 		{
 			final XPath xPathBeans  = xPathFactory.newXPath();
@@ -162,6 +169,8 @@ public class SpringConfigParser implements ParserConstants, BeanParser
 			NodeSupportPlugin plugin = nodesSupportPlugins.get(node.getNodeName());
 			return plugin.handleNode(node, propName);
 		}
+		
+		logger.trace("Unsupported node type {}. Ignoring", node.getNodeName() );
 		return null;
 	}
 
@@ -226,55 +235,31 @@ public class SpringConfigParser implements ParserConstants, BeanParser
 			
 			// Extract namespaces and load matching namespace plugins
 			final NodeList beansRoot = (NodeList) xBeanRoot.evaluate(confFileDom, XPathConstants.NODESET);
+
 			Map<String, String> namespaces = ParserHelper.extractNamespacePrefix(beansRoot);
-			logger.debug( "XML namespaces prefix mapping ", namespaces);
+			logger.debug( "XML namespaces prefix mapping: {}", namespaces);
 			
-			// TODO make loading flexible enough to have a namespace plugin mechanism here
-			SpringBeansNameSpaceParser springBeansParser = new SpringBeansNameSpaceParser();
-			springBeansParser.setBeanParser(this);
-
-			SpringPNameSpaceParser springPNameSpaceParser = new SpringPNameSpaceParser();
-			springPNameSpaceParser.setBeanParser(this);
-
-			if( namespaces.containsKey( springBeansParser.getNameSpaceUri() ) )
+			for( NamespaceParser namespaceParser : namespaceParsers)
 			{
-				prefix = namespaces.get( springBeansParser.getNameSpaceUri() );
-				springBeansParser.setPrefix( prefix );
-				
-				logger.debug("Namespace {}. Adding {} node parser plugins", springBeansParser.getNameSpaceUri(), springBeansParser.getNodeParserPlugins().size() );
-				
-				nodeParserPlugins.addAll( springBeansParser.getNodeParserPlugins() );
-				
-				for( NodeSupportPlugin plugin : springBeansParser.getNodeSupportPlugins() )
+				if( namespaces.containsKey( namespaceParser.getNameSpaceUri() ) )
 				{
-					final String supportedNode = plugin.getSupportedNode();
-					logger.debug("Namespace {}. Adding node support plugin for {} nodes", springBeansParser.getNameSpaceUri(), supportedNode );
+					prefix = namespaces.get( namespaceParser.getNameSpaceUri() );
+					namespaceParser.setPrefix( prefix );
+					logger.debug("Namespace {}. Adding {} node parser plugins", namespaceParser.getNameSpaceUri(), namespaceParser.getNodeParserPlugins().size() );
 					
-					nodesSupportPlugins.put(supportedNode, plugin);
+					nodeParserPlugins.addAll( namespaceParser.getNodeParserPlugins() );
+					
+					for( NodeSupportPlugin plugin : namespaceParser.getNodeSupportPlugins() )
+					{
+						final String supportedNode = plugin.getSupportedNode();
+						logger.debug("Namespace {}. Adding node support plugin for {} nodes", namespaceParser.getNameSpaceUri(), supportedNode );
+						
+						nodesSupportPlugins.put(supportedNode, plugin);
+					}
 				}
 			}
-			else
-			{
-				logger.warn( "Main beans namespace ({}) is not included in {}", springBeansParser.getNameSpaceUri(), configurationFile );
-			}
-			
-			if( namespaces.containsKey( springPNameSpaceParser.getNameSpaceUri() ) )
-			{
-				springPNameSpaceParser.setPrefix( namespaces.get( springPNameSpaceParser.getNameSpaceUri() ) );
-
-				logger.debug("Namespace {}. Adding {} node parser plugins", springPNameSpaceParser.getNameSpaceUri(), springPNameSpaceParser.getNodeParserPlugins().size() );
 				
-				nodeParserPlugins.addAll( springPNameSpaceParser.getNodeParserPlugins() );
-
-				for( NodeSupportPlugin plugin : springPNameSpaceParser.getNodeSupportPlugins() )
-				{
-					final String supportedNode = plugin.getSupportedNode();
-					logger.debug("Namespace {}. Adding node support plugin for {} nodes", springBeansParser.getNameSpaceUri(), supportedNode );
-					
-					nodesSupportPlugins.put(supportedNode, plugin);
-				}
-			}
-		
+			// Now start loading imports and beans
 		
 			final NodeList importsRef = (NodeList) xImports.evaluate(confFileDom, XPathConstants.NODESET);
 			final NodeList beansRef = (NodeList) xBeans.evaluate(confFileDom, XPathConstants.NODESET);
@@ -365,4 +350,17 @@ public class SpringConfigParser implements ParserConstants, BeanParser
 		return nodeParserPlugins;
 	}
 
+	public void addNamespaceParsers( List<NamespaceParser> plugins )
+	{
+		for ( NamespaceParser plugin : plugins )
+		{
+			addNamespaceParser( plugin );
+		}
+	}
+	
+	public void addNamespaceParser( NamespaceParser plugin )
+	{
+		namespaceParsers.add( plugin );
+		plugin.setBeanParser( this );
+	}
 }

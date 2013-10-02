@@ -28,6 +28,7 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.staticioc.generator.CodeGenerator;
+import org.staticioc.parser.NamespaceParser;
 import org.xml.sax.SAXException;
 
 /**
@@ -61,4 +62,20 @@ public interface IoCCompiler
 	 * @throws ParserConfigurationException
 	 */
 	void compile( CodeGenerator generator, String outputPath, Map<String, List<String>> inputOutputMapping, String fileExtensionOverride )  throws SAXException, IOException, ParserConfigurationException;
+
+	/**
+	 * Load a Set of context configuration files and generate a BeanFactory class that instanciates the declared Beans for each input/output mapping
+	 * using the provided file extension.
+	 * 
+	 * @param generator  CodeGenerator object to use to generate the target BeanFactory source code
+	 * @param outputPath were the BeanFactory classes will be written 
+	 * @param inputOutputMapping Map< Target BeanFactory class name, List of configuration files to load>
+	 * @param fileExtensionOverride file extension to use for generated classes
+	 * @param namespacePlugins List<NamespaceParser> of extra namespace support plugins to use in addition to default's Spring Bean and Spring p
+	 * @throws SAXException
+	 * @throws IOException
+	 * @throws ParserConfigurationException
+	 */
+	void compile( CodeGenerator generator, String outputPath, Map<String, List<String>> inputOutputMapping, String fileExtensionOverride, List<NamespaceParser> namespacePlugins )  throws SAXException, IOException, ParserConfigurationException;
+
 }

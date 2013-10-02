@@ -24,6 +24,8 @@ package org.staticioc;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -31,11 +33,13 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.staticioc.generator.CodeGenerator;
 import org.staticioc.generator.JavaCodeGenerator;
+import org.staticioc.parser.NamespaceParser;
 import org.xml.sax.SAXException;
 
 public class SpringStaticFactoryGeneratorTest
 {
 	SpringStaticFactoryGenerator factoryGenerator = new SpringStaticFactoryGenerator();
+	private final static List<NamespaceParser> EMPTY_NAMESPACE_PLUGIN_LIST = new LinkedList<NamespaceParser>();
 	
 	private String normalizeCode( String code)
 	{
@@ -105,7 +109,7 @@ public class SpringStaticFactoryGeneratorTest
 				+ "}\n"
 				+ "}" );
 		
-		result = factoryGenerator.generate(codeGenerator, packageName, className, Arrays.asList( contexts ) );
+		result = factoryGenerator.generate(codeGenerator, packageName, className, Arrays.asList( contexts ), EMPTY_NAMESPACE_PLUGIN_LIST );
 		
 		Assert.assertEquals( "Incorrect generated result", expectedResult, normalizeCode( result.toString() ) );
 	}
@@ -161,7 +165,7 @@ public class SpringStaticFactoryGeneratorTest
 				+ "}\n"
 				+ "}");
 		
-		result = factoryGenerator.generate(codeGenerator, packageName, className, Arrays.asList( contexts ) );
+		result = factoryGenerator.generate(codeGenerator, packageName, className, Arrays.asList( contexts ), EMPTY_NAMESPACE_PLUGIN_LIST );
 		
 		Assert.assertEquals( "Incorrect generated result", expectedResult, normalizeCode( result.toString() ) );
 	}
@@ -214,7 +218,7 @@ public class SpringStaticFactoryGeneratorTest
 				+ "}\n"
 				+ "}");
 		
-		result = factoryGenerator.generate(codeGenerator, packageName, className, Arrays.asList( contexts ) );
+		result = factoryGenerator.generate(codeGenerator, packageName, className, Arrays.asList( contexts ), EMPTY_NAMESPACE_PLUGIN_LIST );
 		
 		Assert.assertEquals( "Incorrect generated result", expectedResult, normalizeCode( result.toString() ) );
 	}

@@ -36,6 +36,7 @@ import org.staticioc.generator.CodeGenerator.Level;
 import org.staticioc.model.Bean;
 import org.staticioc.model.Property;
 import org.staticioc.model.Bean.Scope;
+import org.staticioc.parser.NamespaceParser;
 
 public class SpringStaticFactoryGenerator implements IoCCompiler
 {
@@ -43,6 +44,7 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 	
 	private final static int INIT_BUFFER_SIZE = 4096;
 	private final static String[] EMPTY_STRING_ARRAY = new String[]{};
+	private final static List<NamespaceParser> EMPTY_NAMESPACE_PLUGIN_LIST = new LinkedList<NamespaceParser>();
 		
 	private final static String COMMENT_HEADER = "This code has been generated using Static IoC framework (http://code.google.com/p/static-ioc/). DO NOT EDIT MANUALLY HAS CHANGES MAY BE OVERRIDEN";
 		
@@ -62,11 +64,18 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 	public void compile( CodeGenerator generator, String outputPath, Map< String, List< String >> inputOutputMapping ) throws SAXException,
 			IOException, ParserConfigurationException
 	{
-		compile( generator, outputPath, inputOutputMapping, generator.getDefaultSourceFileExtension() );
+		compile( generator, outputPath, inputOutputMapping, generator.getDefaultSourceFileExtension(), EMPTY_NAMESPACE_PLUGIN_LIST);
 	}
 	
 	@Override
-	public void compile( final CodeGenerator generator, String oPath, final Map< String, List< String >> inputOutputMapping, String fileExtOverride ) throws SAXException,
+	public void compile( final CodeGenerator generator, String outputPath, final Map< String, List< String >> inputOutputMapping, String fileExtOverride ) throws SAXException,
+	IOException, ParserConfigurationException
+	{
+		compile( generator, outputPath, inputOutputMapping, fileExtOverride, EMPTY_NAMESPACE_PLUGIN_LIST);
+	}
+	
+	@Override
+	public void compile( final CodeGenerator generator, String oPath, final Map< String, List< String >> inputOutputMapping, String fileExtOverride, List<NamespaceParser> plugins ) throws SAXException,
 	IOException, ParserConfigurationException
 	{
 		// Check if a valid extension override was provided
@@ -85,13 +94,15 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 			
 			String generatedClassName = generator.getClassName( targetClass );
 			String generatedPackageName = generator.getPackageName( targetClass );
-			StringBuilder generatedCode = generate( generator, generatedPackageName, generatedClassName, inputOutputMapping.get(targetClass) );
+			StringBuilder generatedCode = generate( generator, generatedPackageName, generatedClassName, inputOutputMapping.get(targetClass), plugins );
 			
 			// Generate resulting file
 			logger.info( "Writing {} to {}", targetClass, targetFile );
 			FileUtils.writeStringToFile( new File(targetFile), generatedCode.toString() );
 		}
 	}
+	
+	
 
 	/**
 	 * Load one or multiple context configuration file and generate a BeanFactory class that instanciates the declared Beans
@@ -100,17 +111,20 @@ public class SpringStaticFactoryGenerator implements IoCCompiler
 	 * @param generatedPackageName the name of the target package (if any) to use for the BeanFactory 
 	 * @param generatedClassName the name of the target generated class (and file) name for the BeanFactory
 	 * @param configurationFiles List of Configuration files (Spring contexts) to load
+	 * @param namespacePlugins List<NamespaceParser> of extra namespace support plugins to use in addition to default's Spring Bean and Spring p
 	 * @return The BeanFactory content as StringBuilder object
 	 * @throws SAXException
 	 * @throws IOException
 	 * @throws ParserConfigurationException
 	 */
-	protected StringBuilder generate(final CodeGenerator codeGenerator, final String generatedPackageName, final String generatedClassName, final List<String> configurationFiles )  throws SAXException, IOException, ParserConfigurationException
+	protected StringBuilder generate(final CodeGenerator codeGenerator, final String generatedPackageName, final String generatedClassName, final List<String> configurationFiles, List<NamespaceParser> plugins )  throws SAXException, IOException, ParserConfigurationException
 	{
 		final StringBuilder res = new StringBuilder( INIT_BUFFER_SIZE );
 		codeGenerator.setOutput( res );
 		
 		SpringConfigParser springConfigParser = new SpringConfigParser();
+		springConfigParser.addNamespaceParsers( plugins );
+		
 		Map<String, Bean> beanClassMap = springConfigParser.load( configurationFiles );
 		final LinkedList<Bean> orderedBean = springConfigParser.getBeanContainer().getOrderedBeans();
 

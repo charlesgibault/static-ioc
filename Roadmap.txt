@@ -13,8 +13,7 @@ Please find below some visibility on the planned feature roadmap
   * *Java Generator* - Fix handling of .class parameters 
   * *Samples* - Add full GWT sample project using MVP
 
-// Release 0.3 (In progress)
-// ---------- DONE:
+// Release 0.3 
   * *Releasing* - Changed project groupid to com.googlecode.static-ioc
   * *Releasing* - Added PGP signature for deployed artifacts
   * *Releasing* - Published version 0.3 on OSS Sonatype / Maven Central repository
@@ -33,13 +32,26 @@ Please find below some visibility on the planned feature roadmap
   * *Samples* - Cleaned-up GWT samples (removed warnings)
 
 // Release 0.4
+Done:
   * *Core* - Add namespace plugin mechanism
+  * *Core* - Refactored SpringConfigParser for proper concern separation. Spring Bean parsing fully migrated to NodeSupport/NodeParser plugins
+  * *Core* - Javadoc improvement
+  * *Core* - Code cleaning
+  * *Generator* - Javadoc improvement
+  * *Generator* - Code cleaning
+  * *Generator* - Add namespace plugin mechanism
+  * *MavenPlugin* - Add namespace plugin mechanism
+  * *CommandLine* - Add namespace plugin mechanism
+
+
+in progress, remaining: 
   * *Core* - Add namespace plugin for GWT to make bean definition less versbose
   * *Samples* - Use GWT bean plugin to simplify GWT sample
 
 // Release 0.5
   * *Generator* - Add compile time support for PropertyPlaceHolders like mechanism
   * *Generator* - Support Python target
+  * *Generator* - Support Dart target
   * *Generator* - Support Objective C and Cpp targets
 
 // Release 0.6+

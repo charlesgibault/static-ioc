@@ -24,8 +24,8 @@ public interface ParserConstants
 	String BEAN_PROPERTY_REF_SUFFIX = "-ref";
 	String XML_NAMESPACE_DEF = "xmlns";
 	char XML_NAMESPACE_DELIMITER = ':';
-	String XPATH_BEANS_NODE="beans";
-	String XPATH_BEAN = "/beans/bean";
+	String XPATH_BEANS_NODE="/beans";
+	String XPATH_BEAN = "/beans/*";
 	String XPATH_PROPERTY = "property[@name]";
 	String XPATH_IMPORT = "/beans/import[@resource]";
 	String BEAN = "bean";

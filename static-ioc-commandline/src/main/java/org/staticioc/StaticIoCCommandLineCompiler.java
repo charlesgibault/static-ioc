@@ -31,8 +31,11 @@ import org.slf4j.LoggerFactory;
 import org.staticioc.generator.CodeGenerator;
 import org.staticioc.helper.CodeGeneratorNameHelper;
 import org.staticioc.helper.IoCCompilerHelper;
+import org.staticioc.parser.NamespaceHelper;
+import org.staticioc.parser.NamespaceParser;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -47,6 +50,7 @@ public class StaticIoCCommandLineCompiler
 	private static final String ARG_CODE_GENERATOR = "g";
 	private static final String ARG_TARGET_LANGUAGE = "L";
 	private static final String ARG_TARGET_MAPPING = "t";
+	private static final String ARG_NAMESPACE_PLUGIN = "n";	
 
 	private static final Logger logger  = LoggerFactory.getLogger(StaticIoCCommandLineCompiler.class);
 	
@@ -63,7 +67,8 @@ public class StaticIoCCommandLineCompiler
 		
 		Option codeGenerator = OptionBuilder.withArgName( "package.codeGeneratorClass" )
 				.hasArg()
-				.withDescription(  "Fully qualified classname for the code generator (optional, overrides target language)" )
+				.withDescription(  "Fully qualified classname for the code generator (optional, overrides target language). " + 
+				"Generator must have a default constructor and implement org.staticioc.generator.CodeGenerator")
 				.withLongOpt( "generator" )
 				.create( ARG_CODE_GENERATOR );
 		
@@ -91,6 +96,13 @@ public class StaticIoCCommandLineCompiler
 				.withLongOpt( "output-file-extension" )
 				.create( ARG_FILE_EXTENSION );
 		
+		Option namespacePlugins = OptionBuilder.withArgName( "package1.nameSpacePlugin1,package2.nameSpacePlugin2,..." )
+				.hasArg()
+				.withDescription(  "Extra namespace plugin to register (default: spring-bean, spring-p). " +
+						"Plugins must have default constructor and implement org.staticioc.parser.NamespaceParser" )
+				.withLongOpt( "namespace-plugins" )
+				.create( ARG_NAMESPACE_PLUGIN );
+		
 		Options options = new Options();
 		options.addOption( help );
 		options.addOption( targetLanguage );
@@ -98,6 +110,7 @@ public class StaticIoCCommandLineCompiler
 		options.addOption( targetMapping );
 		options.addOption( codeGenerator );
 		options.addOption( fileExtension );
+		options.addOption( namespacePlugins );
 		
 		return options;
 	}
@@ -179,6 +192,20 @@ public class StaticIoCCommandLineCompiler
 		}
 	}
 	
+	private static List<NamespaceParser> getNamespacePlugins(CommandLine line, Options options )
+	{
+		String nameSpacePluginAsText = null;
+		
+		if( line.hasOption( ARG_NAMESPACE_PLUGIN ) ) { // comma separated namespace packages list
+			nameSpacePluginAsText = line.getOptionValue( ARG_NAMESPACE_PLUGIN );
+			logger.debug( "Using namespace plugins {}", nameSpacePluginAsText );
+			return NamespaceHelper.getNamespacePlugins( nameSpacePluginAsText );
+		}
+
+		logger.debug( "Using default namespace plugins." );
+		return new LinkedList<NamespaceParser>();// return empty List
+	}
+	
 	/**
 	 * @param args
 	 */
@@ -191,6 +218,7 @@ public class StaticIoCCommandLineCompiler
 		CodeGenerator codeGenerator;
 		String outputPath;
 		String fileExtension = null;
+		List<NamespaceParser> namespacePlugins;
 	
 		try {
 	        // parse the command line arguments
@@ -210,6 +238,7 @@ public class StaticIoCCommandLineCompiler
 	        outputPath = getOutputPath(line, options);
 	        codeGenerator = getCodeGenerator( line, options);
 	        targetMapping = getTargetMapping( line, options);
+	        namespacePlugins = getNamespacePlugins( line, options);
 	    }
 	    catch( ParseException exp ) {
 	        // oops, something went wrong
@@ -223,7 +252,7 @@ public class StaticIoCCommandLineCompiler
 	
 		try
 		{			
-			springStaticFactoryGenerator.compile( codeGenerator, outputPath, targetMapping, fileExtension );
+			springStaticFactoryGenerator.compile( codeGenerator, outputPath, targetMapping, fileExtension, namespacePlugins );
 		}
 		catch ( ParserConfigurationException e )
 		{

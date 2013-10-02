@@ -24,6 +24,8 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.staticioc.generator.CodeGenerator;
 import org.staticioc.helper.CodeGeneratorNameHelper;
 import org.staticioc.helper.IoCCompilerHelper;
+import org.staticioc.parser.NamespaceHelper;
+import org.staticioc.parser.NamespaceParser;
 
 import java.io.File;
 import java.util.HashMap;
@@ -49,6 +51,17 @@ public class StaticIocMojo
      */
     private String outputFileExtension = null;
 	
+    /**
+     * Optional additional NamespaceParser plugins to use to load XML configuration in addition to default's Spring Bean and Spring p
+     * <namespacePlugins>
+  	 *   <namespacePlugin>package1.namespacePlugin1</namespacePlugin>
+  	 *   <namespacePlugin>package2.namespacePlugin2</namespacePlugin>
+	 * </namespacePlugins> 
+     *
+     * @parameter expression="${staticioc.namespacePlugins}"
+     */
+    private List<String> namespacePlugins = null;
+    
     /**
      * Name of the target language for generated source
      * @parameter expression="${staticioc.targetLanguage}"
@@ -110,10 +123,11 @@ public class StaticIocMojo
 
         IoCCompiler springStaticFactoryGenerator = new SpringStaticFactoryGenerator();
         CodeGenerator generator = getCodeGenerator();
+        List<NamespaceParser> namespaceParsers = NamespaceHelper.getNamespacePlugins(namespacePlugins);
         
         try
         {
-        	springStaticFactoryGenerator.compile( generator, outputPath.getAbsolutePath(), getTargetMapping(), outputFileExtension );
+        	springStaticFactoryGenerator.compile( generator, outputPath.getAbsolutePath(), getTargetMapping(), outputFileExtension, namespaceParsers );
         }
         catch ( Exception e )
         {
