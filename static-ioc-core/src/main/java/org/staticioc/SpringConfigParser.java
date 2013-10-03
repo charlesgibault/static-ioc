@@ -360,7 +360,10 @@ public class SpringConfigParser implements ParserConstants, BeanParser
 	
 	public void addNamespaceParser( NamespaceParser plugin )
 	{
-		namespaceParsers.add( plugin );
-		plugin.setBeanParser( this );
+		if( plugin != null)
+		{
+			namespaceParsers.add( plugin );
+			plugin.setBeanParser( this );
+		}
 	}
 }

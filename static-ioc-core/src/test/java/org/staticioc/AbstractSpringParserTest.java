@@ -28,6 +28,7 @@ import java.util.Map;
 import org.junit.Assert;
 import org.staticioc.model.Bean;
 import org.staticioc.model.Property;
+import org.staticioc.parser.NamespaceParser;
 
 /**
  * Abstract class to host useful utilities methods for unit testing Bean / Property loading
@@ -39,13 +40,25 @@ public abstract class AbstractSpringParserTest
 	
 	public AbstractSpringParserTest(final String[] testContexts) throws Exception 
 	{
-		parser = new SpringConfigParser();
-		loadedBeans = parser.load( Arrays.asList(testContexts) ) ;
+		this(testContexts, null);
 	}
 	
 	public AbstractSpringParserTest(final String testContext) throws Exception 
 	{
+		this(testContext, null);
+	}
+	
+	public AbstractSpringParserTest(final String[] testContexts, NamespaceParser plugin) throws Exception 
+	{
 		parser = new SpringConfigParser();
+		parser.addNamespaceParser(plugin);
+		loadedBeans = parser.load( Arrays.asList(testContexts) ) ;
+	}
+	
+	public AbstractSpringParserTest(final String testContext, NamespaceParser plugin) throws Exception 
+	{
+		parser = new SpringConfigParser();
+		parser.addNamespaceParser(plugin);
 		loadedBeans = parser.load( testContext );
 	}
 	
