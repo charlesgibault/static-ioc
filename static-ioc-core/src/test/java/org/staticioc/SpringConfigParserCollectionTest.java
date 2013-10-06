@@ -32,7 +32,7 @@ import org.staticioc.model.*;
 /**
  * Unit test for SpringConfigParser
  */
-public class SpringConfigParserCollectionTest extends AbstractSpringParserTest
+public class SpringConfigParserCollectionTest extends AbstractTestSpringParser
 {
 	private final static String TEST_CONTEXT = "src/test/resources/SpringConfigParserTest-Collection.xml";
 	private final Bean collectBean;

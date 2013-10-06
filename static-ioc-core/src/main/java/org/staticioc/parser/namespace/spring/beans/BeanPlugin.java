@@ -4,6 +4,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.staticioc.container.BeanContainer;
 import org.staticioc.dependency.DefinitionDependency;
 import org.staticioc.dependency.FactoryBeanDependency;
@@ -15,6 +16,9 @@ import org.staticioc.model.Bean.Scope;
 import org.staticioc.parser.AbstractNodeSupportPlugin;
 import org.staticioc.parser.NodeParserPlugin;
 import org.staticioc.parser.ParserHelper;
+
+import org.apache.commons.lang3.tuple.Pair;
+
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
@@ -56,14 +60,10 @@ public class BeanPlugin extends AbstractNodeSupportPlugin  implements ResolvedBe
 			return null;
 		}
 
-		final NamedNodeMap beanAttributes = beanNode.getAttributes();
+		Pair<String, String> ids = ParserHelper.extractBeanId(beanNode);
 
-		// use Id if defined, name otherwise (if defined), auto-generated bean name otherwise.
-		final Node idNode = beanAttributes.getNamedItem(ID);
-		final Node bNameNode = beanAttributes.getNamedItem(NAME);
-
-		String id = (idNode != null )? idNode.getNodeValue() : (bNameNode != null )? bNameNode.getNodeValue() : null;
-		final String alias = ( idNode != null  && bNameNode != null)? bNameNode.getNodeValue(): null;
+		String id = ids.getLeft();
+		final String alias = ids.getRight();
 
 		boolean isAnonymous = false;
 		if( id == null )
@@ -73,14 +73,13 @@ public class BeanPlugin extends AbstractNodeSupportPlugin  implements ResolvedBe
 		}
 
 		// Check if this node has a parent
-		final Node parentNode = beanAttributes.getNamedItem(PARENT);
+		final NamedNodeMap beanAttributes = beanNode.getAttributes();
 
 		Bean bean = null;
+		final String parentName = ParserHelper.extractAttributeValueAsString(PARENT, beanAttributes, null);
 
-		if (parentNode != null )
+		if (parentName != null )
 		{
-			final String parentName = parentNode.getNodeValue();
-
 			// Test direct resolution (parent already registered)
 			final Bean parentBean = beanParser.getBeanContainer().getBean( parentName );
 
@@ -115,20 +114,9 @@ public class BeanPlugin extends AbstractNodeSupportPlugin  implements ResolvedBe
 	 */
 	protected String processBeanNodeAttributes(final Node beanNode, final NamedNodeMap beanAttributes, final String id, final String alias, boolean isAnonymous, Bean bean, BeanContainer container) throws XPathExpressionException
 	{
-		String className = (bean != null)? bean.getClassName() : null;
-		boolean abstractBean = false;
+		String className = ParserHelper.extractAttributeValueAsString(CLASS, beanAttributes, (bean != null)? bean.getClassName() : null);
+		boolean abstractBean = ParserHelper.extractAttributeValueAsBoolean( ABSTRACT, beanAttributes, Boolean.FALSE );
 
-		final Node classNode = beanAttributes.getNamedItem(CLASS);
-		if ( classNode != null )
-		{
-			className = classNode.getNodeValue();
-		}
-
-		final Node abstractNode = beanAttributes.getNamedItem( ABSTRACT );
-		if( abstractNode != null )
-		{
-			abstractBean = Boolean.valueOf( abstractNode.getNodeValue() );
-		}
 
 		final Node scopeNode = beanAttributes.getNamedItem(SCOPE);
 		final Node singletonNode = beanAttributes.getNamedItem(SINGLETON);
@@ -143,34 +131,12 @@ public class BeanPlugin extends AbstractNodeSupportPlugin  implements ResolvedBe
 		logger.debug( "id {} scope {} ", id, scope );
 
 		//Handle Factory Bean/Method here
-		String factoryBean=(bean != null)? bean.getFactoryBean() : null;
-		String factoryMethod=(bean != null)? bean.getFactoryMethod() : null;
-
-		final Node factoryBeanNode = beanAttributes.getNamedItem(FACTORY_BEAN);
-		final Node factoryMethodNode = beanAttributes.getNamedItem(FACTORY_METHOD);
-		if ( factoryBeanNode != null )
-		{
-			factoryBean = factoryBeanNode.getNodeValue();
-		}
-		if ( factoryMethodNode != null )
-		{
-			factoryMethod = factoryMethodNode.getNodeValue();
-		}
+		String factoryBean= ParserHelper.extractAttributeValueAsString(FACTORY_BEAN, beanAttributes, (bean != null)? bean.getFactoryBean() : null );
+		String factoryMethod= ParserHelper.extractAttributeValueAsString(FACTORY_METHOD, beanAttributes, (bean != null)? bean.getFactoryMethod() : null );
 
 		// Handle init/destroy methods here:
-		String initMethod=(bean != null)? bean.getInitMethod() : null;
-		String destroyMethod=(bean != null)? bean.getDestroyMethod() : null;
-
-		final Node initMethodBeanNode = beanAttributes.getNamedItem(INIT_METHOD);
-		final Node destroyMethodNode = beanAttributes.getNamedItem(DESTROY_METHOD);
-		if ( initMethodBeanNode != null )
-		{
-			initMethod = initMethodBeanNode.getNodeValue();
-		}
-		if ( destroyMethodNode != null )
-		{
-			destroyMethod = destroyMethodNode.getNodeValue();
-		}
+		String initMethod= ParserHelper.extractAttributeValueAsString(INIT_METHOD, beanAttributes, (bean != null)? bean.getInitMethod() : null );
+		String destroyMethod= ParserHelper.extractAttributeValueAsString(DESTROY_METHOD, beanAttributes, (bean != null)? bean.getDestroyMethod() : null );
 
 		// Class is mandatory for non abstract beans
 		if( className == null && !abstractBean)

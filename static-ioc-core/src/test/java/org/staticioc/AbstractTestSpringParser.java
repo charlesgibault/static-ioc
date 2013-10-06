@@ -33,29 +33,29 @@ import org.staticioc.parser.NamespaceParser;
 /**
  * Abstract class to host useful utilities methods for unit testing Bean / Property loading
  */
-public abstract class AbstractSpringParserTest
+public abstract class AbstractTestSpringParser
 {
 	protected final SpringConfigParser parser;
 	protected final Map<String, Bean> loadedBeans;
 	
-	public AbstractSpringParserTest(final String[] testContexts) throws Exception 
+	public AbstractTestSpringParser(final String[] testContexts) throws Exception 
 	{
 		this(testContexts, null);
 	}
 	
-	public AbstractSpringParserTest(final String testContext) throws Exception 
+	public AbstractTestSpringParser(final String testContext) throws Exception 
 	{
 		this(testContext, null);
 	}
 	
-	public AbstractSpringParserTest(final String[] testContexts, NamespaceParser plugin) throws Exception 
+	public AbstractTestSpringParser(final String[] testContexts, NamespaceParser plugin) throws Exception 
 	{
 		parser = new SpringConfigParser();
 		parser.addNamespaceParser(plugin);
 		loadedBeans = parser.load( Arrays.asList(testContexts) ) ;
 	}
 	
-	public AbstractSpringParserTest(final String testContext, NamespaceParser plugin) throws Exception 
+	public AbstractTestSpringParser(final String testContext, NamespaceParser plugin) throws Exception 
 	{
 		parser = new SpringConfigParser();
 		parser.addNamespaceParser(plugin);

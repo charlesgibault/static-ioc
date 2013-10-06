@@ -24,7 +24,9 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,6 +99,70 @@ public class ParserHelper implements ParserConstants
 			}
 		}
 		return prop;
+	}
+	
+	/**
+	 * 
+	 * @param index of the constructor argument
+	 * @param value of the argument
+	 * @param ref (for ref argument)
+	 * @return a Property representing the 
+	 */
+	public static Property buildContructorArgument(int index, String value, String ref)
+	{
+		return new Property(CONSTRUCTOR_ARGS + index, value, ref);
+	}
+
+	
+	/**
+	 * Extract the name and id attributes of a node a resolve it as an <id,alias> Pair 
+	 * @param beanNode to parse
+	 * @return an <id,alias> Pair
+	 */
+	public static Pair<String, String> extractBeanId( final Node beanNode )
+	{
+		final NamedNodeMap beanAttributes = beanNode.getAttributes();
+
+		// use Id if defined, name otherwise (if defined), auto-generated bean name otherwise.
+		final Node idNode = beanAttributes.getNamedItem(ID);
+		final Node bNameNode = beanAttributes.getNamedItem(NAME);
+
+		String id = (idNode != null )? idNode.getNodeValue() : (bNameNode != null )? bNameNode.getNodeValue() : null;
+		final String alias = ( idNode != null  && bNameNode != null)? bNameNode.getNodeValue(): null;
+		
+		return ImmutablePair.of(id, alias);
+	}
+	
+	/**
+	 * Extract an attribute value as text
+	 * @param attributeName name of the attribute to extract
+	 * @param attributes Map of the node
+	 * @return the String value of the attribute, if it exists, or null otherwise
+	 */
+	public static String extractAttributeValueAsString(final String attributeName, final NamedNodeMap attributes, String defaultValue)
+	{
+		final Node valueNode = attributes.getNamedItem(attributeName);
+		if ( valueNode != null )
+		{
+			return valueNode.getNodeValue();
+		}
+		return defaultValue;
+	}
+		
+	/**
+	 * Extract an attribute value as Boolean
+	 * @param attributeName name of the attribute to extract
+	 * @param attributes Map of the node
+	 * @return the Boolean value of the attribute, if it exists, or null otherwise
+	 */
+	public static Boolean extractAttributeValueAsBoolean(final String attributeName, final NamedNodeMap attributes, Boolean defaultValue)
+	{
+		final String valueAsText = extractAttributeValueAsString(attributeName, attributes, null);
+		if ( valueAsText == null )
+		{
+			return defaultValue;
+		}
+		return Boolean.valueOf( valueAsText );
 	}
 	
 	/**

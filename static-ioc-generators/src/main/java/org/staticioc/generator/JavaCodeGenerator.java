@@ -18,7 +18,7 @@
  */
 package org.staticioc.generator;
 
-import org.apache.commons.lang.WordUtils;
+import org.apache.commons.lang3.text.WordUtils;
 import org.staticioc.model.Bean;
 import org.staticioc.model.Property;
 

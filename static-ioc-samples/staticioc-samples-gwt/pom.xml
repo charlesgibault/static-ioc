@@ -76,10 +76,22 @@
                 <targetLanguage>Java</targetLanguage>
        			<outputPath>${project.build.directory}/generated-sources/gwt</outputPath>
                 <targetMapping>
-                	<org.staticioc.samples.gwt.client.ApplicationContext>${basedir}/src/main/resources/org/staticioc/samples/gwt/applicationContext.xml</org.staticioc.samples.gwt.client.ApplicationContext>
+                	<org.staticioc.samples.gwt.client.ApplicationContext>${basedir}/src/main/resources/org/staticioc/samples/gwt/gwtApplicationContext.xml</org.staticioc.samples.gwt.client.ApplicationContext>
+                <!-- 	<org.staticioc.samples.gwt.client.NoNamespaceApplicationContext>${basedir}/src/main/resources/org/staticioc/samples/gwt/applicationContext-nonamespace.xml</org.staticioc.samples.gwt.client.NoNamespaceApplicationContext> -->
                		<org.staticioc.samples.gwt.server.ApplicationContext>${basedir}/src/main/resources/org/staticioc/samples/gwt/serverContext.xml</org.staticioc.samples.gwt.server.ApplicationContext>
                 </targetMapping>
+                <namespacePlugins>
+  	 				<namespacePlugin>org.staticioc.parser.namespace.gwt.GwtNamespaceParser</namespacePlugin>
+  	 			</namespacePlugins>
         </configuration>
+        <dependencies> <!-- Add namespace plugins here -->
+            <dependency>	
+				<groupId>com.googlecode.static-ioc</groupId>
+				<artifactId>static-ioc-namespace-gwt</artifactId>
+				<version>${project.version}</version>
+				<scope>compile</scope>
+			</dependency>
+        </dependencies>
       </plugin>
 
 

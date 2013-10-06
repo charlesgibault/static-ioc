@@ -30,7 +30,7 @@ import org.staticioc.model.*;
 /**
  * Unit test for SpringConfigParser
  */
-public class SpringConfigParserSimpleBeanTest extends AbstractSpringParserTest
+public class SpringConfigParserSimpleBeanTest extends AbstractTestSpringParser
 {
 	private final static String TEST_CONTEXT = "src/test/resources/SpringConfigParserTest-SimpleBean.xml";
 

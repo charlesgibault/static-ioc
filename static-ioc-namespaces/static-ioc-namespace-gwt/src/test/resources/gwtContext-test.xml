@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+     Copyright (C) 2013 Charles Gibault
+
+     Static IoC - Compile XML based inversion of control configuration file into a single init class, for many languages.
+     Project Home : http://code.google.com/p/static-ioc/
+
+     Licensed under the Apache License, Version 2.0 (the "License");
+     you may not use this file except in compliance with the License.
+     You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     See the License for the specific language governing permissions and
+     limitations under the License.
+
+-->
+<beans 	xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:gwt="http://com.googlecode.static-ioc/schema/gwt"
+		xsi:schemaLocation="http://com.googlecode.static-ioc/schema/gwt ./static-ioc-gwt.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+ 
+    <gwt:messages class="org.staticioc.samples.gwt.client.Messages"/> <!--  default name=messages -->
+	<gwt:messages name="messagesAdmin" class="org.staticioc.samples.gwt.client.AdminMessages"/>
+	<gwt:messages name="missingClassMessage" /> 
+	
+	<gwt:service name="contactsService" interface="org.staticioc.samples.gwt.client.service.ContactsService"/>
+	<gwt:service name="missingInterfaceCService"/>
+
+	<gwt:eventBus />
+		<!-- default name=eventBus, class:com.google.web.bindery.event.shared.EventBus
+		   			interface=com.google.gwt.event.shared.SimpleEventBus -->
+		   			
+	<gwt:eventBus name="legacyEventBus" class="com.google.gwt.event.shared.EventBus" interface="com.google.gwt.event.shared.testing.CountingEventBus" />
+		   			
+	<gwt:historyMapper class="org.staticioc.samples.gwt.client.places.AppPlaceHistoryMapper"/><!--  default name=historyMapper -->
+	<gwt:historyMapper name="anotherHistoryMapper" class="org.staticioc.samples.gwt.client.places.AnotherAppPlaceHistoryMapper"/> 
+	<gwt:historyMapper name="missingClassHistoryMapper" />
+	
+	<!--  default name=activityManager   default activityMapper="activityMapper" default eventBus="eventBus" -->
+	<gwt:activityManager/>
+	
+	<gwt:activityManager name="anotherActivityManager" activityMapper="anotherActivityMapper" eventBus="legacyEventBus"/>
+	
+	<gwt:create name="instance" class="test.stubbedInterface" interface="test.interface"/>
+	<gwt:create name="missingClassGwtCreate"  interface="test.interface"/>
+	<gwt:create name="missingInterfaceGwtCreate"  class="test.stubbedInterface"/>
+	<gwt:create name="missingClassAndInterfaceGwtCreate"/>
+	
+	<bean id="activityMapper" class="test.activityMapper"/>
+	<bean id="anotherActivityMapper" class="test.activityMapper"/>
+</beans>

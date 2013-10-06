@@ -29,9 +29,12 @@
 					</execution>
 				</executions>
 				<configuration>
-				    <includes>
-				        <include>org/staticioc/AbstractSpringParserTest.class</include>
-				    </includes>
+				    <excludes>
+				        <exclude>**/*Test.class</exclude>
+				        <exclude>**/*Test$*.class</exclude>
+				        <exclude>SpringConfigParserTest-*.xml</exclude>
+				        <exclude>logback-test.xml</exclude>
+				    </excludes>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -45,8 +48,8 @@
 		</dependency>
 
 		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
 			<version>${commons-lang-version}</version>
 		</dependency>
 	</dependencies>

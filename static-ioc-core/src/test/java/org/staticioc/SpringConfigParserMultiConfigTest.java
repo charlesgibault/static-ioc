@@ -28,7 +28,7 @@ import org.staticioc.model.*;
 /**
  * Unit test for SpringConfigParser to test parent and prototype resolution when configuration are loaded together (without import)
  */
-public class SpringConfigParserMultiConfigTest extends AbstractSpringParserTest {
+public class SpringConfigParserMultiConfigTest extends AbstractTestSpringParser {
 	private final static String[] TEST_CONTEXT = {
 		"src/test/resources/SpringConfigParserTest-MultiConfig.xml",
 		"src/test/resources/SpringConfigParserTest-SimpleBean.xml",

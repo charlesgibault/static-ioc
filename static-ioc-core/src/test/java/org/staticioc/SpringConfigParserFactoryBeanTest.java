@@ -25,11 +25,12 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import org.staticioc.model.*;
+import org.staticioc.parser.ParserConstants;
 
 /**
  * Unit test for SpringConfigParser
  */
-public class SpringConfigParserFactoryBeanTest extends AbstractSpringParserTest
+public class SpringConfigParserFactoryBeanTest extends AbstractTestSpringParser
 {
 	private final static String TEST_CONTEXT = "src/test/resources/SpringConfigParserTest-FactoryBean.xml";
 
@@ -86,12 +87,19 @@ public class SpringConfigParserFactoryBeanTest extends AbstractSpringParserTest
 		assertEquals("Factory method not properly set", "create" , rpcService.getFactoryMethod() );		
 		assertEquals("Constructor args not found were expected", rpcService.getConstructorArgs().size(), 1 );
 	
+		Property constructorArgs = rpcService.getConstructorArgs().iterator().next();
+		checkProperty( constructorArgs, ParserConstants.CONSTRUCTOR_ARGS + "0", "test.RpcService", null);
+
+		
 		assertEquals("Bean id not properly set", "productFactory", productFactory.getId() );
 		assertEquals("Bean class not properly set", "test.ProductFactory", productFactory.getClassName() );
 		assertEquals("Bean type not properly set", Bean.Type.SIMPLE , productFactory.getType() );
 		assertNull("Factory bean found were not expected" , productFactory.getFactoryBean() );
 		assertNull("Factory method found were not expected", productFactory.getFactoryMethod() );		
 		assertEquals("Constructor args found not found were expected", productFactory.getConstructorArgs().size(), 1 );
+		
+		constructorArgs = productFactory.getConstructorArgs().iterator().next();
+		checkProperty( constructorArgs, ParserConstants.CONSTRUCTOR_ARGS + "0", null, "rpcService");
 				
 		// Ordering checks
 		LinkedHashSet<String> orderedBeans = parser.getBeanContainer().getOrderedBeanIds();

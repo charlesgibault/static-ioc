@@ -59,13 +59,14 @@
     <module>static-ioc-generators</module>
     <module>static-ioc-commandline</module>
     <module>static-ioc-maven-plugin</module>
+    <module>static-ioc-namespaces</module>
     <module>static-ioc-samples</module>
   </modules>
   <properties>
     <slf4j-version>1.7.5</slf4j-version>
     <logback-version>1.0.13</logback-version>
-    <commons-lang-version>2.6</commons-lang-version>
-    <commons-io-version>2.2</commons-io-version>
+    <commons-lang-version>3.1</commons-lang-version>
+    <commons-io-version>2.4</commons-io-version>
     <junit-version>4.10</junit-version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>

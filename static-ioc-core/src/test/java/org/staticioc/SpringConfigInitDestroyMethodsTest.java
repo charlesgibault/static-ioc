@@ -27,7 +27,7 @@ import org.staticioc.model.*;
 /**
  * Unit test for SpringConfigParser
  */
-public class SpringConfigInitDestroyMethodsTest extends AbstractSpringParserTest
+public class SpringConfigInitDestroyMethodsTest extends AbstractTestSpringParser
 {
 	private final static String TEST_CONTEXT = "src/test/resources/SpringConfigParserTest-InitDestroyMethods.xml";
 

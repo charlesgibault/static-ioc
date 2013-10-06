@@ -37,6 +37,7 @@ Done:
   * *Core* - Refactored SpringConfigParser for proper concern separation. Spring Bean parsing fully migrated to NodeSupport/NodeParser plugins
   * *Core* - Javadoc improvement
   * *Core* - Code cleaning
+  * *Namespace* - Add namespace plugin for GWT to make bean definition less versbose
   * *Generator* - Javadoc improvement
   * *Generator* - Code cleaning
   * *Generator* - Add namespace plugin mechanism
@@ -47,6 +48,7 @@ Done:
 in progress, remaining: 
   * *Core* - Add namespace plugin for GWT to make bean definition less versbose
   * *Samples* - Use GWT bean plugin to simplify GWT sample
+  * *Core* Add support for <ref bean/> and <ref local/>
 
 // Release 0.5
   * *Generator* - Add compile time support for PropertyPlaceHolders like mechanism

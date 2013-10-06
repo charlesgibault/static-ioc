@@ -29,7 +29,7 @@ import org.staticioc.model.*;
  * Unit test for SpringConfigParser to test parent resolution and import
  * loading. Note : a cyclic dependency is present in the TEST_CONTEXT
  */
-public class SpringConfigParserScopeTest extends AbstractSpringParserTest {
+public class SpringConfigParserScopeTest extends AbstractTestSpringParser {
 	private final static String TEST_CONTEXT = "src/test/resources/SpringConfigParserTest-Scope.xml";
 
 	public SpringConfigParserScopeTest() throws Exception {
