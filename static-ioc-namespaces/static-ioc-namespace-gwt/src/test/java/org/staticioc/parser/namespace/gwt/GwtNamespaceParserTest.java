@@ -20,6 +20,7 @@ package org.staticioc.parser.namespace.gwt;
 
 
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -281,10 +282,19 @@ public class GwtNamespaceParserTest extends AbstractTestSpringParser
 		assertTrue("Propertes found were none expected", activityManager.getProperties().isEmpty() );
 		assertTrue("Propertes found were none expected", anotherActivityManager.getProperties().isEmpty() );
 		
-		
-		//TODO check that a RunTimeDependency has been set on the activity manager's arguments
 	}
 
+	/**
+	 * Test that dependencies between Beans have been preserved
+	 */
+	@Test
+	public void testBeanDependencies()
+	{
+		// check that a RunTimeDependency has been set on the activity manager's arguments
+		LinkedHashSet<String> orderedBeans = parser.getBeanContainer().getOrderedBeanIds();
+		assertEquals("Incorrect bean order when dependencies are present", "[anotherHistoryMapper, instance, anotherActivityMapper, historyMapper, activityMapper, messagesAdmin, contactsService, eventBus, messages, legacyEventBus, activityManager, anotherActivityManager]", orderedBeans.toString() );
+	}
+	
 
 	/**
 	 * Test <gwt:create/> nodes parsing
