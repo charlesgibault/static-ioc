@@ -43,8 +43,10 @@
 	
 	<!--  default name=activityManager   default activityMapper="activityMapper" default eventBus="eventBus" -->
 	<activityManager/>
-	
 	<activityManager name="anotherActivityManager" activityMapper="anotherActivityMapper" eventBus="legacyEventBus"/>
+	
+	<placeController />	<!--  default name=placeController default eventBus="eventBus" -->
+	<placeController name="anotherPlaceController" eventBus="legacyEventBus"/>
 	
 	<create name="instance" class="test.stubbedInterface" interface="test.interface"/>
 	<create name="missingClassGwtCreate"  interface="test.interface"/>

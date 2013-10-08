@@ -250,8 +250,8 @@ public class GwtNamespaceParserTest extends AbstractTestSpringParser
 		assertEquals("Bean id not properly set", "activityManager", activityManager.getId() );
 		assertEquals("Bean id not properly set", "anotherActivityManager", anotherActivityManager.getId() );
 
-		assertEquals("Bean class not properly set", "com.google.gwt.activity.shared.ActivityManager", activityManager.getClassName() );
-		assertEquals("Bean class not properly set", "com.google.gwt.activity.shared.ActivityManager", anotherActivityManager.getClassName() );
+		assertEquals("Bean class not properly set", GwtNamespaceConstants.ACTIVITY_MANAGER_CLASS, activityManager.getClassName() );
+		assertEquals("Bean class not properly set", GwtNamespaceConstants.ACTIVITY_MANAGER_CLASS, anotherActivityManager.getClassName() );
 
 		assertEquals("Bean type not properly set", Bean.Type.SIMPLE , activityManager.getType() );
 		assertEquals("Bean type not properly set", Bean.Type.SIMPLE , anotherActivityManager.getType() );
@@ -283,6 +283,45 @@ public class GwtNamespaceParserTest extends AbstractTestSpringParser
 		assertTrue("Propertes found were none expected", anotherActivityManager.getProperties().isEmpty() );
 		
 	}
+	
+	/**
+	 * Test <gwt:placeController/> nodes parsing
+	 */
+	@Test
+	public void testPlaceController()
+	{
+		// Retrieve personBean and test properties
+		Bean placeController = loadedBeans.get("placeController");
+		Bean anotherPlaceController = loadedBeans.get("anotherPlaceController");
+
+		Assert.assertNotNull( placeController );
+		Assert.assertNotNull( anotherPlaceController );
+
+		// Bean definition checks
+		assertEquals("Bean id not properly set", "placeController", placeController.getId() );
+		assertEquals("Bean id not properly set", "anotherPlaceController", anotherPlaceController.getId() );
+
+		assertEquals("Bean class not properly set", GwtNamespaceConstants.PLACE_CONTROLLER_CLASS, placeController.getClassName() );
+		assertEquals("Bean class not properly set", GwtNamespaceConstants.PLACE_CONTROLLER_CLASS, anotherPlaceController.getClassName() );
+
+		assertEquals("Bean type not properly set", Bean.Type.SIMPLE , placeController.getType() );
+		assertEquals("Bean type not properly set", Bean.Type.SIMPLE , anotherPlaceController.getType() );
+
+		assertFalse("Named bean wrongly considered as anonymous" , placeController.isAnonymous() );
+		assertFalse("Named bean wrongly considered as anonymous" , anotherPlaceController.isAnonymous() );
+
+		assertFalse("Real bean wrongly considered as abstract" , placeController.isAbstract() );
+		assertFalse("Real bean wrongly considered as abstract" , anotherPlaceController.isAbstract() );
+
+		assertEquals("Constructor args not found were expected", placeController.getConstructorArgs().size(), 1 );
+		assertEquals("Constructor args not found were expected", anotherPlaceController.getConstructorArgs().size(), 1 );
+
+		checkProperty(  placeController.getConstructorArgs().iterator().next(), ParserConstants.CONSTRUCTOR_ARGS + "0", null, "eventBus");
+		checkProperty( anotherPlaceController.getConstructorArgs().iterator().next(), ParserConstants.CONSTRUCTOR_ARGS + "0", null, "legacyEventBus");
+		
+		assertTrue("Propertes found were none expected", placeController.getProperties().isEmpty() );
+		assertTrue("Propertes found were none expected", anotherPlaceController.getProperties().isEmpty() );
+	}
 
 	/**
 	 * Test that dependencies between Beans have been preserved
@@ -292,7 +331,7 @@ public class GwtNamespaceParserTest extends AbstractTestSpringParser
 	{
 		// check that a RunTimeDependency has been set on the activity manager's arguments
 		LinkedHashSet<String> orderedBeans = parser.getBeanContainer().getOrderedBeanIds();
-		assertEquals("Incorrect bean order when dependencies are present", "[anotherHistoryMapper, instance, anotherActivityMapper, historyMapper, activityMapper, messagesAdmin, contactsService, eventBus, messages, legacyEventBus, activityManager, anotherActivityManager]", orderedBeans.toString() );
+		assertEquals("Incorrect bean order when dependencies are present", "[anotherHistoryMapper, instance, anotherActivityMapper, historyMapper, activityMapper, messagesAdmin, contactsService, eventBus, messages, legacyEventBus, anotherPlaceController, placeController, activityManager, anotherActivityManager]", orderedBeans.toString() );
 	}
 	
 

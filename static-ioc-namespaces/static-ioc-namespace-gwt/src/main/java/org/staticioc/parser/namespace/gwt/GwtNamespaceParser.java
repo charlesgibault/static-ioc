@@ -35,7 +35,8 @@ public class GwtNamespaceParser extends AbstractNameSpaceParser implements GwtNa
 		NodeSupportPlugin gwtServicePlugin = new GwtServicePlugin();
 		NodeSupportPlugin gwtEventBusPlugin = new GwtEventBusPlugin();
 		NodeSupportPlugin gwtHistoryMapperPlugin = new GwtHistoryMapperPlugin();
-		NodeSupportPlugin gwtActivityMapperPlugin = new GwtActivityManagerPlugin();		
+		NodeSupportPlugin gwtActivityMapperPlugin = new GwtActivityManagerPlugin();
+		NodeSupportPlugin gwtPlaceControllerPlugin = new GwtPlaceControllerPlugin();
 		
 		nodeSupportPlugins.add( gwtCreatePlugin );
 		nodeSupportPlugins.add( gwtMessagesPlugin );
@@ -43,5 +44,6 @@ public class GwtNamespaceParser extends AbstractNameSpaceParser implements GwtNa
 		nodeSupportPlugins.add( gwtEventBusPlugin );
 		nodeSupportPlugins.add( gwtHistoryMapperPlugin );
 		nodeSupportPlugins.add( gwtActivityMapperPlugin );
+		nodeSupportPlugins.add( gwtPlaceControllerPlugin );
 	}
 }

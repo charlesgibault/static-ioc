@@ -43,11 +43,11 @@ Done:
   * *Generator* - Add namespace plugin mechanism
   * *MavenPlugin* - Add namespace plugin mechanism
   * *CommandLine* - Add namespace plugin mechanism
+  * *Samples* - Use GWT bean plugin to simplify GWT sample
 
 
 in progress, remaining: 
-  * *Core* - Add namespace plugin for GWT to make bean definition less versbose
-  * *Samples* - Use GWT bean plugin to simplify GWT sample
+  * Namespace * gwt namespace elements for RequestFactory?, XSD loading in sample
   * *Core* Add support for <ref bean/> and <ref local/>
 
 // Release 0.5

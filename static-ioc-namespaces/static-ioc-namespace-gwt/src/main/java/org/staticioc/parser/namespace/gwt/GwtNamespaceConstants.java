@@ -23,6 +23,9 @@ interface GwtNamespaceConstants {
 	
 	String FACTORY_BEAN="com.google.gwt.core.client.GWT";
 	String CLASS_SUFFIX = ".class";
+	String TYPE="type";
+	String INTERFACE="interface";
+	
 	String CREATE="create";
 	String MESSAGES="messages";
 
@@ -34,12 +37,12 @@ interface GwtNamespaceConstants {
 	String DEFAULT_EVENT_BUS_INTERFACE = "com.google.gwt.event.shared.SimpleEventBus";
 
 	String HISTORY_MAPPER="historyMapper";
+	
 	String ACTIVITY_MANAGER="activityManager";
 	String ACTIVITY_MANAGER_CLASS="com.google.gwt.activity.shared.ActivityManager";
 	String ACTIVITY_MAPPER="activityMapper";
 
-	String TYPE="type";
-	String INTERFACE="interface";
-	
+	String PLACE_CONTROLLER = "placeController";
+	String PLACE_CONTROLLER_CLASS="com.google.gwt.place.shared.PlaceController";
 	
 }

@@ -27,7 +27,7 @@
 
 	<gwt:messages name="messages" class="org.staticioc.samples.gwt.client.Messages"/> 
 
-		<gwt:service name="contactsService" interface="org.staticioc.samples.gwt.client.service.ContactsService"/>
+	<gwt:service name="contactsService" interface="org.staticioc.samples.gwt.client.service.ContactsService"/>
 	
 	<gwt:eventBus name="eventBus" class="com.google.gwt.event.shared.EventBus" /> <!-- default interface: com.google.gwt.event.shared.SimpleEventBus -->
 	
@@ -35,9 +35,7 @@
 		
 	<gwt:activityManager name="activityManager" activityMapper="activityMapper" eventBus="eventBus"/>
 	
-	<bean name="placeController" class="com.google.gwt.place.shared.PlaceController">
-	     <constructor-arg ref="eventBus"/>
-	</bean>
+	<gwt:placeController name="placeController" eventBus="eventBus"/>
 	
 	<bean name="activityMapper" class="org.staticioc.samples.gwt.client.places.AppActivityMapper">
 		 <property name="reportingActivity" ref="reportingPresenter"/>
