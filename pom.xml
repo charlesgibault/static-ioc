@@ -89,7 +89,7 @@
           <version>2.4.1</version>
         </plugin>
         <plugin>
-          <groupId>com.mycila.maven-license-plugin</groupId>
+          <groupId>com.mycila.maven-license-plugin</groupId> <!-- mvn -Dyear=2013 license:check / license:format -->
           <artifactId>maven-license-plugin</artifactId>
           <version>1.9.0</version>
           <configuration>
