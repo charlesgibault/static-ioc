@@ -22,7 +22,7 @@
 <beans 	xmlns="http://com.googlecode.static-ioc/schema/gwt"
 		xmlns:beans="http://www.springframework.org/schema/beans"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="http://com.googlecode.static-ioc/schema/gwt ./static-ioc-gwt.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+		xsi:schemaLocation="http://com.googlecode.static-ioc/schema/gwt https://static-ioc.googlecode.com/git/static-ioc-namespaces/static-ioc-namespace-gwt/src/main/xsd/static-ioc-gwt-1.0.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
  
     <messages class="org.staticioc.samples.gwt.client.Messages"/> <!--  default name=messages -->
 	<messages name="messagesAdmin" class="org.staticioc.samples.gwt.client.AdminMessages"/>
