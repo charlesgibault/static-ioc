@@ -53,6 +53,8 @@
 	<bean name="activityManager" class="com.google.gwt.activity.shared.ActivityManager">
 	     <constructor-arg ref="activityMapper"/>
 		 <constructor-arg ref="eventBus"/>
+		 
+		 <property name="display" ref="appWidget"/>
 	</bean>
 	
 	<bean name="historyMapper" class="org.staticioc.samples.gwt.client.places.AppPlaceHistoryMapper" factory-bean="com.google.gwt.core.client.GWT">
@@ -90,4 +92,7 @@
 	    <property name="placeController"  ref="placeController"/>
 	    <property name="eventBus" ref="eventBus"/>
 	</bean>
+	
+	
+	<bean name="appWidget" class="com.google.gwt.user.client.ui.SimplePanel"/>
 </beans>

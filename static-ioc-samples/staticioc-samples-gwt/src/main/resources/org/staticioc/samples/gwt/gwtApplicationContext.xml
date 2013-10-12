@@ -23,7 +23,7 @@
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xmlns:p="http://www.springframework.org/schema/p"
 		xmlns:gwt="http://com.googlecode.static-ioc/schema/gwt"
-		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+		xsi:schemaLocation="http://com.googlecode.static-ioc/schema/gwt https://static-ioc.googlecode.com/git/static-ioc-namespaces/static-ioc-namespace-gwt/src/main/xsd/static-ioc-gwt-1.0.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
 	<gwt:messages name="messages" class="org.staticioc.samples.gwt.client.Messages"/> 
 
@@ -33,7 +33,7 @@
 	
 	<gwt:historyMapper name="historyMapper" class="org.staticioc.samples.gwt.client.places.AppPlaceHistoryMapper"/>
 		
-	<gwt:activityManager name="activityManager" activityMapper="activityMapper" eventBus="eventBus"/>
+	<gwt:activityManager name="activityManager" activityMapper="activityMapper" eventBus="eventBus" display="appWidget"/>
 	
 	<gwt:placeController name="placeController" eventBus="eventBus"/>
 	
@@ -73,4 +73,6 @@
 	    <property name="placeController"  ref="placeController"/>
 	    <property name="eventBus" ref="eventBus"/>
 	</bean>
+	
+	<bean name="appWidget" class="com.google.gwt.user.client.ui.SimplePanel"/>
 </beans>
