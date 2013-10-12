@@ -38,11 +38,16 @@ public class RefPlugin extends AbstractNodeSupportPlugin
 	{
 		final NamedNodeMap spNodeAttributes = node.getAttributes();
 		final Node refNode = spNodeAttributes.getNamedItem(BEAN);
+		final Node localRefNode = spNodeAttributes.getNamedItem(LOCAL);
 
 		if( refNode != null) // handle <ref bean="">
 		{
 			return ParserHelper.getRef( propName, refNode.getNodeValue() );
-		} 
+		}
+		else if( localRefNode != null) // handle <ref local="">
+		{
+			return ParserHelper.getRef( propName, localRefNode.getNodeValue() );
+		}
 		else //Handle <ref>value</ref>
 		{
 			return ParserHelper.getRef( propName, ParserHelper.extractFirstChildValue(node) );

@@ -30,6 +30,7 @@ public interface ParserConstants
 	String XPATH_IMPORT = "/beans/import[@resource]";
 	String BEAN = "bean";
 	String REF = "ref";
+	String LOCAL = "local";
 	String ID = "id";
 	String IDREF = "idref";
 	String CLASS = "class";

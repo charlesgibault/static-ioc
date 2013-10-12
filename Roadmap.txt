@@ -33,6 +33,7 @@ Please find below some visibility on the planned feature roadmap
 
 // Release 0.4
 Done:
+  * *Core* - Add partial support for <ref local="bean Id"/> declaration
   * *Core* - Add namespace plugin mechanism
   * *Core* - Refactored SpringConfigParser for proper concern separation. Spring Bean parsing fully migrated to NodeSupport/NodeParser plugins
   * *Core* - Javadoc improvement
@@ -47,7 +48,7 @@ Done:
 
 
 in progress, remaining: 
-  * *Core* Add support for <ref bean/> and <ref local/>
+  * *Core* Enfore inner file restriction for <ref local/>
   * *Wiki* Improve website documentation
 
 // Release 0.5

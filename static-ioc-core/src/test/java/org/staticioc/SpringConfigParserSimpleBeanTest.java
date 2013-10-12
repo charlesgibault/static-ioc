@@ -71,6 +71,8 @@ public class SpringConfigParserSimpleBeanTest extends AbstractTestSpringParser
 		checkProperty(properties, "username", 	"root", 		null );
 		checkProperty(properties, "address", 	"address 1",	null );
 		checkProperty(properties, "country", 	null, 			"country" );
+		checkProperty(properties, "countryRefBean", 	null, 	"country" );
+		checkProperty(properties, "countryRefLocal", 	null, 	"country" );
 		checkProperty(properties, "birthCountry",null, 			"country" );
 		checkProperty(properties, "age", 		"28", 			null );
 		checkProperty(properties, "reference", 	null, 			"number10House" );

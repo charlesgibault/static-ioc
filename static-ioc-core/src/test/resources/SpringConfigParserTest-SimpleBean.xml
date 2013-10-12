@@ -33,7 +33,13 @@
 		<property name="country">
 			<ref>country</ref>
   		</property>
-  		<property name="namedCountry">
+  		<property name="countryRefBean">
+			<ref bean="country"/>
+  		</property>
+  		<property name="countryRefLocal">
+	  		<ref local="country"/>
+  		</property>
+	  	<property name="namedCountry">
 			<ref>myCountry</ref>
   		</property>
   		<property name="birthCountry">
