@@ -47,8 +47,8 @@ Done:
 
 
 in progress, remaining: 
-  * Namespace * gwt namespace elements for RequestFactory?, XSD loading in sample
   * *Core* Add support for <ref bean/> and <ref local/>
+  * *Wiki* Improve website documentation
 
 // Release 0.5
   * *Generator* - Add compile time support for PropertyPlaceHolders like mechanism

@@ -25,6 +25,7 @@ interface GwtNamespaceConstants {
 	String CLASS_SUFFIX = ".class";
 	String TYPE="type";
 	String INTERFACE="interface";
+	String DISPLAY="display";
 	
 	String CREATE="create";
 	String MESSAGES="messages";

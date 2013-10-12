@@ -19,7 +19,7 @@
      limitations under the License.
 
 -->
-<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:schema elementFormDefault="qualified" version="1.0" targetNamespace="http://com.googlecode.static-ioc/schema/gwt">
   <xs:complexType name="messages">
     <xs:simpleContent>
       <xs:extension base="xs:string">
@@ -68,6 +68,17 @@
         <xs:attribute type="xs:string" name="id" 				use="optional" default="activityManager"/>
         <xs:attribute type="xs:string" name="eventBus"  		use="optional" default="eventBus"/>
         <xs:attribute type="xs:string" name="activityMapper"  	use="optional" default="activityMapper"/>
+        <xs:attribute type="xs:string" name="display"  			use="optional" default="null"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  
+  <xs:complexType name="placeController">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="name" 				use="optional" default="placeController"/>
+        <xs:attribute type="xs:string" name="id" 				use="optional" default="placeController"/>
+        <xs:attribute type="xs:string" name="eventBus"  		use="optional" default="eventBus"/>
       </xs:extension>
     </xs:simpleContent>
   </xs:complexType>

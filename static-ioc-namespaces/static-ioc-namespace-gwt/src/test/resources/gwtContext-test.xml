@@ -42,7 +42,7 @@
 	<gwt:historyMapper name="missingClassHistoryMapper" />
 	
 	<!--  default name=activityManager   default activityMapper="activityMapper" default eventBus="eventBus" -->
-	<gwt:activityManager/>
+	<gwt:activityManager display="widget"/>
 	<gwt:activityManager name="anotherActivityManager" activityMapper="anotherActivityMapper" eventBus="legacyEventBus"/>
 	
 	<gwt:placeController />	<!--  default name=placeController default eventBus="eventBus" -->
@@ -55,4 +55,6 @@
 	
 	<bean id="activityMapper" class="test.activityMapper"/>
 	<bean id="anotherActivityMapper" class="test.activityMapper"/>
+		
+	<bean id="widget" class="test.widget"/>
 </beans>

@@ -21,6 +21,7 @@ package org.staticioc.parser.namespace.gwt;
 
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -279,9 +280,13 @@ public class GwtNamespaceParserTest extends AbstractTestSpringParser
 		constructorArgs = it.next();
 		checkProperty( constructorArgs, ParserConstants.CONSTRUCTOR_ARGS + "1", null, "legacyEventBus");
 
-		assertTrue("Propertes found were none expected", activityManager.getProperties().isEmpty() );
-		assertTrue("Propertes found were none expected", anotherActivityManager.getProperties().isEmpty() );
+		// Property checks
+		assertEquals("Missing display property", 1, activityManager.getProperties().size() );
+		final Map<String, Property> props = mapProperties( activityManager.getProperties() );
+		checkProperty(props, "display", null, "widget" );
 		
+		
+		assertTrue("Properties found were none expected", anotherActivityManager.getProperties().isEmpty() );
 	}
 	
 	/**
@@ -331,7 +336,7 @@ public class GwtNamespaceParserTest extends AbstractTestSpringParser
 	{
 		// check that a RunTimeDependency has been set on the activity manager's arguments
 		LinkedHashSet<String> orderedBeans = parser.getBeanContainer().getOrderedBeanIds();
-		assertEquals("Incorrect bean order when dependencies are present", "[anotherHistoryMapper, instance, anotherActivityMapper, historyMapper, activityMapper, messagesAdmin, contactsService, eventBus, messages, legacyEventBus, anotherPlaceController, placeController, activityManager, anotherActivityManager]", orderedBeans.toString() );
+		assertEquals("Incorrect bean order when dependencies are present", "[widget, anotherHistoryMapper, instance, anotherActivityMapper, historyMapper, activityMapper, messagesAdmin, contactsService, eventBus, messages, legacyEventBus, anotherPlaceController, placeController, activityManager, anotherActivityManager]", orderedBeans.toString() );
 	}
 	
 

@@ -53,7 +53,14 @@ public class GwtActivityManagerPlugin extends AbstractGwtNodeSupport
 
 		String activityMapper = ParserHelper.extractAttributeValueAsString(ACTIVITY_MAPPER,  node.getAttributes(), ACTIVITY_MAPPER);
 		String eventBus = ParserHelper.extractAttributeValueAsString(EVENT_BUS,  node.getAttributes(), EVENT_BUS);
+		String display = ParserHelper.extractAttributeValueAsString(DISPLAY,  node.getAttributes(), null);
 
+		if( display != null)
+		{
+			Property displayRef = new Property( DISPLAY, null, display);
+			beanParser.getBeanContainer().addOrReplaceProperty( displayRef, gwtBean.getProperties() );
+		}
+		
 		beanParser.getBeanContainer().addOrReplaceProperty( ParserHelper.buildContructorArgument(0, null, activityMapper) , gwtBean.getConstructorArgs() );
 		beanParser.getBeanContainer().addOrReplaceProperty( ParserHelper.buildContructorArgument(1, null, eventBus) , gwtBean.getConstructorArgs() );
 

@@ -42,7 +42,7 @@
 	<historyMapper name="missingClassHistoryMapper" />
 	
 	<!--  default name=activityManager   default activityMapper="activityMapper" default eventBus="eventBus" -->
-	<activityManager/>
+	<activityManager display="widget"/>
 	<activityManager name="anotherActivityManager" activityMapper="anotherActivityMapper" eventBus="legacyEventBus"/>
 	
 	<placeController />	<!--  default name=placeController default eventBus="eventBus" -->
@@ -55,4 +55,6 @@
 	
 	<beans:bean id="activityMapper" class="test.activityMapper"/>
 	<beans:bean id="anotherActivityMapper" class="test.activityMapper"/>
+	
+	<beans:bean id="widget" class="test.widget"/>
 </beans>
