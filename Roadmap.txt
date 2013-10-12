@@ -48,7 +48,6 @@ Done:
 
 
 in progress, remaining: 
-  * *Core* Enfore inner file restriction for <ref local/>
   * *Wiki* Improve website documentation
 
 // Release 0.5
@@ -58,5 +57,6 @@ in progress, remaining:
   * *Generator* - Support Objective C and Cpp targets
 
 // Release 0.6+
+  * *Core* Enfore inner file restriction for <ref local/>
   * *Generator* - Add runtime interface to allow for support for PropertyPlaceHolders like mechanism
   * *Samples* -  Add Play N sample project?

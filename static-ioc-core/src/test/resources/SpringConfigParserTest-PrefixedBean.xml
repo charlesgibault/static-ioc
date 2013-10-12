@@ -33,6 +33,12 @@
 		<bean:property name="country">
 			<bean:ref>country</bean:ref>
   		</bean:property>
+  		<bean:property name="countryRefBean">
+			<bean:ref bean="country"/>
+  		</bean:property>
+  		<bean:property name="countryRefLocal">
+	  		<bean:ref local="country"/>
+  		</bean:property>
   		<bean:property name="namedCountry">
 			<bean:ref>myCountry</bean:ref>
   		</bean:property>
