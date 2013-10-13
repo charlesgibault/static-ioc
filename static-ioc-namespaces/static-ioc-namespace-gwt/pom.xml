@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>com.googlecode.static-ioc</groupId>
 		<artifactId>static-ioc-namespace</artifactId>
-		<version>0.4</version>
+		<version>0.5-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
