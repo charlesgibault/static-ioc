@@ -19,90 +19,234 @@
      limitations under the License.
 
 -->
-<xs:schema 	xmlns="http://www.springframework.org/schema/beans"
-			xmlns:xs="http://www.w3.org/2001/XMLSchema"
-			targetNamespace="http://com.googlecode.static-ioc/schema/gwt"
-			version="1.0">
-  <xs:annotation>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+		   xmlns:gwt="http://com.googlecode.static-ioc/schema/gwt" 
+	  	   elementFormDefault="qualified"
+	  	   targetNamespace="http://com.googlecode.static-ioc/schema/gwt"
+	  	   version="1.0">
+	<xs:annotation>
 		<xs:documentation><![CDATA[
 Static IOC GWT namespace Schema, version 1.0
 Authors: Charles Gibault
 
 This defines a simple and consistent way of creating GWT objects.
 		]]></xs:documentation>
-  </xs:annotation>
+	</xs:annotation>
+
+	<xs:element name="messages">
+		<xs:annotation>
+			<xs:documentation><![CDATA[GWT constant I18n internationalization messages interface instanciation using GWT.create() mechanism]]></xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute type="xs:string" name="name" use="optional"
+				default="messages">
+				<xs:annotation>
+					<xs:documentation><![CDATA[name of the Bean being instanciated. Default value: messages]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute type="xs:string" name="id" use="optional"
+				default="messages">
+				<xs:annotation>
+					<xs:documentation><![CDATA[Unique identifier of the Bean being instanciated. Default value: messages]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute type="xs:string" name="class" use="required">
+				<xs:annotation>
+					<xs:documentation><![CDATA[i18n interface to be implemented by GWT.create() mechanism]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="service">
+		<xs:annotation>
+			<xs:documentation><![CDATA[GWT RPC interface instanciation using GWT.create() mechanism]]></xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute type="xs:string" name="name" use="optional"
+				default="Auto-generated value">
+				<xs:annotation>
+					<xs:documentation><![CDATA[name of the Bean being instanciated. Default value: Auto-generated value]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute type="xs:string" name="id" use="optional"
+				default="Auto-generated value">
+				<xs:annotation>
+					<xs:documentation><![CDATA[Unique identifier of the Bean being instanciated. Default value: Auto-generated value]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute type="xs:string" name="interface" use="required">
+				<xs:annotation>
+					<xs:documentation><![CDATA[Synchronous interface to be implemented as an asynchronous cliet stub by GWT.create() mechanism]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="eventBus">
+		<xs:annotation>
+			<xs:documentation><![CDATA[GWT EventBus instanciation using GWT.create() mechanism]]></xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute type="xs:string" name="name" use="optional"
+				default="eventBus">
+				<xs:annotation>
+					<xs:documentation><![CDATA[name of the Bean being instanciated. Default value: eventBus]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute type="xs:string" name="id" use="optional"
+				default="eventBus">
+				<xs:annotation>
+					<xs:documentation><![CDATA[Unique identifier of the Bean being instanciated. Default value: eventBus]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute type="xs:string" name="interface" use="optional"
+				default="com.google.web.bindery.event.shared.EventBus">
+
+				<xs:annotation>
+					<xs:documentation><![CDATA[Interface of the EventBus instanciated by GWT.create(). Default type: com.google.web.bindery.event.shared.EventBus (GWT 2.4+)]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute type="xs:string" name="class" use="optional"
+				default="com.google.gwt.event.shared.SimpleEventBus">
+				<xs:annotation>
+					<xs:documentation><![CDATA[Actual implementation to be requested with GWT.create() for the eventBus. Default value: SimpleEventBus]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="historyMapper">
+		<xs:annotation>
+			<xs:documentation><![CDATA[Place History Mapper instanciation using GWT.create() mechanism]]></xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute type="xs:string" name="name" use="optional"
+				default="historyMapper">
+				<xs:annotation>
+					<xs:documentation><![CDATA[name of the Bean being instanciated. Default value: historyMapper]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute type="xs:string" name="id" use="optional"
+				default="historyMapper">
+				<xs:annotation>
+					<xs:documentation><![CDATA[Unique identifier of the Bean being instanciated. Default value: historyMapper]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute type="xs:string" name="class" use="required">
+				<xs:annotation>
+					<xs:documentation><![CDATA[Interface defining the PlaceHistoryMapper extension with the application's PlaceTokenizer]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="activityManager">
+		<xs:annotation>
+			<xs:documentation><![CDATA[Activity Manager instanciation using com.google.gwt.activity.shared.ActivityManager]]></xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute type="xs:string" name="name" use="optional"
+				default="activityManager">
+				<xs:annotation>
+					<xs:documentation><![CDATA[Name the Bean being instanciated. Default value: activityManager]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute type="xs:string" name="id" use="optional"
+				default="activityManager">
+				<xs:annotation>
+					<xs:documentation><![CDATA[Unique identifier of the Bean being instanciated. Default value: activityManager]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute type="xs:string" name="eventBus" use="optional"
+				default="eventBus">
+				<xs:annotation>
+					<xs:documentation><![CDATA[Reference to the EventBus instance to use. Default value: eventBus]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute type="xs:string" name="activityMapper"
+				use="optional" default="activityMapper">
+				<xs:annotation>
+					<xs:documentation><![CDATA[Reference to the ActivityMapper instance to use. Default value: activityMapper]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute type="xs:string" name="display" use="optional"
+				default="null">
+				<xs:annotation>
+					<xs:documentation><![CDATA[Reference to the Widget to display activities' views. Default value: null]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute type="xs:string" name="class" use="optional"
+				default="com.google.gwt.activity.shared.ActivityManager">
+				<xs:annotation>
+					<xs:documentation><![CDATA[Class of the ActivityManager implementation. Default value: com.google.gwt.activity.shared.ActivityManager]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="placeController">
+		<xs:annotation>
+			<xs:documentation><![CDATA[Place Controller instanciation using com.google.gwt.place.shared.PlaceController]]></xs:documentation>
+		</xs:annotation>
+
+		<xs:complexType>
+			<xs:attribute type="xs:string" name="name" use="optional"
+				default="placeController">
+				<xs:annotation>
+					<xs:documentation><![CDATA[Name the Bean being instanciated. Default value: placeController]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute type="xs:string" name="id" use="optional"
+				default="placeController">
+				<xs:annotation>
+					<xs:documentation><![CDATA[Unique identifier of the Bean being instanciated. Default value: placeController]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute type="xs:string" name="eventBus" use="optional"
+				default="eventBus">
+				<xs:annotation>
+					<xs:documentation><![CDATA[Reference to the EventBus instance to use. Default value: eventBus]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute type="xs:string" name="class" use="optional"
+				default="com.google.gwt.place.shared.PlaceController">
+				<xs:annotation>
+					<xs:documentation><![CDATA[Class of the ActivityManager implementation. Default value: com.google.gwt.place.shared.PlaceController]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:element name="create">
+		<xs:annotation>
+			<xs:documentation><![CDATA[Place Controller instanciation using com.google.gwt.place.shared.PlaceController]]></xs:documentation>
+		</xs:annotation>
+
+		<xs:complexType>
+			<xs:attribute type="xs:string" name="name" use="optional"
+				default="Auto-generated value" >
+				<xs:annotation>
+					<xs:documentation><![CDATA[Name the Bean being instanciated. Default value: Auto generated value]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute type="xs:string" name="id" use="optional"
+				default="Auto-generated value" >
+				<xs:annotation>
+					<xs:documentation><![CDATA[Unique identifier of the Bean being instanciated. Default value: Auto generated value]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute type="xs:string" name="interface" use="required" >
+				<xs:annotation>
+					<xs:documentation><![CDATA[Interface to be stubbed by the GWT.create() mechanism]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute type="xs:string" name="class" use="required" >
+				<xs:annotation>
+					<xs:documentation><![CDATA[Actual interface whose implementation stub is returned by the GWT.create() mechanism]]></xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
 	
-  <xs:complexType name="messages">
-    <xs:simpleContent>
-      <xs:extension base="xs:string">
-        <xs:attribute type="xs:string" name="name" 	use="optional" default="messages"/>
-        <xs:attribute type="xs:string" name="id" 	use="optional" default="messages"/>
-        <xs:attribute type="xs:string" name="class" use="required"/>
-      </xs:extension>
-    </xs:simpleContent>
-  </xs:complexType>
-  
-  <xs:complexType name="service">
-    <xs:simpleContent>
-      <xs:extension base="xs:string">
-        <xs:attribute type="xs:string" name="name" 		use="optional" default="Auto-generated value" />
-        <xs:attribute type="xs:string" name="id" 		use="optional" default="Auto-generated value" />
-        <xs:attribute type="xs:string" name="interface" use="required"/>
-      </xs:extension>
-    </xs:simpleContent>
-  </xs:complexType>
-  
-  <xs:complexType name="eventBus">
-    <xs:simpleContent>
-      <xs:extension base="xs:string">
-        <xs:attribute type="xs:string" name="name" 	use="optional" default="eventBus" />
-        <xs:attribute type="xs:string" name="id" 	use="optional" default="eventBus" />
-        <xs:attribute type="xs:string" name="class" use="optional" default="com.google.web.bindery.event.shared.EventBus"/>
-        <xs:attribute type="xs:string" name="type" 	use="optional" default="com.google.gwt.event.shared.SimpleEventBus"/>
-      </xs:extension>
-    </xs:simpleContent>
-  </xs:complexType>
-  
-  <xs:complexType name="historyMapper">
-    <xs:simpleContent>
-      <xs:extension base="xs:string">
-        <xs:attribute type="xs:string" name="name" 	use="optional" default="historyMapper"/>
-        <xs:attribute type="xs:string" name="id" 	use="optional" default="historyMapper"/>
-        <xs:attribute type="xs:string" name="class" use="required"/>
-      </xs:extension>
-    </xs:simpleContent>
-  </xs:complexType>
-    
-  <xs:complexType name="activityManager">
-    <xs:simpleContent>
-      <xs:extension base="xs:string">
-        <xs:attribute type="xs:string" name="name" 				use="optional" default="activityManager"/>
-        <xs:attribute type="xs:string" name="id" 				use="optional" default="activityManager"/>
-        <xs:attribute type="xs:string" name="eventBus"  		use="optional" default="eventBus"/>
-        <xs:attribute type="xs:string" name="activityMapper"  	use="optional" default="activityMapper"/>
-        <xs:attribute type="xs:string" name="display"  			use="optional" default="null"/>
-      </xs:extension>
-    </xs:simpleContent>
-  </xs:complexType>
-  
-  <xs:complexType name="placeController">
-    <xs:simpleContent>
-      <xs:extension base="xs:string">
-        <xs:attribute type="xs:string" name="name" 				use="optional" default="placeController"/>
-        <xs:attribute type="xs:string" name="id" 				use="optional" default="placeController"/>
-        <xs:attribute type="xs:string" name="eventBus"  		use="optional" default="eventBus"/>
-      </xs:extension>
-    </xs:simpleContent>
-  </xs:complexType>
-  
-  <xs:complexType name="create">
-    <xs:simpleContent>
-      <xs:extension base="xs:string">
-        <xs:attribute type="xs:string" name="name" 		use="optional" default="Auto-generated value" />
-        <xs:attribute type="xs:string" name="id" 		use="optional" default="Auto-generated value" />
-        <xs:attribute type="xs:string" name="interface" use="required"/>
-        <xs:attribute type="xs:string" name="class" use="required"/>
-      </xs:extension>
-    </xs:simpleContent>
-  </xs:complexType>
 </xs:schema>
