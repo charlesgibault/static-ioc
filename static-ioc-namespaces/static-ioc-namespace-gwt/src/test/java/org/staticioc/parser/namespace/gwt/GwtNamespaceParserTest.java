@@ -252,7 +252,7 @@ public class GwtNamespaceParserTest extends AbstractTestSpringParser
 		assertEquals("Bean id not properly set", "anotherActivityManager", anotherActivityManager.getId() );
 
 		assertEquals("Bean class not properly set", GwtNamespaceConstants.ACTIVITY_MANAGER_CLASS, activityManager.getClassName() );
-		assertEquals("Bean class not properly set", GwtNamespaceConstants.ACTIVITY_MANAGER_CLASS, anotherActivityManager.getClassName() );
+		assertEquals("Bean class not properly set", "test.activityManager", anotherActivityManager.getClassName() );
 
 		assertEquals("Bean type not properly set", Bean.Type.SIMPLE , activityManager.getType() );
 		assertEquals("Bean type not properly set", Bean.Type.SIMPLE , anotherActivityManager.getType() );

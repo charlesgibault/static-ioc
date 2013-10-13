@@ -22,11 +22,11 @@
 <beans 	xmlns="http://www.springframework.org/schema/beans"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xmlns:gwt="http://com.googlecode.static-ioc/schema/gwt"
-		xsi:schemaLocation="http://com.googlecode.static-ioc/schema/gwt https://static-ioc.googlecode.com/git/static-ioc-namespaces/static-ioc-namespace-gwt/src/main/xsd/static-ioc-gwt-1.0.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+		xsi:schemaLocation="http://com.googlecode.static-ioc/schema/gwt static-ioc-gwt-1.0.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
  
     <gwt:messages class="org.staticioc.samples.gwt.client.Messages"/> <!--  default name=messages -->
 	<gwt:messages name="messagesAdmin" class="org.staticioc.samples.gwt.client.AdminMessages"/>
-	<gwt:messages name="missingClassMessage" /> 
+	<gwt:messages name="missingClassMessage" itd=""/> 
 	
 	<gwt:service name="contactsService" interface="org.staticioc.samples.gwt.client.service.ContactsService"/>
 	<gwt:service name="missingInterfaceCService"/>
@@ -43,7 +43,7 @@
 	
 	<!--  default name=activityManager   default activityMapper="activityMapper" default eventBus="eventBus" -->
 	<gwt:activityManager display="widget"/>
-	<gwt:activityManager name="anotherActivityManager" activityMapper="anotherActivityMapper" eventBus="legacyEventBus"/>
+	<gwt:activityManager name="anotherActivityManager" activityMapper="anotherActivityMapper" eventBus="legacyEventBus" class="test.activityManager"/>
 	
 	<gwt:placeController />	<!--  default name=placeController default eventBus="eventBus" -->
 	<gwt:placeController name="anotherPlaceController" eventBus="legacyEventBus"/>
