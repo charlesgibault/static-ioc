@@ -44,9 +44,7 @@ public class GwtActivityManagerPlugin extends AbstractGwtNodeSupport
 	@Override
 	public Property handleNode( final Node node, final String propName ) throws XPathExpressionException
 	{
-		String className = ParserHelper.extractAttributeValueAsString(CLASS,  node.getAttributes(), null);
-		
-		Bean gwtBean = createBean( node, ACTIVITY_MANAGER, className != null ? className : ACTIVITY_MANAGER_CLASS, null, null);
+		Bean gwtBean = createBean( node, ACTIVITY_MANAGER, ACTIVITY_MANAGER_CLASS, null, null);
 		
 		if( gwtBean == null)
 		{

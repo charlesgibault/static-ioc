@@ -44,9 +44,7 @@ public class GwtPlaceControllerPlugin extends AbstractGwtNodeSupport
 	@Override
 	public Property handleNode( final Node node, final String propName ) throws XPathExpressionException
 	{
-		String className = ParserHelper.extractAttributeValueAsString(CLASS,  node.getAttributes(), null);
-		
-		Bean gwtBean = createBean( node, PLACE_CONTROLLER, className != null ? className : PLACE_CONTROLLER_CLASS, null, null);
+		Bean gwtBean = createBean( node, PLACE_CONTROLLER, PLACE_CONTROLLER_CLASS, null, null);
 		
 		if( gwtBean == null)
 		{
