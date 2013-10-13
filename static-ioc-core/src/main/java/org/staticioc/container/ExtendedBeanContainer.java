@@ -25,7 +25,6 @@ import java.util.Set;
 import org.staticioc.dependency.DefinitionDependency;
 import org.staticioc.dependency.DependencyManager;
 import org.staticioc.dependency.RunTimeDependency;
-import org.staticioc.model.Bean;
 import org.staticioc.model.Property;
 
 public interface ExtendedBeanContainer extends BeanContainer {
@@ -68,7 +67,7 @@ public interface ExtendedBeanContainer extends BeanContainer {
 	List<Property> getPropertyReferences();
 	
 	/**
-	 * @return A Map< alias name, target Bean>
+	 * @return A Map< alias name, target Bean name>
 	 */
-	Map<String, Bean> getAliases();
+	Map<String, String> getAliases();
 }

@@ -29,6 +29,7 @@ public interface ParserConstants
 	String XPATH_PROPERTY = "property[@name]";
 	String XPATH_IMPORT = "/beans/import[@resource]";
 	String BEAN = "bean";
+	String ALIAS = "alias";
 	String REF = "ref";
 	String LOCAL = "local";
 	String ID = "id";

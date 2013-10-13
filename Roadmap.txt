@@ -34,11 +34,13 @@ Please find below some visibility on the planned feature roadmap
 // Release 0.4
 Done:
   * *Core* - Add partial support for <ref local="bean Id"/> declaration
+  * *Core* Add <alias/> node support
   * *Core* - Add namespace plugin mechanism
   * *Core* - Refactored SpringConfigParser for proper concern separation. Spring Bean parsing fully migrated to NodeSupport/NodeParser plugins
   * *Core* - Javadoc improvement
   * *Core* - Code cleaning
-  * *Namespace* - Add namespace plugin for GWT to make bean definition less versbose
+  * *Namespace* - Add namespace plugin for GWT to make bean definition less versbose.
+  * *Namespace* - XML schema's (http://com.googlecode.static-ioc/schema/gwt) XSD is available at https://static-ioc.googlecode.com/git/static-ioc-namespaces/static-ioc-namespace-gwt/src/main/xsd/static-ioc-gwt-1.0.xsd
   * *Generator* - Javadoc improvement
   * *Generator* - Code cleaning
   * *Generator* - Add namespace plugin mechanism

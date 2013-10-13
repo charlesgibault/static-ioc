@@ -81,6 +81,13 @@ public interface BeanContainer extends SimpleBeanContainer
 	void registerRunTimeDependency(RunTimeDependency dependency);
 
 	/**
+	 * Register a name alias
+	 * @param beanName to be referenced by the alias
+	 * @param alias of the Bean
+	 */
+	void registerAlias( String beanName, String alias );
+	
+	/**
 	 * Update a collection of properties while registering potential references in the container (for prototype resolution)
 	 * 
 	 * @param prop the Property to add

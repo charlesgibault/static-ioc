@@ -126,19 +126,27 @@ public class SpringConfigParserSimpleBeanTest extends AbstractTestSpringParser
 		
 		Bean bean2a = loadedBeans.get("country");
 		Bean bean2b = loadedBeans.get("myCountry");
-		
+		Bean bean2c = loadedBeans.get("anotherCountry");
+				
 		Bean bean = loadedBeans.get("personBean");
+		Bean bean2 = loadedBeans.get("anotherMan");
 		
 		Assert.assertNotNull( bean1a );
 		Assert.assertNull( bean1b ); // alias bean should not be referenced
 		Assert.assertNotNull( bean2a );
 		Assert.assertNull( bean2b ); // alias bean should not be referenced
+		Assert.assertNull( bean2c ); // alias should not be referenced
+		
 		
 		Assert.assertNotNull( bean );
+		Assert.assertNotNull( bean2 );
 		
 		// Property checks
-		final Map<String, Property> properties = mapProperties( bean.getProperties() );
+		Map<String, Property> properties = mapProperties( bean.getProperties() );
 		checkProperty(properties, "namedCountry", 	null, "country" ); // Reference to myCountry should be resolved to bean's id country 
+		
+		properties = mapProperties( bean2.getProperties() );
+		checkProperty(properties, "country", 	null, "country" ); // Reference to country should be resolved to bean's id country 
 	}
 
 	/**

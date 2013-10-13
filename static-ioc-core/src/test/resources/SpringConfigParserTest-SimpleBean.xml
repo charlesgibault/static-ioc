@@ -57,6 +57,10 @@
 		</property>
 	</bean>
 
+	 <!-- Alias test  -->
+	<bean id="anotherMan" class="test.Person" p:country-ref="anotherCountry" />
+	<alias name="country" alias="anotherCountry"/>
+	
 	 <!-- class without id  -->
 	<bean class="test.AnonymousPerson" p:name="Tony" p:age="53" p:house-ref="number10House" />
 

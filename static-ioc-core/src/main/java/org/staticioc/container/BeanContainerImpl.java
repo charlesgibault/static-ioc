@@ -52,7 +52,7 @@ public class BeanContainerImpl implements ExtendedBeanContainer
 	private final Map<String,Bean> beans = new ConcurrentHashMap<String,Bean>();
 	
 	// Map a bean's name (alias) to the actual registerd beans 
-	private final Map<String,Bean> aliases = new HashMap<String,Bean>();
+	private final Map<String, String> aliases = new HashMap<String, String>();
 
 	private final DependencyManager<DefinitionDependency> parentDependencyManager = new DependencyManager<DefinitionDependency>();
 	private final DependencyManager<RunTimeDependency> runTimeDependencyManager = new DependencyManager<RunTimeDependency>();
@@ -146,7 +146,7 @@ public class BeanContainerImpl implements ExtendedBeanContainer
 		if( bean.getAlias() != null)
 		{
 			logger.debug( "Adding alias {} for {}", bean.getAlias(), bean.getId() );
-			aliases.put( bean.getAlias(), bean );
+			aliases.put( bean.getAlias(), bean.getId() );
 		}
 		
 		if( bean.getScope().equals( Scope.PROTOTYPE ) )
@@ -166,6 +166,18 @@ public class BeanContainerImpl implements ExtendedBeanContainer
 		{
 			register(bean);
 		}
+	}
+	
+	/**
+	 * Register a name alias
+	 * @param beanName to be referenced by the alias
+	 * @param alias of the Bean
+	 */
+	@Override
+	public void registerAlias( String beanName, String alias )
+	{
+		logger.debug( "Adding alias {} for Bean {}", alias, beanName );
+		aliases.put(alias, beanName);
 	}
 	
 	/**
@@ -220,7 +232,21 @@ public class BeanContainerImpl implements ExtendedBeanContainer
 	public Bean getBean( final String id)
 	{
 		final Bean bean = beans.get(id);
-		return (bean != null)? bean : aliases.get(id);
+		
+		if (bean != null) // id access
+		{
+			return bean;
+		}
+		
+		// Look at aliases
+		String alias = aliases.get(id);
+		
+		if( alias != null)
+		{
+			return beans.get(alias);
+		}
+		
+		return null;
 	}
 	
 	/**
@@ -296,11 +322,11 @@ public class BeanContainerImpl implements ExtendedBeanContainer
 		for( Property prop : propertyReferences )
 		{
 			// Resolve aliases
-			Bean aliasBean = aliases.get( prop.getRef() );
-			if( aliasBean != null )
+			String alias = aliases.get( prop.getRef() );
+			if( alias != null )
 			{
 				logger.debug( "Resolved alias {}", prop.getRef() );
-				prop.setRef( aliasBean.getId() );
+				prop.setRef( alias );
 			}
 			
 			// Resolve Prototypes
@@ -356,7 +382,7 @@ public class BeanContainerImpl implements ExtendedBeanContainer
 
 	@Override
 	public
-	Map<String, Bean> getAliases() {
+	Map<String, String> getAliases() {
 		return aliases;
 	}
 }

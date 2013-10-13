@@ -41,6 +41,7 @@ public class SpringBeansNameSpaceParser extends AbstractNameSpaceParser
 		NodeSupportPlugin idrefPlugin = new IdRefPlugin();
 		NodeSupportPlugin valuePlugin = new ValuePlugin();
 		NodeSupportPlugin nullPlugin = new NullPlugin();
+		NodeSupportPlugin aliasPlugin = new AliasPlugin();
 		
 		nodeSupportPlugins.add( beanPlugin );
 		nodeSupportPlugins.add( listPlugin );
@@ -51,7 +52,7 @@ public class SpringBeansNameSpaceParser extends AbstractNameSpaceParser
 		nodeSupportPlugins.add( idrefPlugin );
 		nodeSupportPlugins.add( valuePlugin );
 		nodeSupportPlugins.add( nullPlugin );
-		
+		nodeSupportPlugins.add( aliasPlugin );
 	}
 
 	@Override
