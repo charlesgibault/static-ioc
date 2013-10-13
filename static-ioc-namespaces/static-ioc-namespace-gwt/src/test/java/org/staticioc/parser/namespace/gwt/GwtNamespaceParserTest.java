@@ -307,7 +307,7 @@ public class GwtNamespaceParserTest extends AbstractTestSpringParser
 		assertEquals("Bean id not properly set", "anotherPlaceController", anotherPlaceController.getId() );
 
 		assertEquals("Bean class not properly set", GwtNamespaceConstants.PLACE_CONTROLLER_CLASS, placeController.getClassName() );
-		assertEquals("Bean class not properly set", GwtNamespaceConstants.PLACE_CONTROLLER_CLASS, anotherPlaceController.getClassName() );
+		assertEquals("Bean class not properly set", "test.placeController", anotherPlaceController.getClassName() );
 
 		assertEquals("Bean type not properly set", Bean.Type.SIMPLE , placeController.getType() );
 		assertEquals("Bean type not properly set", Bean.Type.SIMPLE , anotherPlaceController.getType() );
