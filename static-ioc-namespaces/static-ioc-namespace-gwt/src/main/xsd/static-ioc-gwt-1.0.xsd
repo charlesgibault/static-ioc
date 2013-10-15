@@ -77,7 +77,7 @@ This defines a simple and consistent way of creating GWT objects.
 			</xs:attribute>
 			<xs:attribute type="xs:string" name="interface" use="required">
 				<xs:annotation>
-					<xs:documentation><![CDATA[Synchronous interface to be implemented as an asynchronous cliet stub by GWT.create() mechanism]]></xs:documentation>
+					<xs:documentation><![CDATA[Synchronous interface to be implemented as an asynchronous client stub by GWT.create() mechanism]]></xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
 		</xs:complexType>
@@ -220,7 +220,7 @@ This defines a simple and consistent way of creating GWT objects.
 
 	<xs:element name="create">
 		<xs:annotation>
-			<xs:documentation><![CDATA[Place Controller instanciation using com.google.gwt.place.shared.PlaceController]]></xs:documentation>
+			<xs:documentation><![CDATA[Generic GWT create instanciation]]></xs:documentation>
 		</xs:annotation>
 
 		<xs:complexType>
