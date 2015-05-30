@@ -1,0 +1,38 @@
+# Presentation #
+The current development roadmap for the project is shown below.
+
+While some things can change by the time of the actual version release, it should give some visibility to end-users are per where the project is headed.
+
+## Release 0.5 ##
+  * **Generator** - Add compile time support for PropertyPlaceHolders like mechanism
+  * **Generator** - Support Python target
+  * **Generator** - Support Objective C target
+  * **Generator** - Support Cpp targets
+  * **Samples** - Python sample
+  * **Samples** - Objective C sample
+  * **Samples** - Cpp sample
+
+## Release 0.6 ##
+  * **Core** Enfore inner file restriction for <ref local/>
+  * **Generator** - Add runtime interface to allow for support for PropertyPlaceHolders like mechanism
+  * **Namespace** - Add Android namespace to simplify
+  * **Samples** - Add Android project
+
+
+## Release 0.7 ##
+  * **Namespace** - Add Play N namespace
+  * **Samples** - Add Play N sample project
+  * **Generator** - Support Dart target
+
+
+## Release 0.8 ##
+  * **Core** Add annotation processor support plugin mechanism
+  * **Core** Add annotation processor for java language
+
+
+## Release 0.9 ##
+  * **Generator** - Support Scala target
+
+
+## Release 1.0 ##
+  * **Generator** - Support .Net target
